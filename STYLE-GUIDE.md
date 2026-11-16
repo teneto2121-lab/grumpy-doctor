@@ -22,8 +22,9 @@
 - Running disclaimer gag: "I'm not YOUR doctor. Go see one."
 
 ## Voice
-- Voice settings live in `engine/voice/config.json` (currently stock voice **Brian**, `eleven_v3`, stability 0.0)
-- A custom/library voice needs a paid ElevenLabs plan (API restriction on the free plan)
+- **Custom voice "Dr. Grumbles"** (designed for the channel, ElevenLabs voice id `Lm1AZYoA5uOYmafLK77j`), `eleven_v3`, stability 0.0
+  - Settings live in `engine/voice/config.json`. Episodes 01–05 used the stock voice Brian; 06 onward use the custom voice.
+- ElevenLabs Creator plan (commercial license)
 - Emotion tags in scripts: [annoyed], [sighs], [shouting], [grumbling], and so on
 - **Pace: faster than the default.** The API speed setting has no effect on v3, so every
   voiceover gets sped up afterwards with ffmpeg `atempo` (pitch-preserving). Default rate: **1.12×** (chosen).
