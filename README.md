@@ -8,6 +8,7 @@ Each video is code: a voiceover from ElevenLabs plus a scene file that draws eve
 STYLE-GUIDE.md        decisions about character, voice, tone, content rules, visuals
 engine/core.js        shared parts: the doctor, props (bones, gauge, trophy…), captions, renderer, scene transitions
 engine/voice/         voice config + the "Next patient!" outro line
+engine/mythfact.js    MYTH OR FACT format: scoreboard, case cards, verdict stamps (episode lists CASES)
 engine/anatomy.js     shaded anatomy props with cartoon faces (brain, blood vessel, head, mouth, intestine…)
 episodes/<name>/
   script.txt          the narration, with emotion tags like [annoyed] [sighs] [shouting]
@@ -60,5 +61,7 @@ tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 | 09 | Why does your stomach growl? | 42s |
 | 10 | MYTH OR FACT? Body edition (format pilot) | 57s |
 | 11 | What happens if you sleep 8 hours for 30 days? (format pilot, cut-off ending) | 53s |
+| 12 | MYTH OR FACT? Gross edition | 63s |
+| 13 | The dirtiest thing in your house isn't your toilet (cut-off ending) | 44s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

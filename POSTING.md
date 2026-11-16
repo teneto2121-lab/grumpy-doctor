@@ -101,6 +101,22 @@ Send this to the friend who "runs on 4 hours." 😴 #sleep #bodyfacts #learnonti
 ```
 **Pinned comment:** `No, I won't finish that sentence. Watch it again.`
 
+### Ep 12: MYTH OR FACT? Gross edition
+**File:** `episodes/ep12-myth-or-fact-gross/ep12-myth-or-fact-gross.mp4`
+**Caption:**
+```
+Score out of 6? The last one ruined my lunch. 🤢 #mythorfact #gross #bodyfacts #learnontiktok #science
+```
+**Pinned comment:** `Which one got you? Be honest.`
+
+### Ep 13: The dirtiest thing in your house isn't your toilet
+**File:** `episodes/ep13-kitchen-sponge/ep13-kitchen-sponge.mp4`
+**Caption:**
+```
+Send this to whoever hasn't changed theirs. 🧽🦠 #kitchensponge #germs #learnontiktok #science #cleaningtok
+```
+**Pinned comment:** `No. I'm not finishing the toothbrush sentence.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -115,3 +131,5 @@ Send this to the friend who "runs on 4 hours." 😴 #sleep #bodyfacts #learnonti
 - **Stomach growling:** borborygmi are sounds from gas and fluid moved by gut contractions (peristalsis); they're louder with an empty gut. In the fasting state the migrating motor complex sweeps the stomach and small intestine roughly every 90–120 minutes.
 - **Myth or Fact (ep 10):** 10% brain myth: imaging shows activity across the whole brain over a day. Taller in the morning: spinal discs compress during the day (about 1 cm). Sneezing doesn't stop the heart; pressure changes can briefly alter rhythm. Gastric acid (pH ~1.5–3.5) corrodes some metals such as zinc. Bacteria-to-human cell ratio is roughly 1:1 (Sender, Fuchs & Milo, *PLOS Biology*, 2016). Human ultra-weak photon emission ~1000× below what eyes can see, imaged with ultra-sensitive cameras (Kobayashi et al., *PLOS ONE*, 2009).
 - **Sleep 30 days (ep 11):** sleep increases clearance of brain waste via the glymphatic system (Xie et al., *Science*, 2013, in mice). Sleep supports memory consolidation. Short sleep raises ghrelin and lowers leptin (Spiegel et al., *Annals of Internal Medicine*, 2004; Taheri et al., *PLOS Medicine*, 2004). Sleep deprivation increases amygdala reactivity (Yoo et al., *Current Biology*, 2007). The week-by-week framing is a storytelling device; these effects come from regular sleep, not a fixed schedule.
+- **Gross edition (ep 12):** no evidence for "swallowing spiders in your sleep" (the oft-quoted statistic has no source). Mucus is ~90–95% water. Nails don't grow after death; dehydrating skin retracts. A large share of house dust is tracked/blown in from outdoors (e.g. Layton & Beamer, *Environmental Science & Technology*, 2009); shed skin contributes. Earwax is produced by ceruminous glands (modified apocrine sweat glands) plus sebaceous secretions and dead skin. The stomach protects itself with mucus and bicarbonate; surface lining cells are replaced every few days.
+- **Kitchen sponge (ep 13):** up to 5.4 × 10^10 bacterial cells per cm³ in used kitchen sponges; regularly "sanitized" sponges did not have lower loads; authors suggest replacing sponges weekly (Cardinale et al., *Scientific Reports*, 2017).
