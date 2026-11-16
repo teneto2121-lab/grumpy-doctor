@@ -85,6 +85,19 @@
 - FACT / MYTH / KINDA board; each verdict drops a tag into its column
 - Escalate; the last case is "the one I hate" (wildest), with a punch-in on the verdict
 
+## Batch-2 tools
+- `ping(x,y,r,t,{col,lab})`: pulsing target ring on the body part being discussed (+ optional pill label)
+- `counter(x,y,t,start,dur,from,to,{fmt})`: live number that counts up/down
+- `sharePhone(x,y,s,t,'friend who…',start)`: "SEND TO" share sheet for the share prompt
+- `window.ENDING='cut'`: no outro; the video stops mid-sentence (rewatch hook). End the script mid-sentence.
+- `person(...)` is now shared in anatomy.js
+
+## Format: 30 DAYS (ep 11 pilot)
+- Hook "What happens if you [habit] every day for 30 days?" (3-line HOOK + teaser)
+- Week 1 → Week 4 cards with a DAY x/30 + WEEK tracker board; one clear visual per week; ping rings
+- Share prompt near the end ("Send this to the friend who…"), then a cut-off ending
+- Keep claims modest and sourced; the week framing is a storytelling device
+
 ## Endings
 - **Signature outro:** `window.OUTRO=true` adds the "NEXT PATIENT!" clipboard slam (voice line in
   `engine/voice/next_patient.wav`; re-record with `python3 tools/voice.py --outro` after a voice change).

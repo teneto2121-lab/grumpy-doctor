@@ -93,6 +93,14 @@ How many did you get right? Be honest. 🧠⚖️ #mythorfact #bodyfacts #learno
 ```
 **Pinned comment:** `Score out of 6? Anything under 4 and I'm disappointed.`
 
+### Ep 11: What happens if you sleep 8 hours for 30 days?  *(format pilot: 30 days + cut-off ending)*
+**File:** `episodes/ep11-sleep-30-days/ep11-sleep-30-days.mp4`
+**Caption:**
+```
+Send this to the friend who "runs on 4 hours." 😴 #sleep #bodyfacts #learnontiktok #science #30days
+```
+**Pinned comment:** `No, I won't finish that sentence. Watch it again.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -106,3 +114,4 @@ How many did you get right? Be honest. 🧠⚖️ #mythorfact #bodyfacts #learno
 - **Leg falling asleep:** sustained pressure compresses a nerve (and its blood supply), disrupting signal transmission and causing numbness; when pressure is released the nerve resumes firing irregularly, producing "pins and needles" (transient paresthesia). Frequent or unexplained episodes warrant medical evaluation.
 - **Stomach growling:** borborygmi are sounds from gas and fluid moved by gut contractions (peristalsis); they're louder with an empty gut. In the fasting state the migrating motor complex sweeps the stomach and small intestine roughly every 90–120 minutes.
 - **Myth or Fact (ep 10):** 10% brain myth: imaging shows activity across the whole brain over a day. Taller in the morning: spinal discs compress during the day (about 1 cm). Sneezing doesn't stop the heart; pressure changes can briefly alter rhythm. Gastric acid (pH ~1.5–3.5) corrodes some metals such as zinc. Bacteria-to-human cell ratio is roughly 1:1 (Sender, Fuchs & Milo, *PLOS Biology*, 2016). Human ultra-weak photon emission ~1000× below what eyes can see, imaged with ultra-sensitive cameras (Kobayashi et al., *PLOS ONE*, 2009).
+- **Sleep 30 days (ep 11):** sleep increases clearance of brain waste via the glymphatic system (Xie et al., *Science*, 2013, in mice). Sleep supports memory consolidation. Short sleep raises ghrelin and lowers leptin (Spiegel et al., *Annals of Internal Medicine*, 2004; Taheri et al., *PLOS Medicine*, 2004). Sleep deprivation increases amygdala reactivity (Yoo et al., *Current Biology*, 2007). The week-by-week framing is a storytelling device; these effects come from regular sleep, not a fixed schedule.

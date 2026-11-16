@@ -59,5 +59,6 @@ tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 | 08 | Why does your leg fall asleep? | 36s |
 | 09 | Why does your stomach growl? | 42s |
 | 10 | MYTH OR FACT? Body edition (format pilot) | 57s |
+| 11 | What happens if you sleep 8 hours for 30 days? (format pilot, cut-off ending) | 53s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

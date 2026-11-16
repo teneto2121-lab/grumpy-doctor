@@ -270,7 +270,7 @@ const TSTEP=.28;
 function render(t){
   if(window.TEASER&&!window.__tz&&t<window.TEASER.length*TSTEP){const k=Math.floor(t/TSTEP);
     // the flashed moment is shown smaller and lower, so the hook text above stays clean
-    window.__tz=1;ctx.save();wall(t);ctx.translate(W/2,H/2+190);ctx.scale(.8,.8);ctx.rotate((k%2?.02:-.02));ctx.translate(-W/2,-H/2);render(toVideo(window.TEASER[k]));ctx.restore();window.__tz=0;
+    window.__tz=1;ctx.save();wall(t);const hl=(window.HOOK||[]).length;ctx.translate(W/2,H/2+(hl>2?290:190));ctx.scale(hl>2?.72:.8,hl>2?.72:.8);ctx.rotate((k%2?.02:-.02));ctx.translate(-W/2,-H/2);render(toVideo(window.TEASER[k]));ctx.restore();window.__tz=0;
     ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
     const f=(t%TSTEP)/TSTEP;if(f<.18){ctx.fillStyle=`rgba(255,255,255,${.5*(1-f/.18)})`;ctx.fillRect(0,0,W,H)}
     hookText(t,99);captions(t,1560);
@@ -342,4 +342,4 @@ window.setup=(w,e,d,vis,oenv,ovis,olen)=>{WORDS=w;ENV=e;DUR=d;VIS=vis||[];OUT_EN
   // soft clock ticks during longer pauses (the viewer's "guess" beat). window.PAUSE_TICKS=false disables.
   if(window.PAUSE_TICKS!==false){let off=0;(window.PAUSES||[]).forEach(([p,d])=>{const v0=p+off;if(d>=.7)for(let k=.1;k<d-.1;k+=.25)window.SFX.push([v0+k,'tick',.6]);off+=d})}
   if(window.OUTRO){window.OUTRO_AT=w[w.length-1].e+.25;window.SFX=window.SFX.concat([[window.OUTRO_AT+.25,'stamp'],[window.OUTRO_AT+.35,'next_patient',2.0]])}};
-window.outroLen=()=>window.OUTRO?OUT_LEN+.25:0;window.render=render;
+window.outroLen=()=>window.ENDING==='cut'?-.12:(window.OUTRO?OUT_LEN+.25:0);window.render=render;

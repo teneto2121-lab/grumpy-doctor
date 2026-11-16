@@ -32,6 +32,7 @@ function face(x,y,s,expr,t,{look=[0,0],blink=true}={}){
   else if(expr==='worried'||expr==='annoyed'){ctx.moveTo(-16,38);ctx.quadraticCurveTo(0,28,16,38)}
   else if(expr==='confused'){ctx.moveTo(-16,34);ctx.lineTo(-4,30);ctx.lineTo(8,35);ctx.lineTo(18,31)}
   else if(expr==='scared'){ctx.stroke();E(0,36,10,13);P('#5a1e1e',4);ctx.restore();return}
+  else if(expr==='sleep'){ctx.stroke();[-1,1].forEach(d=>{ctx.fillStyle=SKIN;E(d*26,0,18,21);ctx.fill();ctx.beginPath();ctx.arc(d*26,-2,13,.2,Math.PI-.2);ctx.stroke()});E(0,32,7,8);P('#5a1e1e',3);ctx.restore();return}
   else {ctx.moveTo(-12,32);ctx.lineTo(12,32)}
   ctx.stroke();ctx.restore();
 }
@@ -245,3 +246,34 @@ function stomachOrgan(x,y,s,t,{expr=null,fill=0,shake=0}={}){ctx.save();ctx.tran
   gloss(80,-60,50,20,.5,.4);if(expr)face(60,40,1.1,expr,t);ctx.restore();ctx.restore()}
 // sound waves radiating from a point; k = loudness 0..1
 function soundWaves(x,y,t,k,col='#7b5ea7'){if(k<=0)return;ctx.save();noShadow();for(let i=0;i<4;i++){const u=((t*1.6+i/4)%1);ctx.globalAlpha=(1-u)*k;ctx.strokeStyle=col;ctx.lineWidth=10;ctx.lineCap='round';[-1,1].forEach(d=>{ctx.beginPath();ctx.arc(x,y,40+u*170*k,d>0?-.6:Math.PI-.6,d>0?.6:Math.PI+.6);ctx.stroke()})}ctx.restore()}
+
+
+// ---------- highlight + data props ----------
+// pulsing target ring on a body part, with an optional pill label
+function ping(x,y,r,t,{col='#e63946',lab=null,ly=-1}={}){ctx.save();noShadow();
+  const ph=(t*1.4)%1;ctx.globalAlpha=.5*(1-ph);ctx.strokeStyle=col;ctx.lineWidth=10;E(x,y,r*(1+ph*.6),r*(1+ph*.6));ctx.stroke();
+  ctx.globalAlpha=1;const g=ctx.createRadialGradient(x,y,2,x,y,r);g.addColorStop(0,col+'88');g.addColorStop(1,col+'00');ctx.fillStyle=g;E(x,y,r,r);ctx.fill();
+  ctx.strokeStyle=col;ctx.lineWidth=7;E(x,y,r*.82,r*.82);ctx.stroke();
+  if(lab){ctx.font=`900 34px ${FONT}`;const w=ctx.measureText(lab).width+34,yy=y+ly*(r+40);ctx.beginPath();ctx.roundRect(x-w/2,yy-24,w,48,12);ctx.fillStyle=col;ctx.fill();text(lab,x,yy+2,34,{fill:'#fff',shadow:false})}
+  ctx.restore()}
+// a number that counts from a to b between s and s+dur; fmt(v) -> string
+function counter(x,y,t,s,dur,a,b,{size=90,fmt=v=>Math.round(v)+'',col='#ffd60a',ease=easeOut}={}){if(t<s)return;const v=lerp(a,b,ease(clamp((t-s)/dur)));text(fmt(v),x,y,size,{fill:col,sw:size*.18})}
+// phone with a "send to" share sheet (share prompt)
+function sharePhone(x,y,s,t,who,st){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.beginPath();ctx.roundRect(-150,-280,300,560,40);P(shadeFill(0,-280,0,280,'#343a40','#121416'),8);noShadow();
+  ctx.beginPath();ctx.roundRect(-130,-250,260,500,26);ctx.fillStyle='#f8f9fa';ctx.fill();
+  text('SEND TO',0,-200,32,{fill:'#5c677d',shadow:false});
+  const k=pop(t,st+.2,.35);ctx.save();ctx.translate(0,-110);ctx.scale(k,k);ctx.beginPath();ctx.roundRect(-122,-48,244,96,20);ctx.fillStyle='#e9ecef';ctx.fill();E(-82,0,28,28);ctx.fillStyle='#ffb703';ctx.fill();face(-82,2,.3,'smug',t);
+  ctx.font=`900 22px ${FONT}`;ctx.fillStyle=OL;ctx.textAlign='left';ctx.textBaseline='middle';who.split('\n').forEach((l,i)=>ctx.fillText(l,-46,-13+i*28));ctx.restore();
+  const b=pop(t,st+.7,.3),press=t>st+1.4&&t<st+1.6?.92:1;ctx.save();ctx.translate(0,150);ctx.scale(b*press,b*press);ctx.beginPath();ctx.roundRect(-100,-36,200,72,36);ctx.fillStyle='#e63946';ctx.fill();text('SEND',0,2,36,{fill:'#fff',shadow:false});ctx.restore();
+  ctx.restore()}
+
+// ---------- generic cartoon person (front view) ----------
+function person(x,y,s,t,{expr='calm',shirt='#4cc9f0',glow=0,germs=0,squish=0}={}){ctx.save();ctx.translate(x,y);ctx.scale(s,s*(1-squish));
+  if(glow>0){const g=ctx.createRadialGradient(0,-120,20,0,-120,320);g.addColorStop(0,`rgba(180,255,220,${.55*glow})`);g.addColorStop(1,'rgba(180,255,220,0)');ctx.fillStyle=g;ctx.fillRect(-340,-460,680,680)}
+  [[-38,1],[38,-1]].forEach(([lx])=>{ctx.beginPath();ctx.roundRect(lx-22,40,44,150,22);P('#3a3f47',6)});
+  ctx.beginPath();ctx.roundRect(-85,-130,170,190,50);P(shadeFill(0,-130,0,60,shirt,mixHex(shirt.slice(1),'1d3557',.35)),7);
+  [[-1],[1]].forEach(([d])=>{ctx.save();ctx.strokeStyle=OL;ctx.lineWidth=40;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(d*80,-100);ctx.lineTo(d*115,20);ctx.stroke();ctx.strokeStyle='#f6d2b3';ctx.lineWidth=28;ctx.stroke();ctx.restore()});
+  E(0,-215,82,86);P(radial(0,-215,86,'#f8dcc3','#e4ad86'),7);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';face(0,-208,.95,expr,t);ctx.restore();
+  if(germs>0){const r=rng(5);for(let i=0;i<Math.floor(40*germs);i++){const gx=(r()-.5)*190,gy=-300+r()*480;if(gx<0)continue;ctx.save();ctx.shadowColor='rgba(0,0,0,0)';E(gx,gy,15,11,r()*3);P(['#7ae582','#9bf6ff','#cdb4db'][i%3],3);ctx.restore()}}
+  ctx.restore()}
