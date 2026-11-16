@@ -72,6 +72,14 @@
 - `<episode>/voice.json` `{"speed":1.2}` for faster delivery; aim for ~3+ words/second
 - `window.board(t)`: a fixed panel in the card (e.g. the Myth-or-Fact scoreboard)
 
+## Pacing rules (owner feedback: Myth or Fact felt rushed and didn't make sense)
+- **One topic per video, explained properly.** No lists of 5–7 quick items. At most ~3 beats, each with room to land.
+- **Every idea gets at least ~8–10 seconds**: say it, show it, let it sink in, then move on.
+- **Voice speed 1.12×** (the chosen default). Don't push episodes to 1.18–1.2× for "retention".
+- **Breathing room after key lines**: add a short pause (0.3–0.6s) after punchlines and important facts (tools/pause.py).
+- **Visuals change when the idea changes**, not on every sentence. Keep one clear picture on screen while an idea is explained.
+- Clarity beats speed: if a viewer couldn't explain it back after watching, it was too fast.
+
 ## Breathing room
 - After a question/claim and after a verdict/answer, give the viewer a beat: ~0.8s to guess, ~0.55s to react.
 - `python3 tools/pause.py episodes/<ep> 5.92:0.8 6.54:0.55 ...` inserts silence at those story times (pick gaps
