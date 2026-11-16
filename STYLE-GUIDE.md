@@ -57,6 +57,14 @@
 - He looks up at the card automatically while pointing, and at the camera during punch-ins.
 - **Lip sync:** `tools/voice.py` writes `visemes.json` (mouth shapes from letter timings); used automatically.
 
+## Staging & motion (from ep 08 on)
+- **Show, don't label:** max 1–2 labels per beat; let props act (faces react, things squash, pile up, shake).
+- **Camera inside the card:** `window.CAM=[[t,x,y,zoom],...]` zooms/pans onto the key detail (pinch point,
+  the bubble, the broom). Put labels in `window.overlay(t)` so zooms never crop them.
+- **Impacts:** `window.SHAKES=[seconds]` shakes the card; use `squash(t,start)` for squash-and-stretch and
+  `dust(x,y,t,start)` for a dust puff when something lands.
+- **Build-ons:** `drawOn(points, fraction)` draws lines progressively (nerves, paths).
+
 ## Endings
 - **Signature outro:** `window.OUTRO=true` adds the "NEXT PATIENT!" clipboard slam (voice line in
   `engine/voice/next_patient.wav`; re-record with `python3 tools/voice.py --outro` after a voice change).

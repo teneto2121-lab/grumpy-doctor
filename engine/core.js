@@ -148,6 +148,14 @@ let VIS=[];
 function visAt(t){let lo=0,hi=VIS.length-1;while(lo<=hi){const m=(lo+hi)>>1;if(VIS[m][1]<t)lo=m+1;else if(VIS[m][0]>t)hi=m-1;else return VIS[m][2]}return null}
 // punch-in close-ups: window.PUNCH=[[start,end],...]  (fast cut in, quick cut out)
 function punchAt(t){let v=0;(window.PUNCH||[]).forEach(([a,b])=>{v=Math.max(v,Math.min(clamp((t-a)/.08),clamp((b-t)/.12)))});if(window.OUTRO&&window.OUTRO_AT)v=Math.max(v,clamp((t-window.OUTRO_AT)/.08));return v}
+// impact shakes: window.SHAKES=[seconds,...] -> the card content shakes briefly
+function shakeAt(t){let a=0;(window.SHAKES||[]).forEach(s0=>{const d=t-s0;if(d>=0&&d<.4)a=Math.max(a,Math.exp(-d*9))});return a?[Math.sin(t*95)*16*a,Math.cos(t*80)*12*a]:null}
+// squash & stretch entrance: returns [sx,sy] for an object that drops in at time s
+function squash(t,s){const d=t-s;if(d<0)return[0,0];if(d<.12)return[.85,1.2];const u=d-.12;const w=Math.exp(-u*6)*Math.cos(u*22);return[1+.22*w,1-.22*w]}
+// dust puff at an impact point
+function dust(x,y,t,s,k=1){const d=t-s;if(d<0||d>.7)return;const r=rng(Math.floor(s*100));ctx.save();ctx.globalAlpha=(1-d/.7)*k;for(let i=0;i<9;i++){const a=Math.PI+r()*Math.PI,v=80+r()*160;E(x+Math.cos(a)*v*d*1.6,y+Math.sin(a)*v*d*.4-d*40,18+r()*16+d*30,14+r()*10+d*20);ctx.fillStyle='#e9e4d6';ctx.fill()}ctx.restore()}
+// draw a polyline progressively: pts, fraction 0..1
+function drawOn(pts,f){const L=pts.length-1,upto=f*L;ctx.beginPath();ctx.moveTo(...pts[0]);for(let i=1;i<=Math.ceil(upto);i++){const k=Math.min(1,upto-(i-1));ctx.lineTo(lerp(pts[i-1][0],pts[i][0],k),lerp(pts[i-1][1],pts[i][1],k))}ctx.stroke()}
 // jolts: window.JOLTS=[seconds,...] -> the doctor jumps and his eyes go wide
 function joltAt(t){let v=0;(window.JOLTS||[]).forEach(a=>{const d=t-a;if(d>=0&&d<.6)v=Math.max(v,Math.exp(-d*7)*(d<.05?d/.05:1))});return v}
 function envAt(t){const i=t*FPS;const a=ENV[Math.floor(i)]||0,b=ENV[Math.floor(i)+1]||0;return lerp(a,b,i%1)}
@@ -221,8 +229,12 @@ function drawScene(t,start){
   const S=window.SCENES;if(!S){content(t);return}
   const z=1+.035*clamp((t-start)/5);           // slow push-in
   ctx.save();ctx.translate(W/2,548);ctx.scale(z,z);ctx.translate(-W/2,-548);
+  // window.CAM=[[t,x,y,zoom],...]: camera inside the card (looks at x,y with zoom), eased between keys
+  if(window.CAM){const c=track(window.CAM.map(k=>[k[0],[k[1],k[2],k[3]]]),t);ctx.translate(W/2,548);ctx.scale(c[2],c[2]);ctx.translate(-c[0],-c[1])}
   ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=12;ctx.shadowBlur=0;  // flat drop shadow under props
   content(t);ctx.restore();
+  // window.overlay(t): labels drawn on top of the card, unaffected by the camera
+  if(window.overlay){ctx.save();ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=12;overlay(t);ctx.restore()}
 }
 function drawCard(t,INTRO,alpha){
   const S=window.SCENES,T=window.TINTS||[];
@@ -231,6 +243,7 @@ function drawCard(t,INTRO,alpha){
   const tint=T[Math.max(0,i)]||null;
   card(alpha,{tint});
   ctx.save();ctx.beginPath();ctx.roundRect(48,122,W-96,852,42);ctx.clip();
+  const sh=shakeAt(t);if(sh)ctx.translate(sh[0],sh[1]);
   if(i>0&&lt<TR){const u=easeInOut(lt/TR),prevStart=S[i-1];
     ctx.save();ctx.translate(-u*W,0);ctx.globalAlpha=1-u*.5;drawScene(S[i]-1e-3,prevStart);ctx.restore();
     ctx.save();ctx.translate((1-u)*W*.9,0);drawScene(t,start);ctx.restore();}
