@@ -49,3 +49,31 @@ escalation, fast pace, a new image per sentence. Polish isn't what's holding us 
 - 5–7 numbered cases ("Case 1"), a picture per sentence
 - Bottom panel with **FACT / MYTH / KINDA** buttons the whole time; each verdict drops a card into its column
 - Dr. Grumbles stamps each verdict; escalating weirdness; last case = the wildest (open loop from the start)
+
+---
+
+# Batch 2 (3 more videos)
+
+| Ref | What it is | Length | Words/s | Motion (avg / first 3s) |
+|---|---|---|---|---|
+| 6 | "The most dangerous thing you can smuggle into a British prison isn't a knife, it's a drawing from your daughter." 3D prison mystery, told as "imagine you're a guard" | 74s | 3.0 | 14.2 / 14.2 |
+| 7 | "What happens to your spine if you put your legs up the wall every day for 30 days?" x-ray body illustration, week-by-week | 64s | 3.2 | 1.1 / 3.1 |
+| 8 | Elephant vs bullet: cartoon host bottom-left + 3D scene above, comedic swearing voice | 25s | 3.5 | 8.1 / 9.1 |
+
+## New things worth taking
+1. **Counter-intuitive hook template** (ref 6): "The most dangerous X isn't [obvious], it's [unexpected]."
+2. **Second-person story** (ref 6): "Imagine you're a guard…" puts the viewer inside the situation.
+3. **Cut-off ending** (ref 6): the video stops mid-sentence ("…which is why—"), so viewers rewatch to catch it.
+   A stronger loop than a separate outro.
+4. **"What happens if you do X every day for 30 days?"** (ref 7): in our niche; Week 1 → Week 4 progression
+   gives a built-in reason to keep watching.
+5. **Pulsing target rings** (ref 7): a red glowing ring pulses on the body part being discussed, with a small
+   pill label ("KNEES BEND", "TIGHT HAMSTRINGS") — simple, clear, constant motion.
+6. **Share prompt** (ref 7): "Send this to someone who needs it." Shares drive reach.
+7. **Measurement counters** (ref 8): a cross-section with numbers counting up live (0.01 → 0.97 inch).
+8. **Host + scene layout** (ref 8) is the same as ours, but **something happens within 0.4s** (gunshot),
+   and captions sit on a white banner next to the host, one word at a time.
+9. Ref 7 again proves polish isn't required: static-looking illustration (motion 1.1) with smart highlights.
+
+## Not for us
+- Constant swearing (ref 8): it's that channel's gimmick; it risks reduced distribution and doesn't fit Dr. Grumbles.
