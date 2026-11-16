@@ -1,0 +1,117 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 04: Why can't you tickle yourself? =====
+window.INTRO_END=2.85;
+window.SCENES=[2.85,6.5,12.45,16.4,22.6,28.3,34.1,36.5];
+window.TINTS=['#fff0d6','#ffe0ec','#e6f0ff','#fff1cc','#e8f8ec','#fbe4ff','#ffe0e0','#e6f6ff'];
+window.SFX=[[0.2,'blip'],[0.6,'sparkle',.6],[2.4,'whoosh'],[2.9,'fall',.6],[3.6,'blip'],[5.3,'blip'],[6.5,'whoosh',.8],[9.2,'sparkle'],[9.3,'blip'],[9.95,'pop',.7],[10.5,'blip'],
+ [12.45,'whoosh',.8],[13.1,'fall'],[14.3,'blip'],[15.5,'stamp',.7],[16.4,'whoosh',.8],[17.3,'blip'],[19.2,'beep'],[19.4,'blip'],[20.7,'tada',.6],[20.75,'stamp',.6],
+ [22.6,'whoosh',.8],[23.6,'blip'],[23.9,'beep'],[25.6,'blip'],[27.4,'fall',.5],[28.3,'whoosh',.8],[29.6,'tick'],[29.75,'tick'],[29.9,'tick'],[30.0,'blip'],[32.6,'sparkle'],[32.7,'ding',.6],
+ [34.1,'whoosh',.8],[34.2,'steam'],[34.8,'stamp'],[36.5,'whoosh',.8],[37.6,'blip'],[39.4,'stamp']];
+const MOOD=[[0,.3],[1.0,.35],[2.9,.2],[4.4,.3],[5.3,.4],[6.5,.2],[16.5,.3],[17.6,.45],[18.5,.3],[22.6,.25],[33,.4],[34.2,.95],[35.9,.95],[36.6,.3],[39,.45],[40.9,.4]];
+const POSES=[[0,'point'],[2.7,'shrug'],[4.2,'rest'],[5.0,'point'],[12.3,'rest'],[13.0,'point'],[16.3,'rest'],[16.8,'point'],[22.6,'rest'],[23.2,'point'],[34.1,'up'],[36.4,'shrug'],[37.4,'point']];
+
+// ---- episode props ----
+const SLEEVE_YOU='#4cc9f0',SLEEVE_OTHER='#f4a261';
+function sleeveHand(x,y,s,rot,sleeve,t){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s,s);
+  ctx.beginPath();ctx.roundRect(-330,-60,250,120,30);P(shadeFill(0,-60,0,60,sleeve,mixHex(sleeve.slice(1),'1d3557',.35)),7);
+  ctx.save();noShadow();
+  ctx.beginPath();ctx.roundRect(-95,-55,120,110,40);P('#f2c9a5',7);
+  [[-40,'#f2c9a5'],[-12,'#f2c9a5'],[16,'#f2c9a5']].forEach(([fy])=>{ctx.beginPath();ctx.roundRect(5,fy-12,60,24,12);P('#f2c9a5',5)});
+  ctx.beginPath();ctx.roundRect(10,-62,95,26,13);P('#f2c9a5',5); // pointing index finger
+  ctx.restore();ctx.restore()}
+function thought(x,y,r,t,k){if(k<=0)return;ctx.save();ctx.translate(x,y);ctx.scale(k,k);noShadow();
+  [[-r*.9,r*1.05,14],[-r*.65,r*.8,22]].forEach(([dx,dy,rr])=>{E(dx,dy,rr,rr);P('#fff',5)});
+  curve([[-r,0],[-r*.8,-r*.6],[-r*.2,-r*.85],[r*.4,-r*.8],[r,-r*.3],[r*.9,r*.35],[r*.3,r*.65],[-r*.4,r*.6]]);P('#fff',6);ctx.restore()}
+function knob(x,y,s,val,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  E(0,0,150,150);P(radial(0,0,150,'#f8f9fa','#adb5bd'),8);ctx.save();noShadow();
+  for(let i=0;i<=10;i++){const a=Math.PI*.75+i/10*Math.PI*1.5;ctx.strokeStyle=i/10<=val?'#e63946':'rgba(43,33,24,.3)';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(Math.cos(a)*175,Math.sin(a)*175);ctx.lineTo(Math.cos(a)*205,Math.sin(a)*205);ctx.stroke()}
+  E(0,0,95,95);P(radial(0,0,95,'#ffffff','#ced4da'),7);const a=Math.PI*.75+val*Math.PI*1.5;ctx.strokeStyle=OL;ctx.lineWidth=16;ctx.beginPath();ctx.moveTo(Math.cos(a)*20,Math.sin(a)*20);ctx.lineTo(Math.cos(a)*80,Math.sin(a)*80);ctx.stroke();
+  ctx.restore();ctx.restore()}
+function joystick(x,y,s,t,move){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-90,0,180,70,18);P(shadeFill(0,0,0,70,'#495057','#212529'),7);ctx.save();noShadow();const a=Math.sin(t*6)*.35*move;ctx.save();ctx.rotate(a);ctx.strokeStyle=OL;ctx.lineWidth=22;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,5);ctx.lineTo(0,-90);ctx.stroke();ctx.strokeStyle='#868e96';ctx.lineWidth=12;ctx.stroke();E(0,-100,30,30);P(radial(0,-100,30,'#ff6b6b','#c0182c'),6);ctx.restore();ctx.restore();ctx.restore()}
+function palmUp(x,y,t,wig){ctx.save();ctx.translate(x+Math.sin(t*25)*14*wig,y);ctx.rotate(-.3);cartoonHand(0,90,.6,1);ctx.restore()}
+function laughLines(x,y,t,k){if(k<=0)return;ctx.save();ctx.globalAlpha=k;['HA','HA!','HAHA'].forEach((s,i)=>text(s,x+(i-1)*150+Math.sin(t*20+i)*6,y-i*40+Math.cos(t*17+i)*6,52+i*10,{fill:'#ff595e',sw:10,rot:(i-1)*.15}));ctx.restore()}
+
+function content(t){
+  const CY=560;
+  if(t<2.85){ // intro: hand + feather
+    feather(780,480+Math.sin(t*8)*20,1.0*pop(t,.2),.5+Math.sin(t*10)*.25);
+    text('TRY TO',W/2-120,280,100,{fill:'#fff',sw:16,scale:pop(t,.6),rot:-.04});
+    text('TICKLE YOURSELF',W/2-40,400,92,{fill:'#ff8fab',sw:16,scale:pop(t,1.0),rot:.02});
+    return}
+  if(t<6.5){ // nothing
+    const wig=Math.sin(t*14);
+    sleeveHand(380,CY-40,1.0,0,SLEEVE_YOU,t);
+    feather(560+wig*25,CY-60,.55,1.2+wig*.2);
+    ctx.save();ctx.translate(820,CY-40);sleeveHand(0,0,1.0,Math.PI,SLEEVE_YOU,t);ctx.restore();
+    meter(W/2,CY+200,640,.02+Math.abs(Math.sin(t*3))*.02,t);
+    label('NOTHING.',W/2,215,t,3.6,{bg:'#fff',size:60,rot:-.03});
+    if(t>5.25)label('YOUR BRAIN IS SMARTER',W/2,905,t,5.3,{bg:'#ffd60a',size:48});
+    return}
+  if(t<12.45){ // cerebellum predicts
+    const glow=prog(t,9.2,.4);
+    if(glow>0){const g=ctx.createRadialGradient(W/2-150,CY+110,10,W/2-150,CY+110,200);g.addColorStop(0,`rgba(255,214,10,${.7*glow})`);g.addColorStop(1,'rgba(255,214,10,0)');ctx.fillStyle=g;ctx.fillRect(W/2-400,CY-150,500,520)}
+    brain(W/2,CY+30,1.0,{t,expr:t<9.9?'calm':'smug'});
+    label('CEREBELLUM',230,CY+260,t,9.3,{bg:'#ffd60a',size:50,rot:-.05});
+    if(glow>0){ctx.strokeStyle='#ffd60a';ctx.lineWidth=8;ctx.setLineDash([14,10]);ctx.beginPath();ctx.moveTo(330,CY+220);ctx.lineTo(W/2-160,CY+150);ctx.stroke();ctx.setLineDash([])}
+    thought(800,300,140,t,pop(t,9.95));
+    if(t>9.95){ctx.save();ctx.translate(800,290);ctx.scale(.45*pop(t,10.0),.45*pop(t,10.0));sleeveHand(60,0,1,0,SLEEVE_YOU,t);ctx.restore()}
+    label('PREDICTS IT',800,470,t,10.5,{bg:'#fff',size:46,rot:.04});
+    text('EVERY MOVE YOU MAKE',W/2,205,48,{fill:OL,shadow:false});
+    return}
+  if(t<16.4){ // turns the feeling down
+    const v=lerp(1,.05,easeInOut(prog(t,13.1,.8)));
+    knob(W/2,CY-40,1.05,v,t);
+    text('FEELING',W/2,CY-40,44,{fill:OL,shadow:false,alpha:0});
+    label('TURNED DOWN',W/2,CY+250,t,13.3,{bg:'#4cc9f0',size:56});
+    if(t>14.3)label('NO SURPRISE',260,215,t,14.3,{bg:'#fff',size:46,rot:-.05});
+    stamp('NO TICKLE',W/2,CY+30,t,15.5,110,-.1);
+    return}
+  if(t<22.6){ // someone else tickles you
+    const full=easeOut(prog(t,20.6,.5)),wig=Math.sin(t*16);
+    sleeveHand(330,CY-80,1.0,.08,SLEEVE_OTHER,t);
+    feather(520+wig*30,CY-100,.6,1.2+wig*.25);
+    label('SOMEONE ELSE',300,215,t,17.3,{bg:SLEEVE_OTHER,fg:'#fff',size:48,rot:-.05});
+    brain(800,CY-60,.5,{t,expr:t<19.2?'worried':'scared',look:[-1,0]});
+    if(t>19.2)text('?!',975,CY-150,90,{fill:'#7b5ea7',sw:14,scale:pop(t,19.25)});
+    label("CAN'T PREDICT IT",780,300,t,19.4,{bg:'#fff',size:42,rot:.04});
+    meter(W/2,CY+250,640,lerp(.05,1,full)*(1-.05*Math.abs(Math.sin(t*30))*full),t);
+    laughLines(W/2,CY+120,t,full);
+    if(t>20.7)label('FULL BLAST',W/2,915,t,20.75,{bg:'#e63946',fg:'#fff',size:56});
+    return}
+  if(t<28.3){ // tickle robot, self-controlled
+    const tip=robotArm(490,CY+200,1.0,t,{wiggle:t>25.6?1:0,expr:'happy'});
+    palmUp(tip[0]+150,tip[1]-10,t,t>25.6?.15:0);
+    joystick(220,CY+170,1.0,t,t>25.6?1:0);
+    label('TICKLE ROBOT',W/2,215,t,23.6,{bg:'#fff',size:56});
+    label('YOU CONTROL IT',270,CY-90,t,25.6,{bg:SLEEVE_YOU,size:42,rot:-.05});
+    meter(W/2,915,560,.08,t);
+    if(t>27.4)label('BARELY ANYTHING',300,330,t,27.4,{bg:'#ffd60a',size:44});
+    return}
+  if(t<34.1){ // add a delay
+    const tick=easeOut(prog(t,32.6,.5));
+    const tip=robotArm(490,CY+200,1.0,t,{wiggle:1,expr:t>32.6?'smug':'happy'});
+    palmUp(tip[0]+150,tip[1]-10,t,tick);
+    joystick(220,CY+200,.85,t,1);
+    // delay clock
+    const k=pop(t,29.6);if(k>0){ctx.save();ctx.translate(220,300);ctx.scale(k*.8,k*.8);E(0,0,95,95);P(radial(0,0,95,'#ffffff','#dee2e6'),8);ctx.save();noShadow();const a=-Math.PI/2+((t-29.6)*6);ctx.strokeStyle=OL;ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*65,Math.sin(a)*65);ctx.stroke();ctx.restore();ctx.restore()}
+    label('+ TINY DELAY',230,415,t,30.0,{bg:'#b79ced',fg:'#fff',size:46,rot:.04});
+    text('(a fraction of a second)',230,475,28,{fill:'#5c677d',shadow:false,alpha:prog(t,30.6,.3)});
+    meter(W/2,915,560,lerp(.08,.85,tick),t);
+    if(t>32.6){laughLines(640,230,t,tick);label('IT TICKLES!',230,560,t,32.7,{bg:'#e63946',fg:'#fff',size:46})}
+    return}
+  if(t<36.5){ // they built a robot
+    robotArm(W/2,CY+200,1.25,t,{wiggle:1,expr:'happy'});
+    stamp('A ROBOT!',W/2,240,t,34.8,110,-.08,'#7b5ea7');
+    const r=rng(2);for(let i=0;i<20;i++){const x=r()*W,y=150+((t-34)*360*(.5+r())+r()*800)%820;ctx.fillStyle=['#ffd60a','#e63946','#4cc9f0','#7ae582'][i%4];ctx.save();ctx.translate(x,y);ctx.rotate(t*4+i);ctx.fillRect(-10,-5,20,10);ctx.restore()}
+    return}
+  // outro
+  brain(W/2,CY+20,.95,{t,expr:'smug',look:[.6,-.2]});
+  label('SAW IT COMING',W/2,215,t,37.6,{bg:'#ffd60a',size:60,rot:-.03});
+  stamp("CAN'T TICKLE YOURSELF",W/2,880,t,39.4,62,-.04,'#e63946');
+}
+</script></body></html>

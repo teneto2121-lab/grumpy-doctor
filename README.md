@@ -48,5 +48,7 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
 | 01 | Why do your knuckles crack? | 47s |
 | 02 | Why do you get brain freeze? | 43s |
 | 03 | What happens if you swallow gum? | 46s |
+| 04 | Why can't you tickle yourself? | 41s |
+| 05 | Why does your funny bone hurt? | 40s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

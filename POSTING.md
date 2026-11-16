@@ -37,9 +37,27 @@ It does NOT stay for 7 years. Who told you that?! 🍬 #mythbusting #bodyfacts #
 ```
 **Pinned comment:** `Drop the dumbest health myth you've ever heard. I'll deal with it.`
 
+### Ep 04: Why can't you tickle yourself?
+**File:** `episodes/ep04-tickle-yourself/ep04-tickle-yourself.mp4`
+**Caption:**
+```
+Scientists built a tickle robot for this. A ROBOT. 🤖🪶 #bodyfacts #learnontiktok #brain #science #funfacts
+```
+**Pinned comment:** `Go on. Try it. I'll wait.`
+
+### Ep 05: Why does your funny bone hurt?
+**File:** `episodes/ep05-funny-bone/ep05-funny-bone.mp4`
+**Caption:**
+```
+It's not funny and it's not a bone. 🦴⚡ #funnybone #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `Tag the friend who hits their elbow on everything.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
 - **Knuckles:** Kawchuk et al., *PLOS ONE* (2015): real-time MRI of joint cracking (bubble formation). Donald Unger, 2009 Ig Nobel Prize in Medicine: 60 years of cracking one hand only.
 - **Brain freeze:** brain tissue has no pain receptors; cold on the palate changes blood flow, and the trigeminal nerve refers the pain to the forehead (Serrador et al., 2012, FASEB meeting presentation).
 - **Gum:** gum base is indigestible but passes through the gut in days; blockages reported only in children who swallowed large amounts habitually (Milov et al., *Pediatrics*, 1998).
+- **Tickling:** the cerebellum predicts the sensory result of your own movements and dampens it (Blakemore, Wolpert & Frith, *Nature Neuroscience*, 1998). With a self-controlled tickle robot, adding a 100–300 ms delay made it feel more ticklish (Blakemore, Frith & Wolpert, *Journal of Cognitive Neuroscience*, 1999).
+- **Funny bone:** the ulnar nerve passes through the cubital tunnel behind the medial epicondyle of the humerus, covered only by skin and fat; it supplies the little finger and half of the ring finger. The humerus/"humorous" pun is a popular explanation for the name, not a proven origin.

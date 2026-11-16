@@ -151,3 +151,36 @@ function intestine(path,t,{R=70,waves=[],N=180}={}){
   waves.forEach(w=>{const u=clamp(w,0,1),[x,y]=path(u),[x2,y2]=path(clamp(u+.01,0,1)),a=Math.atan2(y2-y,x2-x);ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeStyle='#c9184a';ctx.lineWidth=12;ctx.beginPath();ctx.ellipse(0,0,10,R*.75,0,0,Math.PI*2);ctx.stroke();ctx.restore()});
   ctx.restore();
 }
+
+// ---------- generic props ----------
+// rubber stamp that slams in at time s
+function stamp(str,x,y,t,s,size=150,rot=-.12,col='#e63946'){if(t<s)return;const k=pop(t,s,.3);ctx.save();noShadow();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(k,k);ctx.font=`900 ${size}px ${FONT}`;const w=ctx.measureText(str).width+size*.6;ctx.beginPath();ctx.roundRect(-w/2,-size*.68,w,size*1.36,30);ctx.fillStyle='rgba(255,255,255,.88)';ctx.fill();ctx.lineWidth=20;ctx.strokeStyle=col;ctx.stroke();text(str,0,size*.05,size,{fill:col,shadow:false});ctx.restore()}
+// cartoon bone (dumbbell) along x, length len, optional face
+function boneProp(x,y,len,s,t,{rot=0,expr=null,look=[0,0]}={}){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s,s);
+  const h=len/2-46,shape=(e)=>{ctx.beginPath();ctx.roundRect(-h,-30-e,2*h,60+2*e,10);[[-h,-34],[-h,34],[h,-34],[h,34]].forEach(([bx,by])=>{ctx.moveTo(bx+46+e,by);ctx.arc(bx,by,46+e,0,Math.PI*2)})};
+  shape(8);ctx.fillStyle=OL;ctx.fill();ctx.save();noShadow();
+  shape(0);ctx.fillStyle=shadeFill(0,-80,0,80,'#ffffff','#e6d9bf');ctx.fill();
+  ctx.strokeStyle='rgba(255,255,255,.9)';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-h+20,-14);ctx.lineTo(h-20,-14);ctx.stroke();
+  [[-h,-34],[h,-34]].forEach(([bx,by])=>gloss(bx-12,by-14,14,8,-.5,.6));
+  if(expr)face(0,6,.85,expr,t,{look});ctx.restore();ctx.restore()}
+function feather(x,y,s,rot,col='#ff8fab'){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s,s);
+  ctx.beginPath();ctx.moveTo(0,-150);ctx.bezierCurveTo(70,-110,60,40,0,120);ctx.bezierCurveTo(-60,40,-70,-110,0,-150);P(shadeFill(-60,0,60,0,'#ffd1dc',col),6);ctx.save();noShadow();
+  ctx.strokeStyle='rgba(43,33,24,.35)';ctx.lineWidth=4;for(let i=-5;i<=4;i++){ctx.beginPath();ctx.moveTo(0,i*22);ctx.lineTo(-38,i*22-26);ctx.moveTo(0,i*22);ctx.lineTo(38,i*22-26);ctx.stroke()}
+  ctx.strokeStyle=OL;ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-140);ctx.lineTo(0,175);ctx.stroke();ctx.restore();ctx.restore()}
+// horizontal meter 0..1 with a label
+function meter(x,y,w,val,t,lab='TICKLE-O-METER'){ctx.save();const h=56;
+  ctx.beginPath();ctx.roundRect(x-w/2,y-h/2,w,h,h/2);P('#fff',7);noShadow();
+  const v=clamp(val);if(v>.01){ctx.save();ctx.beginPath();ctx.roundRect(x-w/2+8,y-h/2+8,(w-16)*v,h-16,(h-16)/2);ctx.fillStyle=shadeFill(x-w/2,0,x+w/2,0,'#7ae582','#e63946');ctx.fill();ctx.restore()}
+  text(lab,x,y-h/2-30,34,{fill:OL,shadow:false});ctx.restore()}
+// cartoon robot arm holding a feather; base at (x,y)
+function robotArm(x,y,s,t,{wiggle=0,expr='happy'}={}){ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  ctx.beginPath();ctx.roundRect(-110,-20,220,90,20);P(shadeFill(0,-20,0,70,'#adb5bd','#6c757d'),7);
+  ctx.save();noShadow();ctx.fillStyle='#ffd60a';[-60,0,60].forEach(dx=>{ctx.beginPath();ctx.arc(dx,25,10,0,7);ctx.fill()});ctx.restore();
+  const a1=-1.2+Math.sin(t*2)*.08,a2=.9+Math.sin(t*9)*.25*wiggle;
+  const j1=[Math.cos(a1)*220,-20+Math.sin(a1)*220],j2=[j1[0]+Math.cos(a1+a2)*190,j1[1]+Math.sin(a1+a2)*190];
+  ctx.lineCap='round';[[[0,-20],j1],[j1,j2]].forEach(([p,q])=>{ctx.strokeStyle=OL;ctx.lineWidth=58;ctx.beginPath();ctx.moveTo(...p);ctx.lineTo(...q);ctx.stroke();ctx.strokeStyle='#ced4da';ctx.lineWidth=44;ctx.stroke()});
+  [[0,-20],j1].forEach(([px,py])=>{E(px,py,34,34);P(radial(px,py,34,'#f8f9fa','#868e96'),6)});
+  // head on the base
+  ctx.beginPath();ctx.roundRect(-80,-150,120,100,22);P(shadeFill(0,-150,0,-50,'#e9ecef','#adb5bd'),7);ctx.save();noShadow();face(-20,-102,.55,expr,t);ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-20,-150);ctx.lineTo(-20,-185);ctx.stroke();E(-20,-192,12,12);P('#e63946',5);ctx.restore();
+  feather(j2[0]+10,j2[1]-40,.45,a1+a2+Math.PI/2+Math.sin(t*12)*.2*wiggle);
+  ctx.restore();return [x+(j2[0]+10)*s,y+(j2[1]-40)*s]}
