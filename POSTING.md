@@ -85,6 +85,14 @@ It has a name. And sometimes it's just CLEANING. 🫃🧹 #stomachgrowl #bodyfac
 ```
 **Pinned comment:** `Worst place your stomach has ever growled? Go.`
 
+### Ep 10: MYTH OR FACT? Body edition  *(new format pilot)*
+**File:** `episodes/ep10-myth-or-fact/ep10-myth-or-fact.mp4`
+**Caption:**
+```
+How many did you get right? Be honest. 🧠⚖️ #mythorfact #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `Score out of 6? Anything under 4 and I'm disappointed.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -97,3 +105,4 @@ It has a name. And sometimes it's just CLEANING. 🫃🧹 #stomachgrowl #bodyfac
 - **Goosebumps:** arrector pili muscles attached to hair follicles contract under sympathetic nervous system activation (cold, fear, strong emotion), raising the hairs and the skin around them. In furry mammals this traps insulating air and makes the animal look bigger.
 - **Leg falling asleep:** sustained pressure compresses a nerve (and its blood supply), disrupting signal transmission and causing numbness; when pressure is released the nerve resumes firing irregularly, producing "pins and needles" (transient paresthesia). Frequent or unexplained episodes warrant medical evaluation.
 - **Stomach growling:** borborygmi are sounds from gas and fluid moved by gut contractions (peristalsis); they're louder with an empty gut. In the fasting state the migrating motor complex sweeps the stomach and small intestine roughly every 90–120 minutes.
+- **Myth or Fact (ep 10):** 10% brain myth: imaging shows activity across the whole brain over a day. Taller in the morning: spinal discs compress during the day (about 1 cm). Sneezing doesn't stop the heart; pressure changes can briefly alter rhythm. Gastric acid (pH ~1.5–3.5) corrodes some metals such as zinc. Bacteria-to-human cell ratio is roughly 1:1 (Sender, Fuchs & Milo, *PLOS Biology*, 2016). Human ultra-weak photon emission ~1000× below what eyes can see, imaged with ultra-sensitive cameras (Kobayashi et al., *PLOS ONE*, 2009).

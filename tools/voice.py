@@ -9,7 +9,7 @@ Writes  voice.wav    sped up to the channel pace (pitch preserved)
         words.json   per-word start/end times, for captions and timing scenes
         env.json     voice loudness per video frame (how wide the mouth opens)
         visemes.json mouth shapes over time (A/E/O/M/F/C), from the letter timings
-Voice settings live in engine/voice/config.json.
+Voice settings live in engine/voice/config.json (per-episode overrides: <episode>/voice.json).
 
 Needs an ElevenLabs API key. In a Claude cloud session it is injected by the network
 proxy; elsewhere set ELEVENLABS_API_KEY.
@@ -75,6 +75,10 @@ if sys.argv[1] == "--outro":
     print(f"outro line: {dur:.2f}s")
 else:
     ep = sys.argv[1]
+    # optional per-episode overrides, e.g. {"speed": 1.2}
+    ov = os.path.join(ep, "voice.json")
+    if os.path.exists(ov):
+        CFG.update(json.load(open(ov))); SPEED = CFG["speed"]
     words, env, vis, dur = process(tts(open(os.path.join(ep, "script.txt")).read().strip()), os.path.join(ep, "voice"))
     json.dump(words, open(os.path.join(ep, "words.json"), "w"))
     json.dump(env, open(os.path.join(ep, "env.json"), "w"))

@@ -1,0 +1,127 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 10: MYTH OR FACT? Body edition (format pilot) =====
+window.INTRO_END=3.15;
+window.HOOK=[['MYTH OR FACT?','#ffd60a',130],['BODY EDITION','#fff',90]];
+window.TEASER=[6.3,19.7,27.2,34.0,39.8,44.6];
+window.SCENES=[3.15,10.0,16.88,22.67,29.11,35.46];
+window.TINTS=['#ffe0ec','#fff1cc','#ffe3e8','#e3f7e9','#e6f0ff','#2b2d42'];
+window.KEYWORDS=['myth','fact','kinda','not'];
+window.PUNCH=[[39.4,40.6,'FACT!']];
+window.JOLTS=[5.97,19.43,27.91,39.43];
+window.SHAKES=[5.97,12.16,19.43,25.87,31.64,39.43];
+window.FOLLOW_AT=29.2;
+window.OUTRO=true;
+const CASES=[ // start, claim, verdict time, verdict, board label
+ {s:3.15, claim:'"You only use 10% of your brain."', v:5.97, verdict:'MYTH', tag:'10% brain'},
+ {s:10.0, claim:'"You\'re taller in the morning."', v:12.16, verdict:'FACT', tag:'Taller AM'},
+ {s:16.88,claim:'"Your heart stops when you sneeze."', v:19.43, verdict:'MYTH', tag:'Sneeze heart'},
+ {s:22.67,claim:'"Stomach acid can dissolve metal."', v:25.87, verdict:'KINDA', tag:'Acid vs metal'},
+ {s:29.11,claim:'"You\'re more bacteria than human."', v:31.64, verdict:'KINDA', tag:'Half germ'},
+ {s:35.46,claim:'"Your body glows in the dark."', v:39.43, verdict:'FACT', tag:'You glow'}];
+window.SFX=[[0,'whoosh',.5],[.28,'tick'],[.56,'tick'],[.84,'tick'],[1.12,'tick'],[1.4,'tick'],[2.0,'blip'],
+ ...CASES.flatMap((c,i)=>[[c.s,'whoosh',.8],[c.s+.05,'pop',.6],[c.s+.85,'blip'],[c.v-.9,'tick',.5],[c.v-.6,'tick',.5],[c.v-.3,'tick',.5],[c.v,'stamp'],[c.v+.05,c.verdict==='FACT'?'ding':c.verdict==='MYTH'?'fall':'pop',.7],[c.v+.5,'whoosh',.5]]),
+ [7.5,'sparkle',.6],[13.0,'fall',.5],[20.4,'beep',.5],[20.9,'beep',.5],[21.4,'beep',.5],[26.5,'sparkle',.4],[27.95,'stamp',.8],[34.4,'tada',.6],[36.4,'steam',.5],[39.5,'steam'],[43.2,'beep'],[43.3,'sparkle',.7]];
+const MOOD=[[0,.4],[3.2,.3],[5.97,.55],[6.6,.3],[8.6,.45],[10,.25],[12.16,.4],[12.6,.25],[19.43,.5],[21.6,.6],[22.6,.3],[25.87,.3],[27.9,.6],[29,.3],[34.4,.45],[35.5,.4],[36.4,.55],[39.43,.95],[40.6,.6],[44.9,.7],[46.5,.7]];
+const POSES=[[0,'point'],[3.15,'point'],[5.9,'up'],[6.6,'point'],[8.6,'facepalm'],[10,'point'],[12.1,'point'],[16.8,'cross'],[17.5,'point'],[21.5,'hips'],[22.6,'point'],[27.9,'up'],[29.1,'point'],[34.3,'shrug'],[35.4,'cross'],[37.4,'point'],[39.4,'up'],[40.6,'point'],[44.9,'facepalm']];
+
+// ---------- scoreboard (fixed at the bottom of the card) ----------
+const COLS={FACT:{x:230,c:'#2a9d8f'},MYTH:{x:540,c:'#e63946'},KINDA:{x:850,c:'#f4a261'}};
+function pill(x,y,str,col,s=1){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.font=`900 26px ${FONT}`;const w=Math.max(200,ctx.measureText(str).width+36);ctx.beginPath();ctx.roundRect(-w/2,-20,w,40,12);P('#fffdf7',4);text(str,0,2,26,{fill:OL,shadow:false});ctx.restore()}
+window.board=function(t){
+  if(t<3.15)return;
+  ctx.save();ctx.beginPath();ctx.roundRect(60,790,W-120,176,22);ctx.fillStyle='rgba(255,253,247,.94)';ctx.fill();ctx.lineWidth=5;ctx.strokeStyle=OL;ctx.stroke();ctx.restore();
+  // which case are we in, and is it in the "guess" window?
+  let cur=-1;CASES.forEach((c,i)=>{if(t>=c.s)cur=i});const C=CASES[cur],guess=C&&t>C.s+.8&&t<C.v;
+  Object.entries(COLS).forEach(([k,{x,c}])=>{
+    const lit=C&&t>=C.v&&t<C.v+1.2&&C.verdict===k;const pulse=guess?1+.05*Math.sin(t*10+x):1;
+    ctx.save();ctx.translate(x,828);ctx.scale(pulse*(lit?1.12:1),pulse*(lit?1.12:1));ctx.beginPath();ctx.roundRect(-115,-26,230,52,16);P(lit?c:mixHex(c.slice(1),'ffffff',.15),6);ctx.shadowColor='rgba(0,0,0,0)';text(k,0,2,34,{fill:'#fff',shadow:false});ctx.restore();
+    if(guess)text('?',x+100,800,34,{fill:c,shadow:false,alpha:.5+.5*Math.sin(t*8)});
+  });
+  // decided cases drop into their column
+  const slots={FACT:0,MYTH:0,KINDA:0};
+  CASES.forEach(c=>{if(t<c.v)return;const col=COLS[c.verdict],n=slots[c.verdict]++;const tx=col.x,ty=885+n*44,u=easeInOut(clamp((t-c.v-.15)/.5));
+    if(u<=0)return;pill(lerp(540,tx,u),lerp(460,ty,u),c.tag,col.c,lerp(1.6,1,u))});
+};
+
+// ---------- props ----------
+function claimBox(str,t,s){const k=pop(t,s,.3);if(k<=0)return;ctx.save();ctx.translate(W/2,245);ctx.scale(k,k);ctx.font=`900 46px ${FONT}`;const w=ctx.measureText(str).width+60;ctx.beginPath();ctx.roundRect(-w/2,-42,w,84,20);P('#fff',6);text(str,0,3,46,{fill:OL,shadow:false});ctx.restore()}
+function caseCard(n,t,s){const d=t-s;if(d<0||d>.85)return;const k=easeBack(clamp(d/.25))*(1-easeIn3(clamp((d-.65)/.2)));ctx.save();ctx.translate(W/2,480);ctx.rotate(-.06);ctx.scale(k,k);
+  ctx.beginPath();ctx.roundRect(-190,-200,380,400,30);P(shadeFill(0,-200,0,200,'#ffffff','#e9ecef'),9);ctx.beginPath();ctx.roundRect(-190,-200,380,100,{upperLeft:30,upperRight:30,lowerLeft:0,lowerRight:0});P(shadeFill(0,-200,0,-100,'#ff5a65','#d62839'),9);
+  ctx.shadowColor='rgba(0,0,0,0)';text('CASE',0,-148,64,{fill:'#fff',shadow:false});text(String(n),0,50,230,{fill:OL,shadow:false});ctx.restore()}
+function verdictStamp(c,t){if(t<c.v||t>c.v+1.4)return;const col=COLS[c.verdict].c;stamp(c.verdict==='KINDA'?'KINDA.':c.verdict+'!',W/2,470,t,c.v,140,-.1,col)}
+function person(x,y,s,t,{expr='calm',shirt='#4cc9f0',glow=0,germs=0,squish=0}={}){ctx.save();ctx.translate(x,y);ctx.scale(s,s*(1-squish));
+  if(glow>0){const g=ctx.createRadialGradient(0,-120,20,0,-120,320);g.addColorStop(0,`rgba(180,255,220,${.55*glow})`);g.addColorStop(1,'rgba(180,255,220,0)');ctx.fillStyle=g;ctx.fillRect(-340,-460,680,680)}
+  [[-38,1],[38,-1]].forEach(([lx])=>{ctx.beginPath();ctx.roundRect(lx-22,40,44,150,22);P('#3a3f47',6)});
+  ctx.beginPath();ctx.roundRect(-85,-130,170,190,50);P(shadeFill(0,-130,0,60,shirt,mixHex(shirt.slice(1),'1d3557',.35)),7);
+  [[-1],[1]].forEach(([d])=>{ctx.save();ctx.strokeStyle=OL;ctx.lineWidth=40;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(d*80,-100);ctx.lineTo(d*115,20);ctx.stroke();ctx.strokeStyle='#f6d2b3';ctx.lineWidth=28;ctx.stroke();ctx.restore()});
+  E(0,-215,82,86);P(radial(0,-215,86,'#f8dcc3','#e4ad86'),7);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';face(0,-208,.95,expr,t);ctx.restore();
+  if(germs>0){const r=rng(5);for(let i=0;i<Math.floor(40*germs);i++){const gx=(r()-.5)*190,gy=-300+r()*480;if(gx<0)continue;ctx.save();ctx.shadowColor='rgba(0,0,0,0)';E(gx,gy,15,11,r()*3);P(['#7ae582','#9bf6ff','#cdb4db'][i%3],3);ctx.restore()}}
+  ctx.restore()}
+function heartIcon(x,y,s,t,beat=1){const b=1+.08*beat*Math.max(0,Math.sin(t*7.5));ctx.save();ctx.translate(x,y);ctx.scale(s*b,s*b);ctx.beginPath();ctx.moveTo(0,40);ctx.bezierCurveTo(-90,-20,-50,-90,0,-45);ctx.bezierCurveTo(50,-90,90,-20,0,40);P(radial(-20,-30,90,'#ff6b6b','#c0182c'),7);ctx.restore()}
+function ecg(x0,y,w,t,stutter){ctx.save();ctx.shadowColor='rgba(0,0,0,0)';ctx.beginPath();ctx.roundRect(x0-20,y-90,w+40,180,20);P('#14161a',6);ctx.strokeStyle='#7ae582';ctx.lineWidth=6;ctx.lineJoin='round';ctx.beginPath();
+  for(let i=0;i<=w;i+=4){const ph=((i/w)*3+t*1.2)%1;let v=0;if(ph>.4&&ph<.44)v=-70;else if(ph>.44&&ph<.47)v=40;else if(ph>.6&&ph<.7)v=-12*Math.sin((ph-.6)/.1*Math.PI);
+    if(stutter>0&&Math.abs(i-w*.55)<40)v*=(1-stutter)+stutter*.2,v+=stutter*Math.sin(i*.3)*14;i?ctx.lineTo(x0+i,y+v):ctx.moveTo(x0+i,y+v)}ctx.stroke();ctx.restore()}
+function coin(x,y,r,eaten,t){ctx.save();ctx.translate(x,y);ctx.beginPath();for(let i=0;i<=40;i++){const a=i/40*Math.PI*2,rr=r*(1-eaten*(.3+.3*Math.sin(a*5+1)));ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();P(radial(0,0,r,'#ffd27a','#b5651d'),6);ctx.shadowColor='rgba(0,0,0,0)';text('1¢',0,4,r*.7,{fill:'#7a3e10',shadow:false,alpha:1-eaten});ctx.restore()}
+function scale(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);const tilt=Math.sin(t*2)*.03;ctx.strokeStyle=OL;ctx.lineWidth=14;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,160);ctx.lineTo(0,-60);ctx.stroke();ctx.save();ctx.rotate(tilt);ctx.beginPath();ctx.moveTo(-250,-60);ctx.lineTo(250,-60);ctx.stroke();
+  [[-250,'human'],[250,'bact']].forEach(([px,k])=>{ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(px,-60);ctx.lineTo(px-60,30);ctx.moveTo(px,-60);ctx.lineTo(px+60,30);ctx.stroke();ctx.beginPath();ctx.ellipse(px,32,90,16,0,0,Math.PI);P('#adb5bd',6);
+    if(k==='human'){E(px,-5,46,40);P(radial(px,-5,46,'#ffc8dd','#f07896'),5);E(px,-5,14,14);P('#7b2cbf',3)}else{ctx.beginPath();ctx.roundRect(px-55,-25,110,44,22);P(radial(px,-5,60,'#b9fbc0','#52b788'),5);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';face(px,-4,.32,'happy',t);ctx.restore()}});
+  ctx.restore();ctx.beginPath();ctx.roundRect(-110,150,220,30,10);P('#6c757d',6);ctx.restore()}
+function eyeIcon(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.moveTo(-90,0);ctx.quadraticCurveTo(0,-80,90,0);ctx.quadraticCurveTo(0,80,-90,0);P('#fff',7);E(0,0,32,32);P('#3a86ff',5);E(0,0,14,14);P(OL,0);ctx.strokeStyle='#e63946';ctx.lineWidth=16;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-90,-70);ctx.lineTo(90,70);ctx.stroke();ctx.restore()}
+function camera(x,y,s,t,flash){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-120,-70,240,150,26);P(shadeFill(0,-70,0,80,'#495057','#212529'),8);ctx.beginPath();ctx.roundRect(-50,-100,100,40,10);P('#343a40',6);E(0,5,52,52);P(radial(0,5,52,'#74c0fc','#1c3d5a'),7);
+  if(flash>0){ctx.globalAlpha=flash;ctx.fillStyle='#fff';ctx.beginPath();for(let i=0;i<12;i++){const a=i/12*Math.PI*2,r=i%2?60:150;ctx.lineTo(80+Math.cos(a)*r,-90+Math.sin(a)*r)}ctx.fill();ctx.globalAlpha=1}ctx.restore()}
+
+function content(t){
+  const CY=470;
+  if(t<3.15)return; // intro: doctor close-up only ("And it gets weirder.")
+  const i=CASES.reduce((a,c,k)=>t>=c.s?k:a,0),C=CASES[i];
+  if(i===5){ctx.save();ctx.fillStyle='rgba(10,12,24,.92)';ctx.fillRect(0,0,W,H);ctx.restore()}
+  caseCard(i+1,t,C.s);
+  if(t<C.s+.8)return;
+  claimBox(C.claim,t,C.s+.8);
+  if(i===0){ // brain 10%
+    const full=t>6.55;
+    if(!full){brain(W/2,CY+40,.95,{t,tint:'#cfd4da',expr:'calm'});ctx.save();ctx.beginPath();ctx.rect(W/2+120,CY-200,140,420);ctx.clip();brain(W/2,CY+40,.95,{t,expr:'calm'});ctx.restore();label('10%',W/2+250,CY-90,t,4.7,{bg:'#ffd60a',size:52,rot:.06})}
+    else{brain(W/2,CY+40,.95,{t,expr:t>8.63?'confused':'happy',look:t>8.63?[.6,-.6]:[0,0]});
+      const r=rng(2);for(let k=0;k<7;k++){const on=t<7.5?1:((Math.sin(t*9+k*2)+1)/2);const gx=W/2+(r()-.5)*380,gy=CY+(r()-.5)*240;ctx.save();ctx.globalAlpha=.6*on;const g=ctx.createRadialGradient(gx,gy,4,gx,gy,70);g.addColorStop(0,'rgba(255,240,120,.9)');g.addColorStop(1,'rgba(255,240,120,0)');ctx.fillStyle=g;ctx.fillRect(gx-70,gy-70,140,140);ctx.restore()}
+      if(t>7.5&&t<8.6)label('NOT ALL AT ONCE',W/2,CY+250,t,7.5,{bg:'#fff',size:40});
+      if(t>8.63){text('?',W/2+230,CY-120,110,{fill:'#7b5ea7',sw:14,scale:pop(t,8.7)});label('CLEARLY NOT WELL',W/2,CY+250,t,8.7,{bg:'#ffd60a',size:40})}}
+  }
+  if(i===1){ // taller in the morning
+    if(t<12.56){person(W/2,CY+70,.95,t,{expr:'happy'});E(W/2+300,CY-130,60,60);P(radial(W/2+300,CY-130,60,'#ffe066','#f4a261'),6)}
+    else if(t<14.58){const sq=(Math.sin((t-12.6)*2)+1)/2;for(let k=0;k<6;k++){const y=CY-180+k*(70-14*sq);ctx.beginPath();ctx.roundRect(W/2-90,y,180,50-6*sq,18);P(shadeFill(0,y,0,y+50,'#ffffff','#e3d6bd'),6);if(k<5){ctx.beginPath();ctx.roundRect(W/2-70,y+50-6*sq,140,20-8*sq,8);P('#4cc9f0',4)}}label('SPINE DISCS SQUISH',W/2,CY+260,t,12.7,{bg:'#4cc9f0',size:40})}
+    else{person(W/2-200,CY+70,.9,t,{expr:'happy'});person(W/2+200,CY+80,.9,t,{expr:'annoyed',squish:.04});E(W/2-330,CY-120,40,40);P('#ffd166',5);ctx.save();ctx.translate(W/2+330,CY-120);ctx.beginPath();ctx.arc(0,0,40,.6,5.6);ctx.arc(14,-8,32,5.4,.9,true);P('#cdb4db',5);ctx.restore();
+      if(t>15.2)label('−1 cm BY BEDTIME',W/2,CY+250,t,15.3,{bg:'#e63946',fg:'#fff',size:40})}
+  }
+  if(i===2){ // sneeze heart
+    if(t<19.43){person(W/2-170,CY+70,.85,t,{expr:t>18.8?'scared':'worried'});if(t>18.6){burst(W/2+40,CY-60,90*pop(t,18.7),'#fff');text('ACHOO!',W/2+40,CY-60,46,{fill:OL,shadow:false,scale:pop(t,18.7)})}heartIcon(W/2+250,CY+40,1.1,t)}
+    else{heartIcon(W/2,CY-70,1.0,t);ecg(140,CY+130,800,t,t>19.9&&t<21.5?1:0);if(t>21.5)label('DOES NOT STOP',W/2,CY+260,t,21.6,{bg:'#2a9d8f',fg:'#fff',size:40})}
+  }
+  if(i===3){ // acid vs metal
+    stomachOrgan(W/2,CY+70,.62,t,{expr:t>27.9?'smug':'calm'});
+    ctx.save();ctx.beginPath();ctx.ellipse(W/2+10,CY+125,150,60,0,0,Math.PI*2);ctx.fillStyle='rgba(158,240,26,.55)';ctx.fill();ctx.restore();
+    const eaten=clamp((t-26.3)/1.6)*.7;coin(W/2+10,CY+110,48,eaten,t);
+    if(t>26.3){const r=rng(4);for(let k=0;k<8;k++){const u=((t*.9+r())%1);E(W/2+10+(r()-.5)*90,CY+100-u*120,6+r()*6,6+r()*6);ctx.globalAlpha=1-u;P('#d8f3dc',3);ctx.globalAlpha=1}}
+    if(t>26.3&&t<27.9)label('SOME METALS. SLOWLY.',W/2,CY+290,t,26.4,{bg:'#fff',size:40});
+    stamp('DO NOT TEST THIS',W/2,CY-150,t,27.95,64,-.06);
+  }
+  if(i===4){ // half bacteria
+    if(t<32.07)person(W/2,CY+115,.95,t,{expr:'worried',germs:clamp((t-30.4)/1.2)});
+    else if(t<33.33){scale(W/2,CY-20,1.0,t);label('≈ 1 : 1',W/2,CY+240,t,32.6,{bg:'#ffd60a',size:48})}
+    else{person(W/2,CY+115,.95,t,{expr:'scared',germs:1});label('HALF GERM',W/2+250,CY+40,t,33.6,{bg:'#7ae582',size:48,rot:-.04});
+      if(t>34.4){const r=rng(2);for(let k=0;k<26;k++){const x=r()*W,y=140+((t-34)*360*(.5+r())+r()*600)%650;ctx.fillStyle=['#ffd60a','#e63946','#4cc9f0','#7ae582'][k%4];ctx.save();ctx.translate(x,y);ctx.rotate(t*4+k);ctx.fillRect(-10,-5,20,10);ctx.restore()}}}
+  }
+  if(i===5){ // you glow
+    if(t<37.43){label('THE ONE I HATE',W/2,CY,t,36.4,{bg:'#e63946',fg:'#fff',size:52,rot:-.04});}
+    else if(t<39.96){person(W/2,CY+115,.95,t,{expr:'calm',shirt:'#3a3f47',glow:clamp((t-37.8)/.8)})}
+    else if(t<42.8){person(W/2-170,CY+115,.85,t,{expr:'calm',shirt:'#3a3f47',glow:.5});eyeIcon(W/2+230,CY-40,1.0);label('1000× TOO DIM',W/2+230,CY+90,t,41.0,{bg:'#fff',size:38,rot:.04})}
+    else if(t<44.18){person(W/2-170,CY+115,.85,t,{expr:'scared',shirt:'#3a3f47',glow:1});camera(W/2+230,CY,1.0,t,t>43.2?clamp(1-(t-43.2)/.5):0);label('CAUGHT ON CAMERA',W/2+230,CY+150,t,43.3,{bg:'#ffd60a',size:34,rot:.04})}
+    else{person(W/2,CY+115,1.0,t,{expr:'annoyed',shirt:'#3a3f47',glow:1});label('YOU GLOW.',W/2+260,CY-20,t,44.2,{bg:'#b9fbc0',size:56,rot:-.04})}
+  }
+  verdictStamp(C,t);
+}
+</script></body></html>

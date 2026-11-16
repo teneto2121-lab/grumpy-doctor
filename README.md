@@ -56,5 +56,6 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
 | 07 | Why do we get goosebumps? | 35s |
 | 08 | Why does your leg fall asleep? | 36s |
 | 09 | Why does your stomach growl? | 42s |
+| 10 | MYTH OR FACT? Body edition (format pilot) | 49s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

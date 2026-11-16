@@ -218,7 +218,9 @@ function captions(t,y){
   const c=CHUNKS.find(c=>t>=c.s&&t<c.e);if(!c)return;const size=80;ctx.font=`900 ${size}px ${FONT}`;
   const parts=c.map(w=>w.w.replace(/[.,?!]/g,'').toUpperCase());const sp=36,ws=parts.map(p=>ctx.measureText(p).width),tot=ws.reduce((a,b)=>a+b,0)+sp*(parts.length-1);
   const k=pop(t,c.s,.2)*Math.min(1,900/tot);let x=W/2-tot/2;ctx.save();ctx.translate(W/2,y);ctx.scale(k,k);ctx.translate(-W/2,-y);
-  parts.forEach((p,i)=>{const w=c[i];const on=t>=w.s&&t<(c[i+1]?c[i+1].s:c.e);text(p,x+ws[i]/2,y,size,{fill:on?'#ffd60a':'#fff',sw:20,scale:on?1.1:1});x+=ws[i]+sp});ctx.restore()}
+  parts.forEach((p,i)=>{const w=c[i];const on=t>=w.s&&t<(c[i+1]?c[i+1].s:c.e);const kw=(window.KEYWORDS||[]).includes(p.toLowerCase().replace(/[^a-z0-9%]/g,''));
+    if(kw){ctx.save();ctx.translate(x+ws[i]/2,y);ctx.scale(on?1.1:1,on?1.1:1);ctx.rotate(-.03);ctx.beginPath();ctx.roundRect(-ws[i]/2-16,-size*.62,ws[i]+32,size*1.24,16);P('#ffd60a',7);ctx.restore();text(p,x+ws[i]/2,y,size,{fill:OL,sw:0,scale:on?1.1:1,rot:-.03,shadow:false})}
+    else text(p,x+ws[i]/2,y,size,{fill:on?'#ffd60a':'#fff',sw:20,scale:on?1.1:1});x+=ws[i]+sp});ctx.restore()}
 
 // ---------- FRAME ----------
 // ---------- card with scenes ----------
@@ -227,8 +229,9 @@ function captions(t,y){
 function sceneIndex(t){const S=window.SCENES||[];let i=-1;for(let k=0;k<S.length;k++)if(t>=S[k])i=k;return i}
 function drawScene(t,start){
   const S=window.SCENES;if(!S){content(t);return}
-  const z=1+.035*clamp((t-start)/5);           // slow push-in
-  ctx.save();ctx.translate(W/2,548);ctx.scale(z,z);ctx.translate(-W/2,-548);
+  const z=1+.07*clamp((t-start)/6);            // push-in
+  const dir=(Math.round(start*7)%2)?1:-1,pan=dir*Math.min(30,(t-start)*7); // slow sideways drift, alternating per scene
+  ctx.save();ctx.translate(W/2+pan,548);ctx.scale(z,z);ctx.translate(-W/2,-548);
   // window.CAM=[[t,x,y,zoom],...]: camera inside the card (looks at x,y with zoom), eased between keys
   if(window.CAM){const c=track(window.CAM.map(k=>[k[0],[k[1],k[2],k[3]]]),t);ctx.translate(W/2,548);ctx.scale(c[2],c[2]);ctx.translate(-c[0],-c[1])}
   ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=12;ctx.shadowBlur=0;  // flat drop shadow under props
@@ -236,6 +239,12 @@ function drawScene(t,start){
   // window.overlay(t): labels drawn on top of the card, unaffected by the camera
   if(window.overlay){ctx.save();ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=12;overlay(t);ctx.restore()}
 }
+// window.FOLLOW_AT (default: halfway): "FOLLOW FOR MORE ANGRY MEDICINE" slides in for 3.5s. window.FOLLOW=false disables.
+function followBanner(t){if(window.FOLLOW===false)return;const a=window.FOLLOW_AT||DUR*.5,d=t-a;if(d<0||d>3.5)return;
+  const x=lerp(-500,W/2,easeOut(clamp(d/.4)))+lerp(0,W,easeIn3(clamp((d-3.1)/.4)));ctx.save();ctx.shadowColor='rgba(0,0,0,0)';
+  ctx.font=`900 34px ${FONT}`;const w=ctx.measureText('FOLLOW FOR MORE ANGRY MEDICINE').width+70;ctx.beginPath();ctx.roundRect(x-w/2,138,w,58,29);P('#e63946',6);
+  text('FOLLOW FOR MORE ANGRY MEDICINE',x,169,34,{fill:'#fff',shadow:false});ctx.restore()}
+function easeIn3(x){return x*x*x}
 function drawCard(t,INTRO,alpha){
   const S=window.SCENES,T=window.TINTS||[];
   if(!S){card(alpha);ctx.save();content(t);ctx.restore();return}
@@ -248,9 +257,22 @@ function drawCard(t,INTRO,alpha){
     ctx.save();ctx.translate(-u*W,0);ctx.globalAlpha=1-u*.5;drawScene(S[i]-1e-3,prevStart);ctx.restore();
     ctx.save();ctx.translate((1-u)*W*.9,0);drawScene(t,start);ctx.restore();}
   else drawScene(t,start);
+  // window.board(t): a fixed panel inside the card (e.g. a scoreboard) that doesn't slide or drift
+  if(window.board){ctx.save();ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=10;window.board(t);ctx.restore()}
+  followBanner(t);
   ctx.restore();
 }
+const TSTEP=.28;
 function render(t){
+  if(window.TEASER&&!window.__tz&&t<window.TEASER.length*TSTEP){const k=Math.floor(t/TSTEP);
+    // the flashed moment is shown smaller and lower, so the hook text above stays clean
+    window.__tz=1;ctx.save();wall(t);ctx.translate(W/2,H/2+190);ctx.scale(.8,.8);ctx.rotate((k%2?.02:-.02));ctx.translate(-W/2,-H/2);render(window.TEASER[k]);ctx.restore();window.__tz=0;
+    ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
+    const f=(t%TSTEP)/TSTEP;if(f<.18){ctx.fillStyle=`rgba(255,255,255,${.5*(1-f/.18)})`;ctx.fillRect(0,0,W,H)}
+    hookText(t,99);captions(t,1560);
+    ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);return}
+  return renderMain(t)}
+function renderMain(t){
   const INTRO=window.INTRO_END||4.9;ctx.clearRect(0,0,W,H);wall(t);
   // camera: intro close-up on doctor, then doctor moves to bottom with card above
   const intro=easeInOut(prog(t,INTRO-.5,.8));
@@ -281,7 +303,7 @@ function render(t){
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
     text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
-  if(!out)captions(t,t<INTRO||pf>.5?1560:1060);
+  if(!out&&!window.__tz)captions(t,t<INTRO||pf>.5?1560:1060);
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }
 // ---------- hook text (#4): on screen from the very first frame ----------

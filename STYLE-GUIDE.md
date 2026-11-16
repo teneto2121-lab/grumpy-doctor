@@ -65,6 +65,19 @@
   `dust(x,y,t,start)` for a dust puff when something lands.
 - **Build-ons:** `drawOn(points, fraction)` draws lines progressively (nerves, paths).
 
+## Retention toolkit (from the reference analysis, see docs/REFERENCE-ANALYSIS.md)
+- `window.TEASER=[t,...]`: flashes 4–6 upcoming climaxes (0.28s each) under the hook; payoff first
+- Cards drift and push in automatically; `window.FOLLOW_AT` puts the follow banner (default: halfway)
+- `window.KEYWORDS=[...]`: those words get a yellow box in the captions (verdicts, NOT, numbers)
+- `<episode>/voice.json` `{"speed":1.2}` for faster delivery; aim for ~3+ words/second
+- `window.board(t)`: a fixed panel in the card (e.g. the Myth-or-Fact scoreboard)
+
+## Format: MYTH OR FACT? (ep 10 pilot)
+- Hook "Myth or fact? [X] edition. And it gets weirder." + teaser
+- 5–7 numbered cases: CASE card → claim box → guess window (buttons pulse) → verdict stamp → 1–2 explanation beats
+- FACT / MYTH / KINDA board; each verdict drops a tag into its column
+- Escalate; the last case is "the one I hate" (wildest), with a punch-in on the verdict
+
 ## Endings
 - **Signature outro:** `window.OUTRO=true` adds the "NEXT PATIENT!" clipboard slam (voice line in
   `engine/voice/next_patient.wav`; re-record with `python3 tools/voice.py --outro` after a voice change).
