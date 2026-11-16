@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script>
+// ===== Episode 01: Why do your knuckles crack? =====
+window.INTRO_END=4.9;
+// ---------- TIMELINE ----------
+// mood: 0 = mildly grumpy, 1 = fully outraged
+const MOOD=[[0,.35],[1.0,.55],[1.6,.4],[3.0,.55],[4.6,.05],[7.0,.0],[12.5,.1],[19.6,.45],[20.4,.15],[25.0,.2],[28.5,.3],[30.2,.15],[31.8,.45],[32.6,.2],[39.6,.4],[40.3,.95],[42.0,.95],[42.6,.3],[44.2,.55],[45.2,1],[46.6,1]];
+const POSES=[[0,'rest'],[0.3,'point'],[3.6,'point'],[4.3,'shrug'],[5.9,'rest'],[7.6,'point'],[12.0,'point'],[12.6,'rest'],[13.2,'point'],[19.0,'point'],[19.6,'up'],[20.6,'rest'],[21.8,'point'],[24.2,'rest'],[25.2,'chin'],[27.8,'chin'],[28.6,'point'],[30.0,'rest'],[31.7,'shrug'],[32.4,'rest'],[33.0,'point'],[39.5,'point'],[40.1,'up'],[42.0,'up'],[42.6,'rest'],[44.3,'shrug'],[45.0,'point']];
+// scene content inside card, by time
+function content(t){
+  const CY=560;
+  // A: intro 0-4.9
+  if(t<4.9){
+    text('YOU.',W/2,330,200,{fill:'#e63946',sw:22,scale:pop(t,0.35)*(1+.05*Math.sin(t*14)*clamp(1.6-t)),rot:-.05});
+    // knuckle crack graphic
+    const k=pop(t,2.3);if(k>0){ctx.save();ctx.translate(830,640);ctx.rotate(.15);ctx.scale(k*.62,k*.62);cartoonHand(0,0,1,-1);ctx.restore();
+      const c=prog(t,2.55,.45);if(c>0&&c<1){burst(830,470,100*easeOut(c),'#ffd60a');text('CRACK!',830,470,48,{fill:OL,shadow:false,scale:easeOut(c)})}
+      if(t>2.9)label('AGAIN?!',250,560,t,3.1,{bg:'#e63946',fg:'#fff',size:64,rot:-.08})}
+    return}
+  // B: "Fine. Let me explain" 4.9-7.4
+  if(t<7.4){text('*sigh*',W/2,380,110,{fill:'#5c677d',sw:0,scale:pop(t,4.95),rot:-.04,shadow:false});
+    label('LET ME EXPLAIN',W/2,620,t,5.6,{bg:'#4cc9f0',size:78});return}
+  // C: capsule 7.4-12.6
+  if(t<12.6){const k=easeOut(prog(t,7.4,.5));ctx.save();ctx.globalAlpha=k;joint(W/2,CY,0,0,t,{sparkle:prog(t,11.3,.4)});ctx.restore();
+    text('YOUR JOINT',W/2,215,70,{fill:OL,shadow:false,scale:pop(t,7.5)});
+    label('CAPSULE',W/2-230,CY+200,t,9.1,{bg:'#b79ced',size:52,rot:-.05});
+    label('FLUID',W/2+250,CY+200,t,9.95,{bg:'#9bf6ff',size:52,rot:.05});
+    label('SLIPPERY',W/2,CY-210,t,11.4,{bg:'#fff',size:56,rot:.03});return}
+  // D: pull 12.6-19.2 ; E: pop 19.2-21.8
+  if(t<21.8){
+    const gap=easeInOut(prog(t,13.3,.9))*70,bub=t<17.0?0:(t<19.75?easeOut(prog(t,17.0,2.6))*26:lerp(26,62,easeBack(prog(t,19.75,.35))));
+    const shake=t>19.75&&t<20.2?Math.sin(t*90)*10:0;
+    ctx.save();ctx.translate(shake,0);
+    // pull arrows
+    const ak=pop(t,13.3);if(ak>0&&t<19.2){[-1,1].forEach(d=>{ctx.save();ctx.translate(W/2+d*(330+gap/2+Math.sin(t*6)*8),CY-150);ctx.scale(d*ak,ak);poly([[-40,-22],[20,-22],[20,-45],[60,0],[20,45],[20,22],[-40,22]]);P('#e63946',6);ctx.restore()})}
+    joint(W/2,CY,gap,bub,t);ctx.restore();
+    text('PULL',W/2,215,70,{fill:OL,shadow:false,scale:pop(t,13.35)});
+    gauge(W-200,CY+250,lerp(.85,.12,easeInOut(prog(t,15.7,.7))),t,14.7);
+    if(t>16.9&&t<19.6)label('GAS BUBBLE',W/2-150,CY+260,t,17.1,{bg:'#fff',size:52});
+    if(t>19.7){const c=prog(t,19.75,.3);burst(W/2,CY-30,lerp(80,220,easeOut(c)),'#ffd60a');text('POP!',W/2,CY-30,lerp(60,120,easeBack(c)),{fill:'#e63946',sw:14,stroke:OL});}
+    return}
+  // F: MRI 21.8-25.2
+  if(t<25.2){const k=easeOut(prog(t,21.8,.4));
+    ctx.save();ctx.beginPath();ctx.roundRect(110,210,W-220,640,26);ctx.fillStyle='#050608';ctx.fill();ctx.clip();
+    ctx.globalAlpha=k;ctx.filter='grayscale(1) contrast(1.3)';joint(W/2,560,70,62,t,{gray:true,fluidA:.6});ctx.filter='none';
+    const sy=210+((t-21.8)*260)%640;ctx.fillStyle='rgba(120,255,200,.18)';ctx.fillRect(110,sy,W-220,26);ctx.restore();
+    ctx.beginPath();ctx.roundRect(110,210,W-220,640,26);ctx.strokeStyle='#5c677d';ctx.lineWidth=10;ctx.stroke();
+    text('● REC',190,250,36,{fill:'#ff595e',shadow:false,align:'left',alpha:Math.sin(t*6)>0?1:.3});
+    label('FILMED IN AN MRI',W/2,880,t,22.6,{bg:'#4cc9f0',size:60});text('(2015 study)',W/2,945,36,{fill:'#5c677d',shadow:false,alpha:prog(t,23.2,.3)});
+    return}
+  // G: 20 minutes 25.2-30.3
+  if(t<30.3){const k=pop(t,25.25);
+    ctx.save();ctx.translate(W/2,520);ctx.scale(k,k);
+    E(0,0,230,230);P('#fff',10);
+    const f=easeInOut(prog(t,28.7,1.0));ctx.strokeStyle='#4cc9f0';ctx.lineWidth=40;ctx.beginPath();ctx.arc(0,0,190,-Math.PI/2,-Math.PI/2+f*Math.PI*2);ctx.stroke();
+    text(String(Math.round(f*20)),0,-20,150,{fill:OL,shadow:false});text('MIN',0,90,56,{fill:OL,shadow:false});ctx.restore();
+    // gas re-dissolving
+    const r=rng(8);for(let i=0;i<14;i++){const a=r()*6.28,d=280+((t*40+r()*100)%120);const s=lerp(26,6,prog(t,26,3.5));ctx.fillStyle='rgba(255,255,255,.9)';ctx.strokeStyle=OL;ctx.lineWidth=4;ctx.beginPath();ctx.arc(W/2+Math.cos(a)*d,520+Math.sin(a)*d*.9,s,0,7);ctx.fill();ctx.stroke()}
+    label('CAN\'T CRACK AGAIN YET',W/2,215,t,25.9,{bg:'#e63946',fg:'#fff',size:54});
+    label('~20 MINUTES',W/2,880,t,29.2,{bg:'#ffd60a',size:64});return}
+  // H: arthritis? 30.3-32.5
+  if(t<32.5){text('ARTHRITIS?',W/2,420,130,{fill:'#7b5ea7',sw:18,scale:pop(t,30.6),rot:-.03});
+    if(t>31.85){const k=pop(t,31.9,.3);ctx.save();ctx.translate(W/2,680);ctx.rotate(-.12);ctx.scale(k,k);ctx.beginPath();ctx.roundRect(-200,-95,400,190,30);ctx.lineWidth=18;ctx.strokeStyle='#e63946';ctx.stroke();text('NO.',0,8,150,{fill:'#e63946',shadow:false});ctx.restore()}
+    return}
+  // I: two hands experiment 32.5-42.4
+  if(t<42.4){
+    if(t<40.1){
+      const k=pop(t,32.7);
+      ctx.save();ctx.translate(W/2-230,640);ctx.scale(k*.9,k*.9);cartoonHand(0,0,1,1);ctx.restore();
+      ctx.save();ctx.translate(W/2+230,640);ctx.scale(k*.9,k*.9);cartoonHand(0,0,1,-1);ctx.restore();
+      // crack bursts on left
+      if(t>33.6){const c=((t-33.6)*1.6)%1;burst(W/2-230+(c>.5?60:-40),430,70*easeOut(c),'#ffd60a');text('CRACK',W/2-230+(c>.5?60:-40),430,30,{fill:OL,shadow:false,scale:easeOut(c)})}
+      label('CRACKED',W/2-230,250,t,33.6,{bg:'#ffd60a',size:52,rot:-.05});
+      label('NEVER',W/2+230,250,t,34.8,{bg:'#fff',size:52,rot:.05});
+      const yrs=Math.round(easeInOut(prog(t,35.3,1.1))*60);
+      if(t>35.2)text(`${yrs} YEARS`,W/2,890,72,{fill:OL,shadow:false,scale:pop(t,35.25),alpha:1-prog(t,37.8,.2)});
+      check(W/2-230,660,1,pop(t,38.1,.35));check(W/2+230,660,1,pop(t,38.25,.35));
+      if(t>38.0)label('NO ARTHRITIS',W/2,880,t,38.0,{bg:'#2a9d8f',fg:'#fff',size:58});
+    } else {
+      const k=pop(t,40.15,.5);trophy(W/2,520+Math.sin(t*5)*8,1.6*k);
+      const r=rng(2);for(let i=0;i<30;i++){const x=r()*W,y=150+((t-40)*400*(.5+r())+r()*800)%840;ctx.fillStyle=['#ffd60a','#e63946','#4cc9f0','#7ae582'][i%4];ctx.save();ctx.translate(x,y);ctx.rotate(t*4+i);ctx.fillRect(-10,-5,20,10);ctx.restore()}
+      label('AN AWARD!',W/2,250,t,40.65,{bg:'#e63946',fg:'#fff',size:68});
+      text('(Ig Nobel Prize, 2009)',W/2,860,42,{fill:'#5c677d',shadow:false,alpha:prog(t,41.0,.3)});
+    }
+    return}
+  // J: outro
+  label('HARMLESS',W/2,300,t,43.2,{bg:'#2a9d8f',fg:'#fff',size:80,rot:-.04});
+  label('STILL ANNOYING',W/2,520,t,44.35,{bg:'#ffd60a',size:76,rot:.04});
+  if(t>45.25){const k=pop(t,45.3,.3);ctx.save();ctx.translate(W/2,770);ctx.rotate(-.06);ctx.scale(k*(1+.04*Math.sin(t*16)),k);text('STOP IT.',0,0,150,{fill:'#e63946',sw:22});ctx.restore()}
+}
+
+</script></body></html>
