@@ -262,6 +262,7 @@ function render(t){
     if(pf>0)punchFX(t,pf,out);
     ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();
     if(out)outroFX(t);
+    const pw=punchWord(t);if(pw&&pf>.5){ctx.save();ctx.translate(W/2,400);ctx.rotate(-.05);ctx.scale(1+.04*Math.sin(t*18),1);text(pw[0],0,0,Math.min(190,1500/pw[0].length),{fill:'#ffd60a',sw:28,scale:pop(pw[1],0,.25)});ctx.restore()}
   }
   // name tag: window.NAMETAG=[start,end]
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
@@ -273,8 +274,9 @@ function render(t){
 // ---------- hook text (#4): on screen from the very first frame ----------
 // window.HOOK=[['LINE',color,size],...]
 function hookText(t,INTRO){const H_=window.HOOK;if(!H_)return;const a=1-prog(t,INTRO-.6,.35);if(a<=0)return;
-  let y=250;H_.forEach(([str,col,size=110],i)=>{const b=1+.04*Math.sin(t*5+i);text(str,W/2,y,size,{fill:col||'#fff',sw:size*.17,scale:b,rot:(i%2?.025:-.03),alpha:a});y+=size*1.08})}
+  let y=170;H_.forEach(([str,col,size=110],i)=>{y+=size*.6;const b=1+.04*Math.sin(t*5+i);text(str,W/2,y,size,{fill:col||'#fff',sw:size*.17,scale:b,rot:(i%2?.025:-.03),alpha:a});y+=size*.55})}
 // ---------- punch-in look ----------
+function punchWord(t){for(const q of (window.PUNCH||[]))if(q[2]&&t>=q[0]&&t<q[1])return [q[2],t-q[0]];return null}
 function punchFX(t,pf,out){ctx.save();ctx.globalAlpha=pf;
   const g=ctx.createRadialGradient(W/2,H*.55,200,W/2,H*.55,1200);g.addColorStop(0,out?'#ffe08a':'#ffb4a2');g.addColorStop(1,out?'#f4a261':'#e63946');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.translate(W/2,H*.5);ctx.rotate(t*.15);ctx.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<24;i++){ctx.rotate(Math.PI/12);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1500,-60);ctx.lineTo(1500,60);ctx.closePath();ctx.fill()}

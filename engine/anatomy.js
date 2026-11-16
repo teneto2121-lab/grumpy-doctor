@@ -184,3 +184,52 @@ function robotArm(x,y,s,t,{wiggle=0,expr='happy'}={}){ctx.save();ctx.translate(x
   ctx.beginPath();ctx.roundRect(-80,-150,120,100,22);P(shadeFill(0,-150,0,-50,'#e9ecef','#adb5bd'),7);ctx.save();noShadow();face(-20,-102,.55,expr,t);ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-20,-150);ctx.lineTo(-20,-185);ctx.stroke();E(-20,-192,12,12);P('#e63946',5);ctx.restore();
   feather(j2[0]+10,j2[1]-40,.45,a1+a2+Math.PI/2+Math.sin(t*12)*.2*wiggle);
   ctx.restore();return [x+(j2[0]+10)*s,y+(j2[1]-40)*s]}
+
+// ---------- lungs + diaphragm (front view). twitch 0..1 pulls the diaphragm down; air 0..1 shows inflow ----------
+function lungsDiaphragm(cx,cy,s,t,{twitch=0,air=0,expr=null}={}){ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  const ex=1+.07*twitch;
+  // trachea + bronchi
+  ctx.lineCap='round';ctx.lineJoin='round';
+  [[OL,58],['#f4c2c2',42]].forEach(([c,w])=>{ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();ctx.moveTo(0,-360);ctx.lineTo(0,-150);ctx.moveTo(0,-150);ctx.lineTo(-90,-80);ctx.moveTo(0,-150);ctx.lineTo(90,-80);ctx.stroke()});
+  ctx.save();noShadow();ctx.strokeStyle='rgba(43,33,24,.3)';ctx.lineWidth=5;for(let y=-340;y<-160;y+=26){ctx.beginPath();ctx.moveTo(-16,y);ctx.lineTo(16,y);ctx.stroke()}ctx.restore();
+  // lungs
+  [-1,1].forEach(d=>{ctx.save();ctx.translate(d*150,0);ctx.scale(d*ex,ex);
+    curve([[-40,-230],[40,-200],[95,-90],[105,40],[80,150],[0,175],[-70,160],[-80,40],[-75,-120]]);P(radial(20,-40,220,'#ffc2d1','#e9799a'),8);
+    ctx.save();noShadow();gloss(30,-120,26,48,.2,.35);ctx.strokeStyle='rgba(150,45,90,.3)';ctx.lineWidth=5;ctx.beginPath();ctx.moveTo(-60,0);ctx.quadraticCurveTo(20,-20,90,30);ctx.stroke();ctx.restore();ctx.restore()});
+  // air arrows
+  if(air>0){ctx.save();noShadow();ctx.globalAlpha=air;for(let k=0;k<3;k++){const y=-380+((t*420+k*90)%240);poly([[-18,y],[18,y],[18,y+24],[32,y+24],[0,y+56],[-32,y+24],[-18,y+24]]);P('#4cc9f0',5)}ctx.restore()}
+  // diaphragm dome (flattens and drops when it twitches)
+  const dy=190+55*twitch,arc=lerp(110,35,twitch);
+  ctx.beginPath();ctx.moveTo(-300,dy+60);ctx.quadraticCurveTo(0,dy-arc*2+60,300,dy+60);ctx.lineTo(300,dy+110);ctx.quadraticCurveTo(0,dy-arc*2+110,-300,dy+110);ctx.closePath();P(shadeFill(0,dy-arc,0,dy+110,'#e76f51','#b23a2b'),8);
+  ctx.save();noShadow();ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=5;for(let i=-4;i<=4;i++){ctx.beginPath();ctx.moveTo(i*60,dy+70-arc*(1-(i*i)/25)*.95);ctx.lineTo(i*60,dy+100-arc*(1-(i*i)/25)*.95);ctx.stroke()}
+  if(expr)face(0,dy+20-arc+ (twitch*20),.8,expr,t);ctx.restore();
+  ctx.restore()}
+// ---------- vocal cords, top view. closed 0..1 ----------
+function vocalCords(cx,cy,s,t,closed){ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  E(0,0,230,270);P(radial(0,0,270,'#f7a8b8','#d45d79'),8);ctx.save();noShadow();
+  const gap=lerp(70,0,closed);
+  // airway (dark triangle between the folds)
+  poly([[0,-200],[gap,190],[-gap,190]]);ctx.fillStyle='#2b0510';ctx.fill();
+  [-1,1].forEach(d=>{poly([[0,-210],[d*(gap+4),190],[d*(gap+70),200],[d*80,-170]]);P(shadeFill(d*80,0,0,0,'#fff3f5','#f1c0cb'),6)});
+  ctx.restore();ctx.restore()}
+// ---------- skin cross-section with hairs + arrector pili muscles. pull 0..1 stands hairs up ----------
+function skinHair(cx,cy,s,t,{pull=0,n=3,cold=0}={}){ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  const Wd=820,top=-120,bot=260,xs=Array.from({length:n},(_,i)=>-Wd/2+Wd*(i+.5)/n);
+  const bump=x=>xs.reduce((a,hx)=>a+pull*42*Math.exp(-(((x-hx-30)/55)**2)),0);
+  // dermis block
+  ctx.beginPath();ctx.moveTo(-Wd/2,top-bump(-Wd/2));for(let x=-Wd/2;x<=Wd/2;x+=10)ctx.lineTo(x,top-bump(x));ctx.lineTo(Wd/2,bot);ctx.lineTo(-Wd/2,bot);ctx.closePath();P(shadeFill(0,top,0,bot,'#fbd0c0','#f2a48f'),8);
+  ctx.save();noShadow();
+  // epidermis band
+  ctx.beginPath();ctx.moveTo(-Wd/2,top-bump(-Wd/2));for(let x=-Wd/2;x<=Wd/2;x+=10)ctx.lineTo(x,top-bump(x));for(let x=Wd/2;x>=-Wd/2;x-=10)ctx.lineTo(x,top+34-bump(x)*.8);ctx.closePath();ctx.fillStyle=cold>0?mixHex('f6d2b3','d8ecff',cold*.6):'#f6d2b3';ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.stroke();
+  xs.forEach(hx=>{
+    const ang=lerp(-.95,-.08,easeInOut(pull)); // hair angle from vertical
+    const bx=hx-70,by=top+250; // follicle bulb, deep in the dermis
+    // follicle
+    ctx.save();ctx.translate(bx,by);ctx.rotate(ang);ctx.beginPath();ctx.roundRect(-20,-250,40,260,20);P('#fff0e6',5);E(0,8,28,24);P('#e9a17c',5);
+    // hair shaft
+    ctx.strokeStyle=OL;ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-460);ctx.stroke();ctx.strokeStyle='#5a3d2b';ctx.lineWidth=7;ctx.stroke();ctx.restore();
+    // arrector pili muscle: from mid-follicle to under the epidermis
+    const fx=bx+Math.sin(ang)*120,fy=by-Math.cos(ang)*120,mx=hx+60,my=top+44;
+    const thick=lerp(16,26,pull);ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=thick+10;ctx.beginPath();ctx.moveTo(fx+10,fy);ctx.quadraticCurveTo((fx+mx)/2+20,(fy+my)/2+30*(1-pull),mx,my);ctx.stroke();ctx.strokeStyle=pull>0?mixHex('e76f51','c1121f',pull):'#e76f51';ctx.lineWidth=thick;ctx.stroke();
+  });
+  ctx.restore();ctx.restore()}

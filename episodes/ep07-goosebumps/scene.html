@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 07: Why do we get goosebumps? =====
+window.INTRO_END=3.45;
+window.HOOK=[['WHY DO WE GET','#fff',88],['GOOSEBUMPS?','#ffd60a',116]];
+window.SCENES=[3.45,5.0,11.5,16.0,25.0,29.9];
+window.TINTS=['#e6f0ff','#ffe8e0','#ffe0ec','#fff1cc','#e3f7e9','#efe6ff'];
+window.PUNCH=[[22.25,25.0,'NOT A CAT!']];
+window.JOLTS=[2.64,12.4,18.1];
+window.OUTRO=true;
+window.SFX=[[1.65,'sparkle',.7],[2.64,'stamp',.6],[3.0,'whoosh'],[4.3,'blip'],[5.0,'whoosh',.8],[7.2,'blip'],[10.4,'beep'],[10.7,'beep'],[11.0,'beep'],
+ [11.5,'whoosh',.8],[12.4,'pop'],[12.45,'whoosh',.5],[15.4,'pop',.7],[15.5,'blip'],[16.0,'whoosh',.8],[16.7,'blip'],[18.1,'pop',1.2],[18.15,'steam',.8],[19.2,'blip'],[20.6,'blip'],
+ [22.3,'stamp'],[22.35,'steam'],[25.0,'whoosh',.8],[26.3,'blip'],[28.5,'fall',.7],[28.6,'blip'],[29.9,'whoosh',.8],[30.9,'blip'],[31.75,'stamp']];
+const MOOD=[[0,.25],[1.6,.3],[3.5,.25],[11.9,.35],[16,.25],[19,.35],[22.2,.95],[25,.5],[26,.35],[30,.3],[31.7,.4],[33,.4]];
+const POSES=[[0,'chin'],[1.6,'point'],[3.5,'shrug'],[5.0,'point'],[11.5,'point'],[16,'rest'],[16.6,'point'],[22.2,'up'],[25.0,'hips'],[26.3,'point'],[29.9,'cross'],[31.6,'facepalm']];
+
+// ---- episode props ----
+function snowflake(x,y,s,rot,col='#4cc9f0'){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.strokeStyle=OL;ctx.lineWidth=s*.28;ctx.lineCap='round';
+  for(let pass=0;pass<2;pass++){if(pass){ctx.strokeStyle=col;ctx.lineWidth=s*.16}for(let i=0;i<6;i++){ctx.rotate(Math.PI/3);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-s);ctx.moveTo(0,-s*.6);ctx.lineTo(s*.25,-s*.85);ctx.moveTo(0,-s*.6);ctx.lineTo(-s*.25,-s*.85);ctx.stroke()}}ctx.restore()}
+function ghost(x,y,s,t){ctx.save();ctx.translate(x,y+Math.sin(t*3)*8);ctx.scale(s,s);ctx.beginPath();ctx.moveTo(-70,60);ctx.lineTo(-70,-20);ctx.arc(0,-20,70,Math.PI,0);ctx.lineTo(70,60);for(let i=0;i<4;i++)ctx.quadraticCurveTo(52-i*35,85,35-i*35,60);ctx.closePath();P(shadeFill(0,-90,0,60,'#ffffff','#dee2e6'),7);noShadow();E(-24,-20,10,14);P(OL,0);E(24,-20,10,14);P(OL,0);E(0,15,14,18);P(OL,0);ctx.restore()}
+// cartoon cat; puff 0..1 fluffs fur and makes it bigger
+function cat(x,y,s,t,puff){ctx.save();ctx.translate(x,y);const k=s*(1+.32*puff);ctx.scale(k,k);
+  const fur=(rx,ry,cx,cy)=>{if(puff<=.02){E(cx,cy,rx,ry);return}ctx.beginPath();const n=40;for(let i=0;i<=n;i++){const a=i/n*Math.PI*2,r=1+.13*puff*(i%2?1:-.2);ctx.lineTo(cx+Math.cos(a)*rx*r,cy+Math.sin(a)*ry*r)}ctx.closePath()};
+  // tail (bottle-brush when puffed)
+  ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=40+40*puff;ctx.beginPath();ctx.moveTo(110,60);ctx.quadraticCurveTo(230,30,200,-120+Math.sin(t*3)*10);ctx.stroke();ctx.strokeStyle='#f4a261';ctx.lineWidth=26+40*puff;ctx.stroke();
+  fur(150,105,0,60);P(radial(0,40,160,'#ffc78a','#e07a2e'),8);noShadow();
+  fur(105,95,-70,-70);P(radial(-80,-90,110,'#ffc78a','#e07a2e'),8);
+  [[-140,-140],[-10,-140]].forEach(([ex,ey])=>{poly([[ex-35,ey+40],[ex,ey-20-20*puff],[ex+35,ey+40]]);P('#e07a2e',7)});
+  // stripes
+  ctx.strokeStyle='rgba(150,70,20,.45)';ctx.lineWidth=12;[-40,10,60].forEach(sx=>{ctx.beginPath();ctx.moveTo(sx,-20);ctx.quadraticCurveTo(sx+10,40,sx-10,90);ctx.stroke()});
+  face(-75,-70,.9,puff>.3?'scared':'calm',t);
+  [-60,40].forEach(lx=>{ctx.beginPath();ctx.roundRect(lx-22,120,44,70,20);P('#f4a261',6)});
+  ctx.restore()}
+function armBumps(cx,cy,s,t,k){ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  ctx.beginPath();ctx.roundRect(-430,-95,860,190,95);P(shadeFill(0,-95,0,95,'#f6d2b3','#e4ad86'),8);noShadow();
+  const r=rng(12);for(let i=0;i<70;i++){const x=-400+r()*800,y=-70+r()*140;const b=k*(.6+.4*Math.sin(t*6+i));E(x,y,6+4*b,6+4*b);ctx.fillStyle=`rgba(200,120,90,${.25+.35*b})`;ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=2.5;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x,y-12-10*b);ctx.stroke()}
+  ctx.restore()}
+function tape(cx,y,w,lab){ctx.save();ctx.beginPath();ctx.roundRect(cx-w/2,y-26,w,52,8);P(shadeFill(0,y-26,0,y+26,'#ffe066','#f4b400'),6);noShadow();ctx.strokeStyle=OL;ctx.lineWidth=4;for(let x=cx-w/2+20;x<cx+w/2;x+=40){ctx.beginPath();ctx.moveTo(x,y-26);ctx.lineTo(x,y-(x%80?6:-4));ctx.stroke()}text(lab,cx,y+60,40,{fill:OL,shadow:false});ctx.restore()}
+
+function content(t){
+  const CY=560;
+  if(t<3.45){ // intro: cold or scared
+    if(t>1.6){snowflake(230,640,90*easeBack(prog(t,1.65,.4)),t*.6);label('COLD',230,780,t,1.7,{bg:'#4cc9f0',size:50,rot:-.06})}
+    if(t>2.6){ghost(850,620,1.0*easeBack(prog(t,2.64,.4)),t);label('SCARED',850,780,t,2.7,{bg:'#fff',size:50,rot:.06})}
+    return}
+  if(t<5.0){ // same thing
+    snowflake(260,CY-20,110,t*.6);ghost(820,CY-20,1.1,t);
+    text('=',W/2,CY-20,160,{fill:OL,shadow:false,scale:pop(t,4.2)});
+    label('SAME THING',W/2,CY+230,t,4.3,{bg:'#ffd60a',size:64});
+    return}
+  if(t<11.5){ // tiny muscle on every hair
+    skinHair(W/2,CY+40,1.0,t,{pull:0});
+    text('YOUR SKIN, UP CLOSE',W/2,195,52,{fill:OL,shadow:false});
+    if(t>7.1){label('TINY MUSCLE',780,CY+300,t,7.2,{bg:'#e76f51',fg:'#fff',size:46,rot:.04});const pulse=.5+.5*Math.sin(t*8);ctx.save();ctx.globalAlpha=.6*pulse;ctx.strokeStyle='#ffd60a';ctx.lineWidth=10;ctx.setLineDash([16,12]);ctx.beginPath();ctx.ellipse(W/2-150,CY+40,110,90,0,0,Math.PI*2);ctx.stroke();ctx.setLineDash([]);ctx.restore()}
+    if(t>10.3){const r=rng(3);for(let i=0;i<3;i++){const x=W/2-300+i*275;ctx.save();ctx.globalAlpha=(Math.sin(t*20+i)+1)/2;poly([[x,CY-260],[x+28,CY-200],[x+6,CY-200],[x+22,CY-140],[x-20,CY-215],[x,CY-215]]);P('#ffd60a',5);ctx.restore()}label('NERVES FIRE',220,330,t,10.4,{bg:'#ffd60a',size:44,rot:-.05})}
+    return}
+  if(t<16.0){ // yank -> bump
+    const pull=easeOut(prog(t,12.0,.7));
+    skinHair(W/2,CY+40,1.0,t,{pull,cold:pull});
+    if(t>12.3)label('YANK!',820,300,t,12.4,{bg:'#e63946',fg:'#fff',size:60,rot:.08});
+    if(t>15.3)label('= A GOOSEBUMP',W/2,905,t,15.4,{bg:'#ffd60a',size:52});
+    return}
+  if(t<25.0){ // the cat
+    const puff=easeOut(prog(t,18.1,.35));
+    cat(W/2-40,CY+60,1.1,t,puff);
+    label('IF YOU WERE A CAT',W/2,205,t,16.7,{bg:'#fff',size:50});
+    if(t>19.0)label('TRAPS WARM AIR',230,CY+320,t,19.2,{bg:'#ffd166',size:40,rot:-.05});
+    if(t>20.5)label('LOOKS BIGGER',840,CY+320,t,20.6,{bg:'#e76f51',fg:'#fff',size:40,rot:.05});
+    return}
+  if(t<29.9){ // just bumps, same size
+    armBumps(W/2,CY-40,1.0,t,1);
+    label('YOU',W/2,215,t,25.1,{bg:'#fff',size:60});
+    text('covered in tiny bumps',W/2,CY+120,44,{fill:'#5c677d',shadow:false,alpha:prog(t,26.6,.3)});
+    if(t>28.4){tape(W/2,CY+250,760,'SAME SIZE');}
+    return}
+  // bluffing
+  armBumps(W/2,CY-80,.85,t,1);
+  label('BLUFFING',W/2,CY+170,t,30.9,{bg:'#7b5ea7',fg:'#fff',size:64,rot:-.03});
+  stamp('WITH NOTHING.',W/2,CY+330,t,31.75,74,-.05);
+}
+</script></body></html>

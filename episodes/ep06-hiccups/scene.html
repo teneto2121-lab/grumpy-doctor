@@ -1,0 +1,95 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 06: Why do we hiccup? =====
+window.INTRO_END=2.85;
+window.HOOK=[['WHY DO WE','#fff',100],['HICCUP?','#ffd60a',150]];
+window.SCENES=[2.85,10.6,14.5,18.9,24.8,29.1,33.3];
+window.TINTS=['#ffe3e8','#ffe0ec','#fff3d6','#e6f0ff','#fff1cc','#efe6ff','#e3f7e9'];
+window.PUNCH=[[12.45,13.35,'HIC!'],[27.3,28.95,'68 YEARS!']];
+window.JOLTS=[7.26,12.56,27.4];
+window.OUTRO=true;
+window.SFX=[[0.4,'pop',.6],[1.1,'pop',.5],[2.4,'whoosh'],[4.2,'blip'],[5.4,'blip'],[7.26,'pop'],[7.3,'whoosh',.5],[8.2,'blip'],
+ [10.6,'whoosh',.8],[10.9,'blip'],[11.75,'stamp',.6],[12.56,'pop',1.3],[12.58,'stamp'],[14.5,'whoosh',.8],[14.7,'blip'],[15.6,'pop',.6],[16.5,'blip'],[17.6,'blip'],
+ [18.9,'whoosh',.8],[19.3,'blip'],[21.4,'stamp'],[22.5,'blip'],[23.4,'pop',.4],[23.9,'pop',.4],[24.8,'whoosh',.8],[25.9,'tick'],[26.1,'tick'],[26.3,'tick'],[26.5,'blip'],[27.4,'stamp'],[27.45,'steam'],
+ [29.1,'whoosh',.8],[29.5,'blip'],[30.0,'blip'],[30.4,'blip'],[30.7,'stamp'],[31.6,'blip'],[33.3,'whoosh',.8],[34.0,'blip'],[35.3,'ding',.6],[36.6,'stamp']];
+const MOOD=[[0,.25],[1.6,.15],[2.9,.3],[7.26,.4],[9,.3],[12.5,.95],[13.3,.4],[14.6,.3],[19,.35],[21.4,.3],[25,.4],[27.3,.95],[28.9,.6],[29.3,.2],[33.4,.35],[36.6,.5],[37.5,.5]];
+const POSES=[[0,'pinch'],[1.5,'facepalm'],[2.9,'rest'],[3.6,'point'],[9.2,'point'],[12.4,'up'],[13.4,'point'],[17.6,'shrug'],[18.9,'chin'],[20.9,'shrug'],[22.4,'point'],[25,'lean'],[27.3,'up'],[29.1,'cross'],[31.4,'point'],[33.3,'hips'],[36.4,'cross']];
+
+// ---- episode props ----
+function hic(x,y,s,a=1){ctx.save();ctx.globalAlpha*=a;ctx.translate(x,y);ctx.scale(s,s);E(0,0,90,60);P('rgba(255,255,255,.95)',6);text('hic!',0,4,52,{fill:'#e63946',shadow:false});ctx.restore()}
+function plateFast(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);E(0,20,130,40);P(shadeFill(0,-20,0,60,'#ffffff','#ced4da'),7);noShadow();
+  curve([[-70,10],[-50,-30],[0,-45],[50,-30],[70,10],[0,25]]);P(radial(0,-10,80,'#ffd166','#e76f51'),6);
+  ctx.save();ctx.rotate(Math.sin(t*20)*.3);ctx.strokeStyle=OL;ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(60,-40);ctx.lineTo(150,-140);ctx.stroke();ctx.strokeStyle='#adb5bd';ctx.lineWidth=6;ctx.stroke();ctx.restore();
+  ctx.strokeStyle='rgba(43,33,24,.5)';ctx.lineWidth=6;for(let i=0;i<3;i++){ctx.beginPath();ctx.moveTo(-170,-40+i*30);ctx.lineTo(-120,-40+i*30);ctx.stroke()}ctx.restore()}
+function sodaCan(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-60,-110,120,220,22);P(shadeFill(-60,0,60,0,'#ff6b6b','#b5172f'),7);noShadow();
+  E(0,-108,58,14);P('#dee2e6',5);text('FIZZ',0,10,40,{fill:'#fff',sw:8,shadow:false,rot:-.1});gloss(-30,0,10,70,0,.35);
+  const r=rng(4);for(let i=0;i<8;i++){const u=((t*.8+r())%1);E((r()-.5)*90,-130-u*130,6+r()*6,6+r()*6);ctx.globalAlpha=1-u;P('#bde0fe',3);ctx.globalAlpha=1}ctx.restore()}
+function gulp(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);E(0,0,80,55);P('#8a1c2b',7);noShadow();E(0,20,50,22);ctx.fillStyle='#ef6f86';ctx.fill();
+  for(let k=0;k<3;k++){const u=((t*1.5+k/3)%1);ctx.globalAlpha=1-u;ctx.strokeStyle='#4cc9f0';ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.arc(-140+u*130,-10,20+k*6,-.8,.8);ctx.stroke();ctx.globalAlpha=1}ctx.restore()}
+function womb(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);E(0,0,230,210);P(radial(0,0,230,'#ffe5ec','#f4acb7'),8);noShadow();
+  ctx.save();ctx.rotate(-.3);E(-20,30,110,80);P('#ffcdb2',6);E(60,-60,70,68);P('#ffcdb2',6);face(70,-60,.6,'calm',t);E(-90,80,30,24);P('#ffcdb2',5);ctx.restore();
+  ctx.strokeStyle='rgba(43,33,24,.4)';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(-60,60);ctx.quadraticCurveTo(-150,140,-200,90);ctx.stroke();ctx.restore()}
+function calendar(x,y,s,txt,sub){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-140,-120,280,250,24);P(shadeFill(0,-120,0,130,'#ffffff','#e9ecef'),8);noShadow();ctx.beginPath();ctx.roundRect(-140,-120,280,72,{upperLeft:24,upperRight:24,lowerLeft:0,lowerRight:0});P(shadeFill(0,-120,0,-48,'#ff5a65','#d62839'),8);
+  [-70,70].forEach(dx=>{ctx.beginPath();ctx.roundRect(dx-10,-145,20,50,10);P('#5c677d',6)});text(sub,0,-84,38,{fill:'#fff',shadow:false});text(txt,0,40,96,{fill:OL,shadow:false});ctx.restore()}
+function sugarSpoon(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.rotate(-.5);ctx.strokeStyle=OL;ctx.lineWidth=20;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,150);ctx.stroke();ctx.strokeStyle='#ced4da';ctx.lineWidth=10;ctx.stroke();E(0,-20,45,60);P(shadeFill(-45,0,45,0,'#f1f3f5','#adb5bd'),7);noShadow();E(0,-30,32,30);P('#fff',4);ctx.restore()}
+function glassUpside(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);poly([[-70,90],[70,90],[52,-90],[-52,-90]]);P('rgba(189,224,254,.8)',7);noShadow();ctx.fillStyle='rgba(76,201,240,.6)';ctx.fillRect(-60,40,120,46);ctx.restore()}
+function ghost(x,y,s,t){ctx.save();ctx.translate(x,y+Math.sin(t*3)*8);ctx.scale(s,s);ctx.beginPath();ctx.moveTo(-70,60);ctx.lineTo(-70,-20);ctx.arc(0,-20,70,Math.PI,0);ctx.lineTo(70,60);for(let i=0;i<4;i++)ctx.quadraticCurveTo(52-i*35,85,35-i*35,60);ctx.closePath();P('#f8f9fa',7);noShadow();E(-24,-20,10,14);P(OL,0);E(24,-20,10,14);P(OL,0);E(0,15,14,18);P(OL,0);ctx.restore()}
+
+function content(t){
+  const CY=560;
+  if(t<2.85){ // intro: hic bubbles
+    [[220,560,.4],[860,520,1.1],[300,700,1.9]].forEach(([x,y,s])=>{if(t>s){const u=prog(t,s,.6);hic(x,y-u*40,easeBack(Math.min(1,u*2)),1-prog(t,s+1.2,.4))}});
+    return}
+  if(t<10.6){ // diaphragm twitch + gasp
+    const tw=t>7.26?Math.max(0,Math.sin((t-7.26)*9))*Math.exp(-(t-7.26)*1.2):0;
+    lungsDiaphragm(W/2,CY-40,.95,t,{twitch:tw,air:t>7.8&&t<9.6?1:0,expr:t>7.26?'scared':'calm'});
+    label('DIAPHRAGM',W/2,905,t,4.2,{bg:'#e76f51',fg:'#fff',size:52});
+    label('BIG MUSCLE UNDER YOUR LUNGS',W/2,215,t,5.4,{bg:'#fff',size:42});
+    if(t>7.26)label('TWITCH!',870,700,t,7.3,{bg:'#ffd60a',size:50,rot:.08});
+    if(t>8.2)label('GASP!',210,330,t,8.2,{bg:'#4cc9f0',size:54,rot:-.08});
+    return}
+  if(t<14.5){ // vocal cords slam
+    const cl=easeOut(prog(t,11.7,.3));
+    vocalCords(W/2,CY,1.0,t,cl);
+    label('VOCAL CORDS',W/2,205,t,10.9,{bg:'#fff',size:56});
+    if(t>11.75)label('SLAM!',820,CY+260,t,11.75,{bg:'#e63946',fg:'#fff',size:60,rot:.08});
+    if(t>12.56){const c=prog(t,12.56,.4);burst(W/2,CY,lerp(80,260,easeOut(c)),'#ffd60a');text('HIC!',W/2,CY,lerp(60,150,easeBack(c)),{fill:'#e63946',sw:16})}
+    return}
+  if(t<18.9){ // triggers
+    plateFast(250,350,.9*pop(t,14.7),t);label('EATING TOO FAST',650,350,t,14.8,{bg:'#fff',size:42});
+    sodaCan(250,580,.85*pop(t,15.6),t);label('FIZZY DRINKS',650,580,t,15.7,{bg:'#fff',size:42});
+    gulp(250,810,.9*pop(t,16.5),t);label('GULPING AIR',650,810,t,16.6,{bg:'#fff',size:42});
+    text('TRIGGERS',W/2,190,60,{fill:OL,shadow:false});
+    return}
+  if(t<24.8){ // nobody knows; babies hiccup
+    if(t<22.3){
+      const r=rng(6);for(let i=0;i<7;i++){const x=150+r()*780,y=260+r()*600;text('?',x,y+Math.sin(t*3+i)*12,90+r()*80,{fill:['#7b5ea7','#4cc9f0','#e63946'][i%3],sw:12,scale:pop(t,19.3+i*.08)})}
+      stamp('NOBODY KNOWS',W/2,CY,t,21.4,90,-.06);
+    } else {
+      womb(W/2,CY+20,1.1*pop(t,22.4),t);
+      label('EVEN BEFORE BIRTH',W/2,205,t,22.5,{bg:'#ffd60a',size:50});
+      [[W/2+230,CY-150,23.4],[W/2+300,CY-30,23.9]].forEach(([x,y,s])=>{if(t>s)hic(x,y-prog(t,s,.8)*30,.8*easeBack(prog(t,s,.3)),1-prog(t,s+.6,.3))});
+    }
+    return}
+  if(t<29.1){ // 68 years
+    const yr=Math.round(lerp(1922,1990,easeInOut(prog(t,25.9,.7))));
+    calendar(W/2,CY-40,1.4*pop(t,24.9),String(yr),'YEAR');
+    label('ONE MAN, NONSTOP',W/2,205,t,24.95,{bg:'#fff',size:56});
+    if(t>26.5)label('68 YEARS',W/2,880,t,26.5,{bg:'#e63946',fg:'#fff',size:64});
+    return}
+  if(t<33.3){ // cures = folklore
+    sugarSpoon(240,360,1*pop(t,29.5));glassUpside(W/2,380,1*pop(t,30.0));ghost(840,370,1*pop(t,30.4),t);
+    stamp('FOLKLORE',W/2,590,t,30.7,90,-.06,'#7b5ea7');
+    if(t>31.5){label('HOLD YOUR BREATH',W/2,800,t,31.6,{bg:'#4cc9f0',size:50});text('might help a little',W/2,890,44,{fill:'#5c677d',shadow:false,alpha:prog(t,32.2,.3)})}
+    return}
+  // see a real doctor
+  calendar(300,CY-60,1.0*pop(t,33.4),'2+','DAYS');
+  label('SEE A REAL DOCTOR',730,CY-60,t,35.3,{bg:'#2a9d8f',fg:'#fff',size:40,rot:.03});
+  if(t>35.0){ctx.strokeStyle=OL;ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(470,CY-60);ctx.lineTo(500,CY-60);ctx.stroke()}
+  stamp('NOT ME.',W/2,CY+250,t,36.6,110,-.06);
+}
+</script></body></html>

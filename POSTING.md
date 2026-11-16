@@ -53,6 +53,22 @@ It's not funny and it's not a bone. 🦴⚡ #funnybone #bodyfacts #learnontiktok
 ```
 **Pinned comment:** `Tag the friend who hits their elbow on everything.`
 
+### Ep 06: Why do we hiccup?  *(new voice + all new features)*
+**File:** `episodes/ep06-hiccups/ep06-hiccups.mp4`
+**Caption:**
+```
+One man hiccupped for 68 YEARS. 😤 #hiccups #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `What's your hiccup cure? Wrong answers only.`
+
+### Ep 07: Why do we get goosebumps?
+**File:** `episodes/ep07-goosebumps/ep07-goosebumps.mp4`
+**Caption:**
+```
+Your body is bluffing. With nothing. 🐱❄️ #goosebumps #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `What gives you goosebumps? (Besides me.)`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -61,3 +77,5 @@ It's not funny and it's not a bone. 🦴⚡ #funnybone #bodyfacts #learnontiktok
 - **Gum:** gum base is indigestible but passes through the gut in days; blockages reported only in children who swallowed large amounts habitually (Milov et al., *Pediatrics*, 1998).
 - **Tickling:** the cerebellum predicts the sensory result of your own movements and dampens it (Blakemore, Wolpert & Frith, *Nature Neuroscience*, 1998). With a self-controlled tickle robot, adding a 100–300 ms delay made it feel more ticklish (Blakemore, Frith & Wolpert, *Journal of Cognitive Neuroscience*, 1999).
 - **Funny bone:** the ulnar nerve passes through the cubital tunnel behind the medial epicondyle of the humerus, covered only by skin and fat; it supplies the little finger and half of the ring finger. The humerus/"humorous" pun is a popular explanation for the name, not a proven origin.
+- **Hiccups:** involuntary spasm of the diaphragm followed by sudden closure of the glottis (the "hic"). Common triggers: large or fast meals, carbonated drinks, swallowing air. Fetal hiccups are seen on ultrasound. Charles Osborne holds the Guinness record: hiccupping from 1922 to 1990 (68 years). Hiccups lasting over 48 hours ("persistent hiccups") warrant medical evaluation.
+- **Goosebumps:** arrector pili muscles attached to hair follicles contract under sympathetic nervous system activation (cold, fear, strong emotion), raising the hairs and the skin around them. In furry mammals this traps insulating air and makes the animal look bigger.
