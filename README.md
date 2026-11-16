@@ -61,7 +61,7 @@ tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 | 09 | Why does your stomach growl? | 42s |
 | 10 | MYTH OR FACT? Body edition (format pilot) | 57s |
 | 11 | What happens if you sleep 8 hours for 30 days? (format pilot, cut-off ending) | 53s |
-| 12 | MYTH OR FACT? Gross edition | 63s |
+| 12 | MYTH OR FACT? Gross edition (not posted, format retired) | 63s |
 | 13 | The dirtiest thing in your house isn't your toilet (cut-off ending) | 44s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

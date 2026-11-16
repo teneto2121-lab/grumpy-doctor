@@ -101,7 +101,7 @@ Send this to the friend who "runs on 4 hours." 😴 #sleep #bodyfacts #learnonti
 ```
 **Pinned comment:** `No, I won't finish that sentence. Watch it again.`
 
-### Ep 12: MYTH OR FACT? Gross edition
+### Ep 12: MYTH OR FACT? Gross edition  *(NOT POSTING: format retired)*
 **File:** `episodes/ep12-myth-or-fact-gross/ep12-myth-or-fact-gross.mp4`
 **Caption:**
 ```

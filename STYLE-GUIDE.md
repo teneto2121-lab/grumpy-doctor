@@ -79,7 +79,9 @@
   SFX in story time as usual. Longer pauses get soft clock ticks automatically.
 - Animations that should keep moving during a pause can use video time: `window.__rt`, `toVideo(storyTime)`.
 
-## Format: MYTH OR FACT? (ep 10 pilot)
+## Format: MYTH OR FACT? (RETIRED, do not make more)
+Retired at the owner's request after ep 12 (not posted). Kept for reference only; engine/mythfact.js stays but isn't used.
+
 - Hook "Myth or fact? [X] edition. And it gets weirder." + teaser
 - 5–7 numbered cases: CASE card → claim box → guess window (buttons pulse) → verdict stamp → 1–2 explanation beats
 - FACT / MYTH / KINDA board; each verdict drops a tag into its column
