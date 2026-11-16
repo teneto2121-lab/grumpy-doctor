@@ -184,7 +184,7 @@ function buildChunks(){CHUNKS=[];let cur=[];WORDS.forEach(w=>{cur.push(w);if(/[.
 function captions(t,y){
   const c=CHUNKS.find(c=>t>=c.s&&t<c.e);if(!c)return;const size=80;ctx.font=`900 ${size}px ${FONT}`;
   const parts=c.map(w=>w.w.replace(/[.,?!]/g,'').toUpperCase());const sp=36,ws=parts.map(p=>ctx.measureText(p).width),tot=ws.reduce((a,b)=>a+b,0)+sp*(parts.length-1);
-  const k=pop(t,c.s,.2);let x=W/2-tot/2;ctx.save();ctx.translate(W/2,y);ctx.scale(k,k);ctx.translate(-W/2,-y);
+  const k=pop(t,c.s,.2)*Math.min(1,900/tot);let x=W/2-tot/2;ctx.save();ctx.translate(W/2,y);ctx.scale(k,k);ctx.translate(-W/2,-y);
   parts.forEach((p,i)=>{const w=c[i];const on=t>=w.s&&t<(c[i+1]?c[i+1].s:c.e);text(p,x+ws[i]/2,y,size,{fill:on?'#ffd60a':'#fff',sw:20,scale:on?1.1:1});x+=ws[i]+sp});ctx.restore()}
 
 // ---------- FRAME ----------
@@ -201,7 +201,11 @@ function render(t){
   // card + content (content draws in intro too, over the doctor's head area)
   if(t<INTRO){ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(t);ctx.restore()}
   else{card(cardA);ctx.save();content(t);ctx.restore();ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore()}
-  captions(t,t<INTRO?1840:1060);
+  // name tag: window.NAMETAG=[start,end]
+  if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
+    label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
+    text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
+  captions(t,t<INTRO?1560:1060);
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }
 window.setup=(w,e,d)=>{WORDS=w;ENV=e;DUR=d;buildChunks()};window.render=render;

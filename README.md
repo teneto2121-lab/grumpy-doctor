@@ -32,7 +32,8 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
    - `content(t)`: what's on the explainer card at time `t`
    - `window.SFX`: sound cues `[seconds, name, volume]`. Available: crack, pop, blip, ding, whoosh,
      stamp, sparkle, fall, tick, beep, tada, steam
-5. Check a few frames: `node tools/render.js episodes/ep02-... stills 3 15 30`
+5. Check a few frames: `node tools/render.js episodes/ep02-... stills 3 15 30`,
+   then `python3 tools/sheet.py episodes/ep02-... sheet.jpg` for a contact sheet
 6. Render the video: `node tools/render.js episodes/ep02-...`
 
 ## Requirements
@@ -44,3 +45,7 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
 | # | Topic | Length |
 |---|-------|--------|
 | 01 | Why do your knuckles crack? | 47s |
+| 02 | Why do you get brain freeze? | 43s |
+| 03 | What happens if you swallow gum? | 46s |
+
+Captions, hashtags and posting steps: see `POSTING.md`.
