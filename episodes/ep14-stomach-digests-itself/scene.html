@@ -1,0 +1,91 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 14: Your stomach is trying to digest itself (first cold-open episode) =====
+window.COLD_OPEN={end:3.3,bg:'#3d0a12',text:[['YOUR STOMACH IS','#fff',100],['DIGESTING ITSELF','#9ef01a',124],['RIGHT NOW.','#ffd60a',110,2.5]],draw:coldOpen};
+window.INTRO_END=6.1;
+window.SCENES=[6.1,11.9,14.1,21.2,26.9,35.3];
+window.TINTS=['#e3f7e9','#fff1cc','#e6f0ff','#ffe8e0','#ffe0e0','#f3efff'];
+window.PUNCH=[[32.2,35.0,'FIGHTING ITSELF!']];
+window.JOLTS=[12.9,31.3];
+window.SHAKES=[12.9,31.3];
+window.KEYWORDS=['acid','slime','ulcer'];
+window.CAM=[[0,540,548,1],[14.6,540,548,1],[15.2,540,520,1.25],[20.9,540,520,1.25],[21.2,540,548,1]];
+window.OUTRO=true;
+window.SFX=[[0,'stamp',.8],[0,'steam',.6],[.5,'pop',.6],[1.0,'pop',.6],[1.5,'pop',.6],[2.0,'pop',.6],[2.5,'stamp',.7],[2.55,'pop',.8],[3.0,'pop',.6],[3.3,'whoosh'],
+ [6.1,'whoosh',.8],[7.7,'blip'],[8.9,'sparkle',.5],[9.6,'blip'],[11.9,'whoosh',.8],[12.9,'stamp'],[14.1,'whoosh',.8],[15.9,'pop',.5],[16.4,'pop',.5],[17.2,'blip'],[18.8,'sparkle'],[19.4,'blip'],
+ [21.2,'whoosh',.8],[22.5,'tick'],[23.1,'tick'],[23.7,'tick'],[24.3,'tick'],[25.0,'ding',.6],[26.9,'whoosh',.8],[28.6,'fall',.6],[30.0,'steam',.5],[31.3,'stamp'],[32.2,'stamp'],[32.25,'steam'],[35.3,'whoosh',.8],[36.6,'blip']];
+const MOOD=[[0,.3],[3.3,.2],[4.2,.15],[5.2,.35],[6.1,.3],[12.9,.5],[13.6,.3],[21,.3],[27,.4],[31.3,.6],[32.2,.95],[35,.55],[37.6,.6]];
+const POSES=[[0,'rest'],[3.3,'pinch'],[5.0,'point'],[6.1,'point'],[11.9,'point'],[12.9,'up'],[13.6,'point'],[14.1,'point'],[21.2,'chin'],[22.2,'point'],[26.9,'point'],[31.3,'facepalm'],[32.2,'up'],[35.2,'shrug'],[36.6,'cross']];
+
+// ---------- cold open: inside the stomach, acid boiling ----------
+function coldOpen(t){
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#5a0f1c');g.addColorStop(.6,'#9d1d34');g.addColorStop(1,'#3d0a12');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // stomach wall folds
+  ctx.strokeStyle='rgba(255,140,160,.35)';ctx.lineWidth=26;ctx.lineCap='round';for(let k=0;k<7;k++){ctx.beginPath();for(let x=-60;x<=W+60;x+=20){const y=620+k*120+Math.sin(x/90+k*1.7+t*1.5)*36;x===-60?ctx.moveTo(x,y):ctx.lineTo(x,y)}ctx.stroke()}
+  // melting drips from the wall
+  const r=rng(4);for(let k=0;k<9;k++){const x=60+r()*960,len=(70+r()*160)*(.5+.5*Math.sin(t*2+k));ctx.beginPath();ctx.roundRect(x-12,560+r()*120,24,len,12);ctx.fillStyle='rgba(158,240,26,.55)';ctx.fill()}
+  // acid lake
+  const ay=1300;ctx.beginPath();ctx.moveTo(0,H);for(let x=0;x<=W;x+=12)ctx.lineTo(x,ay+Math.sin(x/70+t*5)*22+Math.sin(x/23+t*9)*7);ctx.lineTo(W,H);ctx.closePath();
+  const ag=ctx.createLinearGradient(0,ay,0,H);ag.addColorStop(0,'#c7f464');ag.addColorStop(1,'#4f772d');ctx.fillStyle=ag;ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke();
+  // bubbles rising + popping every half-second
+  for(let k=0;k<16;k++){const u=((t*.8+r())%1),x=60+r()*960,y=H-u*(H-ay+60);E(x,y,10+r()*16,10+r()*16);ctx.fillStyle='rgba(230,255,180,.85)';ctx.fill()}
+  [0,.5,1,1.5,2,2.5,3].forEach((st,k)=>{const d=t-st;if(d>=0&&d<.45){const x=180+((k*373)%720),y=ay-10;burst(x,y,50+d*260,'#d9ed92');text(['SIZZLE','HISS','BLORP','SSSS'][k%4],x,y,40,{fill:OL,shadow:false,scale:easeOut(d/.3)})}});
+  // steam
+  ctx.strokeStyle='rgba(255,255,255,.4)';ctx.lineWidth=12;for(let k=0;k<5;k++){ctx.beginPath();for(let j=0;j<=12;j++){const u=j/12,x=150+k*190+Math.sin(u*7+t*4+k)*24,y=ay-40-u*360;j?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke()}
+}
+
+// ---------- props ----------
+function coin(x,y,r,eaten){ctx.save();ctx.translate(x,y);ctx.beginPath();for(let i=0;i<=40;i++){const a=i/40*Math.PI*2,rr=r*(1-eaten*(.3+.3*Math.sin(a*5+1)));ctx.lineTo(Math.cos(a)*rr,Math.sin(a)*rr)}ctx.closePath();P(radial(0,0,r,'#ffd27a','#b5651d'),6);ctx.restore()}
+function steak(x,y,s,eaten,t){ctx.save();ctx.translate(x,y);ctx.scale(s*(1-.35*eaten),s*(1-.35*eaten));curve([[-130,-20],[-90,-80],[20,-90],[120,-50],[140,30],[60,80],[-60,80],[-130,40]]);P(radial(0,0,150,'#e5989b','#9d0208'),7);
+  ctx.save();ctx.shadowColor='rgba(0,0,0,0)';ctx.strokeStyle='rgba(255,255,255,.6)';ctx.lineWidth=10;ctx.beginPath();ctx.moveTo(-90,-10);ctx.quadraticCurveTo(0,-40,100,0);ctx.stroke();if(eaten>0){const r=rng(3);for(let k=0;k<6;k++){E((r()-.5)*220,(r()-.5)*120,10,10);ctx.fillStyle='rgba(199,244,100,.8)';ctx.fill()}}ctx.restore();ctx.restore()}
+// wall cross-section: acid on top, slime shield, lining cells. gap 0..1 breaks the shield; worn 0..1 wears cells
+function wallSection(cx,cy,t,{shield=1,gap=0,worn=0,renew=0,neutral=0,ulcer=0}={}){
+  const x0=cx-420,w=840;
+  ctx.beginPath();ctx.roundRect(x0,cy-260,w,170,{upperLeft:30,upperRight:30,lowerLeft:0,lowerRight:0});ctx.fillStyle='rgba(158,240,26,.6)';ctx.fill();
+  const r=rng(9);for(let k=0;k<14;k++){const u=((t*.9+r())%1),x=x0+30+r()*(w-60);let y=cy-240+u*170;const blocked=shield>0&&!(gap>0&&Math.abs(x-cx)<70*gap);if(blocked&&y>cy-110)y=cy-110-(y-(cy-110));E(x,y,9,9);P('#55a630',3)}
+  // slime shield
+  if(shield>0){ctx.save();ctx.globalAlpha=shield;ctx.beginPath();ctx.rect(x0,cy-95,w,70);if(gap>0)ctx.rect(cx-70*gap,cy-95,140*gap,70);ctx.clip('evenodd');ctx.fillStyle='rgba(155,231,255,.85)';ctx.fillRect(x0,cy-95,w,70);ctx.strokeStyle='rgba(255,255,255,.7)';ctx.lineWidth=6;ctx.beginPath();for(let x=x0;x<=x0+w;x+=14)ctx.lineTo(x,cy-80+Math.sin(x/40+t*3)*6);ctx.stroke();ctx.restore()}
+  if(neutral>0){const r2=rng(2);for(let k=0;k<8;k++){const x=x0+60+r2()*(w-120),y=cy-100-((t*60+k*30)%60);ctx.save();ctx.globalAlpha=neutral*(.5+.5*Math.sin(t*8+k));text('✦',x,y,30,{fill:'#4cc9f0',shadow:false});ctx.restore()}}
+  // lining cells
+  for(let i=0;i<12;i++){const x=x0+i*70,ww=worn>0?(1-worn*((i*37)%10)/10):1,fresh=renew>0?clamp(renew*12-i):1;const h=110*ww*Math.max(.15,fresh);
+    const hole=ulcer>0&&Math.abs(x+35-cx)<80;ctx.beginPath();ctx.roundRect(x+4,cy-25+(110-h),62,h-6,12);P(hole?mixHex('f8b4b4','9d0208',ulcer):(fresh<1?'#ffd6e0':'#f8b4b4'),4)}
+  ctx.beginPath();ctx.rect(x0,cy+85,w,90);ctx.fillStyle='#e07a7a';ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.strokeRect(x0,cy-260,w,435);
+}
+function calendarMini(x,y,s,txt,sub){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-110,-100,220,210,20);P('#fff',7);ctx.beginPath();ctx.roundRect(-110,-100,220,60,{upperLeft:20,upperRight:20,lowerLeft:0,lowerRight:0});P('#e63946',7);ctx.shadowColor='rgba(0,0,0,0)';text(sub,0,-68,30,{fill:'#fff',shadow:false});text(txt,0,35,80,{fill:OL,shadow:false});ctx.restore()}
+
+window.overlay=function(t){if(t>=14.1&&t<21.2){if(t>16.9)label('SLIME SHIELD',W/2+230,215,t,17.2,{bg:'#9be7ff',size:42,rot:.04});if(t>19.3)label('NEUTRALIZED',W/2-230,215,t,19.4,{bg:'#fff',size:42,rot:-.04})}};
+function content(t){
+  const CY=560;
+  if(t<6.1)return;
+  if(t<11.9){ // full of acid, strong enough to dissolve some metals
+    stomachOrgan(W/2-160,CY+80,.7,t,{expr:'calm'});ctx.save();ctx.beginPath();ctx.ellipse(W/2-150,CY+140,170,58,0,0,Math.PI*2);ctx.fillStyle='rgba(158,240,26,.55)';ctx.fill();ctx.restore();
+    label('ACID',W/2-150,CY-200,t,7.7,{bg:'#9ef01a',size:52,rot:-.04});
+    if(t>8.7){coin(W/2+260,CY+40,70,clamp((t-8.9)/2.2)*.7);label('SOME METALS',W/2+260,CY+170,t,9.6,{bg:'#fff',size:38,rot:.04})}
+    return}
+  if(t<14.1){ // breaks down meat... and your stomach is made of meat
+    if(t<12.8){steak(W/2,CY,1.4,clamp((t-11.3)/1.5),t);label('BREAKS DOWN MEAT',W/2,CY+220,t,11.0,{bg:'#fff',size:44})}
+    else{stomachOrgan(W/2,CY+80,.85,t,{expr:'scared',shake:1});label('YOUR STOMACH = MEAT',W/2,CY-230,t,12.9,{bg:'#e63946',fg:'#fff',size:46,rot:-.04})}
+    return}
+  if(t<21.2){ // slime shield + neutralizing at the surface
+    wallSection(W/2,CY+60,t,{shield:clamp((t-14.8)/.6),neutral:clamp((t-18.6)/.5)});
+    return}
+  if(t<26.9){ // worn down, replaced every few days
+    const renew=t>23.6?clamp((t-23.6)/2):0;wallSection(W/2,CY+60,t,{worn:clamp((t-21.8)/1.5)*(1-renew),renew});
+    calendarMini(W/2,CY-250,.8,String(1+Math.floor(clamp((t-22.4)/2.6)*4)),'DAY');
+    if(t>24.9)label('NEW LINING EVERY FEW DAYS',W/2,CY+330,t,25.0,{bg:'#7ae582',size:40});
+    return}
+  if(t<35.3){ // shield fails -> ulcer
+    const gap=easeOut(clamp((t-27.3)/1.2));wallSection(W/2,CY+60,t,{gap,ulcer:clamp((t-28.6)/2)});
+    if(t>28.5)ping(W/2,CY+80,110,t,{col:'#e63946'});
+    stamp('ULCER',W/2,CY-230,t,31.3,110,-.08);
+    return}
+  // you thought YOU had a stressful job
+  stomachOrgan(W/2,CY+90,.8,t,{expr:'annoyed'});
+  ctx.save();ctx.translate(W/2+150,CY-40);ctx.beginPath();ctx.moveTo(0,-26);ctx.bezierCurveTo(16,-4,16,14,0,14);ctx.bezierCurveTo(-16,14,-16,-4,0,-26);P('#9be7ff',4);ctx.restore();
+  label('"STRESSFUL JOB"',W/2,CY-230,t,36.6,{bg:'#fff',size:46,rot:-.04});
+}
+</script></body></html>

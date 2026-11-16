@@ -63,5 +63,7 @@ tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 | 11 | What happens if you sleep 8 hours for 30 days? (format pilot, cut-off ending) | 53s |
 | 12 | MYTH OR FACT? Gross edition (not posted, format retired) | 63s |
 | 13 | The dirtiest thing in your house isn't your toilet (cut-off ending) | 44s |
+| 14 | Your stomach is digesting itself (cold open) | 41s |
+| 15 | You fart up to 20 times a day (cold open, cut-off ending) | 36s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

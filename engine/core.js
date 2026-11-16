@@ -276,8 +276,19 @@ function render(t){
     hookText(t,99);captions(t,1560);
     ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);return}
   return renderMain(t)}
+// ---------- cold open: window.COLD_OPEN={end:seconds, draw(t), text:[['LINE',color,size],...], bg:'#color'} ----------
+// The first seconds are a full-screen dramatic shot with the bold claim (no doctor), then a flash cut into the episode.
+function coldOpenFrame(s,t){const C=window.COLD_OPEN;ctx.clearRect(0,0,W,H);ctx.fillStyle=C.bg||'#14161a';ctx.fillRect(0,0,W,H);
+  const z=1+.12*easeOut(clamp(s/C.end))+.015*Math.sin(s*23)*Math.max(0,1-s*2);
+  ctx.save();ctx.translate(W/2,H*.56);ctx.scale(z,z);ctx.translate(-W/2,-H*.56);C.draw(s);ctx.restore();
+  // vignette for contrast behind the claim
+  const g=ctx.createLinearGradient(0,0,0,H*.5);g.addColorStop(0,'rgba(0,0,0,.55)');g.addColorStop(1,'rgba(0,0,0,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H*.5);
+  let y=230;(C.text||[]).forEach(([str,col,size0,at],i)=>{ctx.font=`900 ${size0}px ${FONT}`;const size=size0*Math.min(1,980/ctx.measureText(str).width);y+=size*.6;
+    if(at!==undefined&&s<at){y+=size*.55;return}const k=at!==undefined?pop(s,at,.3):1;text(str,W/2,y,size,{fill:col,sw:size*.2,scale:k*(1+.03*Math.sin(s*9+i)),rot:i%2?.03:-.03});y+=size*.55});
+  ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10)}
 function renderMain(t){
   const s=toScript(t);window.__rt=t;
+  if(window.COLD_OPEN&&s<window.COLD_OPEN.end&&!window.__tz){coldOpenFrame(s,t);return}
   const INTRO=window.INTRO_END||4.9;ctx.clearRect(0,0,W,H);wall(t);
   // camera: intro close-up on doctor, then doctor moves to bottom with card above
   const intro=easeInOut(prog(s,INTRO-.5,.8));
@@ -309,6 +320,7 @@ function renderMain(t){
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
     text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
   if(!out&&!window.__tz)captions(t,s<INTRO||pf>.5?1560:1060);
+  if(window.COLD_OPEN){const d=s-window.COLD_OPEN.end;if(d>=0&&d<.15){ctx.fillStyle=`rgba(255,255,255,${.9*(1-d/.15)})`;ctx.fillRect(0,0,W,H)}}
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }
 // ---------- hook text (#4): on screen from the very first frame ----------

@@ -72,6 +72,14 @@
 - `<episode>/voice.json` `{"speed":1.2}` for faster delivery; aim for ~3+ words/second
 - `window.board(t)`: a fixed panel in the card (e.g. the Myth-or-Fact scoreboard)
 
+## The first second (data: ~70% of viewers left at 0:01 on eps 1–11; whoever stayed watched to the end)
+- **Cold open** (`window.COLD_OPEN`): first ~2–3s = full-screen dramatic visual + the bold claim in huge text. No doctor, no card.
+- **First words = a bold claim within 0.1s, ≤ 8 words.** No sighs, no "Ah.", no setup. Emotion tags come after the claim.
+- **Something moves/changes every ~0.5s** in the first 2 seconds (zoom, burst, splash, impact).
+- High-contrast text on a dark or saturated background (not pale teal).
+- The doctor enters after the cut, reacting to the claim.
+- Judge new episodes by **retention at 0:01–0:02** first.
+
 ## Pacing rules (owner feedback: Myth or Fact felt rushed and didn't make sense)
 - **One topic per video, explained properly.** No lists of 5–7 quick items. At most ~3 beats, each with room to land.
 - **Every idea gets at least ~8–10 seconds**: say it, show it, let it sink in, then move on.

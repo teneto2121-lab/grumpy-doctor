@@ -1,0 +1,98 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 15: You fart up to 20 times a day (cold open + cut-off ending) =====
+window.COLD_OPEN={end:3.45,bg:'#2d1b4e',text:[['YOU FART UP TO','#fff',100],['20 TIMES A DAY','#7ae582',130],['YES. YOU.','#ffd60a',110,2.2]],draw:coldOpen};
+window.INTRO_END=6.0;
+window.SCENES=[6.0,11.3,16.0,20.5,29.6];
+window.TINTS=['#e6f0ff','#e3f7e9','#fff3d6','#ffe8e0','#efe6ff'];
+window.PUNCH=[[27.4,29.6,'YOU EXHALE IT!']];
+window.JOLTS=[27.5];
+window.SHAKES=[27.5];
+window.KEYWORDS=['air','bacteria','sulfur','blood','lungs'];
+window.ENDING='cut';
+window.FOLLOW_AT=20.6;
+window.SFX=[[0,'pop',1],[.45,'pop',.9],[.95,'pop',.9],[1.45,'pop',.9],[1.95,'pop',.9],[2.2,'stamp',.7],[2.45,'pop',.9],[2.95,'pop',.9],[3.45,'whoosh'],
+ [6.0,'whoosh',.8],[6.6,'blip'],[7.9,'pop',.5],[8.9,'pop',.5],[9.7,'pop',.5],[11.3,'whoosh',.8],[12.5,'blip'],[13.9,'pop',.5],[14.6,'blip'],
+ [16.0,'whoosh',.8],[17.5,'tick'],[17.8,'tick'],[18.1,'tick'],[18.5,'ding',.5],[19.4,'blip'],[20.5,'whoosh',.8],[21.3,'blip'],[23.8,'blip'],[25.2,'blip'],[26.3,'whoosh',.6],[27.45,'stamp'],[27.5,'steam'],
+ [29.6,'whoosh',.8],[30.4,'blip'],[31.6,'whoosh',.5],[33.0,'steam',.5]];
+const MOOD=[[0,.3],[3.4,.25],[4.6,.45],[5.5,.3],[6,.3],[16,.35],[19.4,.45],[20.6,.3],[26.3,.5],[27.4,.95],[29.6,.5],[31.5,.6],[35,.7]];
+const POSES=[[0,'rest'],[3.4,'point'],[4.5,'hips'],[6,'point'],[11.3,'point'],[16,'chin'],[17.3,'point'],[20.5,'point'],[27.4,'up'],[29.6,'point'],[31.5,'facepalm']];
+
+// ---------- cold open: gas clouds bursting everywhere ----------
+function blobUnion(circles,col,lw){ctx.beginPath();circles.forEach(([cx,cy,r])=>{ctx.moveTo(cx+r+lw/2,cy);ctx.arc(cx,cy,r+lw/2,0,Math.PI*2)});ctx.fillStyle=OL;ctx.fill();ctx.beginPath();circles.forEach(([cx,cy,r])=>{ctx.moveTo(cx+r,cy);ctx.arc(cx,cy,r,0,Math.PI*2)});ctx.fillStyle=col;ctx.fill()}
+function cloudPuff(x,y,s,col){ctx.save();ctx.translate(x,y);ctx.scale(s,s);blobUnion([[0,0,70],[-60,20,50],[60,25,55],[-30,-35,50],[35,-30,48]],col,10);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';E(-25,-40,22,12,-.4);ctx.fillStyle='rgba(255,255,255,.45)';ctx.fill();ctx.restore();ctx.restore()}
+function coldOpen(t){
+  const g=ctx.createRadialGradient(W/2,H*.62,100,W/2,H*.62,1100);g.addColorStop(0,'#6a3fa0');g.addColorStop(1,'#1d1035');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // speed rays
+  ctx.save();ctx.translate(W/2,H*.62);ctx.rotate(t*.3);ctx.fillStyle='rgba(255,255,255,.07)';for(let i=0;i<18;i++){ctx.rotate(Math.PI/9);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1400,-70);ctx.lineTo(1400,70);ctx.closePath();ctx.fill()}ctx.restore();
+  // a new cloud bursts every half-second
+  const words=['PFFT!','TOOT!','BRAAP!','FWEEP!','PRRT!','POOT!','PFFFT!'];
+  [-.3,.45,.95,1.45,1.95,2.45,2.95].forEach((st,k)=>{const d=t-st;if(d<0)return;const x=[260,820,300,780,540,240,840][k],y=[1500,1300,1000,1620,1180,1300,1000][k];
+    const s=easeBack(clamp(d/.35))*(1+d*.25);ctx.save();ctx.globalAlpha=clamp(1.8-d*.5);cloudPuff(x,y,s*1.2,['#9ef01a','#b9fbc0','#c7f464','#80ed99','#d9ed92','#9ef01a','#b9fbc0'][k]);
+    text(words[k],x,y,64,{fill:'#fff',sw:12,scale:easeBack(clamp(d/.3)),rot:(k%2?.12:-.12)});ctx.restore()});
+  // tally counter racing to 20
+  const n=Math.min(20,Math.floor(t/2.0*20)+1);ctx.save();ctx.translate(W/2,820);ctx.beginPath();ctx.roundRect(-220,-90,440,180,40);ctx.fillStyle='rgba(0,0,0,.45)';ctx.fill();text(`×${n}`,0,4,140,{fill:'#7ae582',sw:20,scale:1+.06*Math.sin(t*30)});ctx.restore();
+}
+
+// ---------- props ----------
+function bacterium(x,y,s,t,{expr='happy',shades=false,suitcase=false}={}){ctx.save();ctx.translate(x,y+Math.sin(t*4+x)*5);ctx.scale(s,s);
+  ctx.strokeStyle=OL;ctx.lineWidth=4;for(let i=0;i<10;i++){const a=i/10*Math.PI*2,w=Math.sin(t*10+i)*.15;ctx.beginPath();ctx.moveTo(Math.cos(a)*58,Math.sin(a)*42);ctx.lineTo(Math.cos(a+w)*80,Math.sin(a+w)*62);ctx.stroke()}
+  E(0,0,62,46);P(radial(0,0,62,'#b9fbc0','#52b788'),5);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';face(0,4,.62,expr,t);
+  if(shades){ctx.fillStyle=OL;[-16,16].forEach(dx=>{ctx.beginPath();ctx.roundRect(dx-15,-8,30,18,6);ctx.fill()});ctx.fillRect(-2,-2,4,4)}
+  if(suitcase){ctx.beginPath();ctx.roundRect(48,10,46,36,6);P('#8d5524',4);ctx.strokeStyle=OL;ctx.lineWidth=4;ctx.beginPath();ctx.arc(71,10,10,Math.PI,0);ctx.stroke()}ctx.restore();ctx.restore()}
+
+function mouthBig(x,y,s,t,open){ctx.save();ctx.translate(x,y);ctx.scale(s,s);E(0,0,170,130*open+10);P('#5a1e1e',8);ctx.save();ctx.shadowColor='rgba(0,0,0,0)';E(0,60*open,110,50*open);ctx.fillStyle='#e05a5a';ctx.fill();ctx.fillStyle='#fff';ctx.fillRect(-120,-130*open,240,30*open);ctx.restore();
+  ctx.beginPath();ctx.ellipse(0,0,190,150*open+24,0,0,Math.PI*2);ctx.lineWidth=26;ctx.strokeStyle='#e07a8b';ctx.stroke();ctx.restore()}
+function airBubbles(x0,y0,x1,y1,t,n=8){for(let k=0;k<n;k++){const u=((t*.7+k/n)%1);const x=lerp(x0,x1,u)+Math.sin(u*9+k)*20,y=lerp(y0,y1,u);E(x,y,16,16);P('rgba(189,224,254,.9)',4)}}
+function gasCloud(x,y,s,t,sulfur){ctx.save();ctx.translate(x,y);ctx.scale(s,s);blobUnion([[0,0,150],[-130,40,110],[130,50,115],[-60,-90,110],[80,-80,105]],'#ced4da',10);
+  if(sulfur>0){ctx.save();ctx.shadowColor='rgba(0,0,0,0)';E(150,70,40*sulfur,40*sulfur);ctx.fillStyle='#ffd60a';ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.stroke();
+    ctx.strokeStyle='#8ac926';ctx.lineWidth=7;ctx.lineCap='round';for(let k=0;k<3;k++){ctx.beginPath();for(let j=0;j<=10;j++){const u=j/10,xx=130+k*24+Math.sin(u*8+t*5+k)*10,yy=20-u*120;j?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke()}ctx.restore()}
+  ctx.restore()}
+function door(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-140,-260,280,520,10);P(shadeFill(-140,0,140,0,'#b5835a','#7f5539'),8);E(90,10,16,16);P('#ffd166',5);ctx.beginPath();ctx.roundRect(-110,-360,220,70,12);P('#2a9d8f',6);ctx.shadowColor='rgba(0,0,0,0)';text('OUTSIDE',0,-324,40,{fill:'#fff',shadow:false});ctx.restore()}
+
+function content(t){
+  const CY=560;
+  if(t<6.0)return;
+  if(t<11.3){ // mostly swallowed air
+    mouthBig(W/2,CY-60,.9,t,.6+.2*Math.sin(t*6));airBubbles(W/2+420,CY-200,W/2,CY-20,t);
+    label('MOSTLY SWALLOWED AIR',W/2,205,t,6.6,{bg:'#bde0fe',size:46});
+    [[7.89,'EATING FAST',CY+170],[8.92,'CHEWING GUM',CY+255],[9.71,'TALKING WHILE EATING',CY+340]].forEach(([st,lab,y])=>{if(t>st)label(lab,W/2,y,t,st,{bg:'#fff',size:42,rot:(y%2?.03:-.03)})});
+    return}
+  if(t<16.0){ // gut bacteria feasting
+    const gp=u=>[140+800*u,CY+40+Math.sin(u*Math.PI*2)*110];intestine(gp,t,{R:90,waves:[(t*.12)%1]});
+    const r=rng(3);for(let k=0;k<5;k++){const u=.1+k*.2,[x,y]=gp(u);bacterium(x,y,.55,t,{expr:'happy'});if(t>13.6){const pu=((t*1.2+k*.3)%1);E(x+20,y-50-pu*80,12+pu*10,12+pu*10);ctx.globalAlpha=1-pu;P('#b9fbc0',4);ctx.globalAlpha=1}}
+    label('GUT BACTERIA',W/2,215,t,12.5,{bg:'#b9fbc0',size:52});
+    if(t>14.5)label("FEASTING ON FOOD YOU COULDN'T DIGEST",W/2,890,t,14.6,{bg:'#fff',size:32});
+    return}
+  if(t<20.5){ // less than 1% smells
+    gasCloud(W/2,CY+40,1.1,t,easeBack(clamp((t-18.3)/.4)));
+    label('AND THE SMELL?',W/2,205,t,16.3,{bg:'#fff',size:48});
+    if(t>17.5)counter(W/2-80,CY+320,t,17.5,1.0,100,1,{size:90,fmt:v=>(v<=1.5?'< 1':Math.round(v))+'%',col:'#ffd60a'});
+    if(t>19.3)label('SULFUR',W/2+260,CY-170,t,19.4,{bg:'#ffd60a',size:44,rot:.05});
+    return}
+  if(t<29.6){ // hold it in -> blood -> lungs -> exhale
+    person(320,CY+150,1.0,t,{expr:t<23.8?'worried':'scared',shirt:'#9d8189',squish:.03*Math.sin(t*20)});
+    ping(320,CY+150,70,t,{col:'#7ae582'});
+    if(t>21.3)label('HOLD IT IN',320,CY-250,t,21.3,{bg:'#fff',size:42,rot:-.04});
+    // path: belly -> up through blood to the lungs -> out of the mouth
+    const path=[[320,CY+150],[420,CY+120],[440,CY-20],[370,CY-80],[320,CY-150],[420,CY-150],[700,CY-170]];
+    const prog_=clamp((t-23.6)/3.2);ctx.save();ctx.strokeStyle='#e63946';ctx.lineWidth=14;ctx.lineCap='round';ctx.lineJoin='round';ctx.setLineDash([22,14]);ctx.lineDashOffset=-t*60;drawOn(path,prog_);ctx.setLineDash([]);ctx.restore();
+    if(prog_>0&&prog_<1){const L=path.length-1,f=prog_*L,i=Math.min(L-1,Math.floor(f)),k=f-i;E(lerp(path[i][0],path[i+1][0],k),lerp(path[i][1],path[i+1][1],k),20,20);P('#7ae582',5)}
+    if(t>23.8)label('INTO YOUR BLOOD',760,CY+60,t,23.8,{bg:'#e63946',fg:'#fff',size:36,rot:.04});
+    if(t>25.2)label('TO YOUR LUNGS',760,CY+160,t,25.2,{bg:'#ffc2d1',size:36,rot:.04});
+    if(t>26.3){const k=easeOut(clamp((t-26.3)/.6));cloudPuff(lerp(430,780,k),CY-180,.6+.5*k,'#9ef01a');label('BREATHED OUT',780,CY-330,t,26.4,{bg:'#9ef01a',size:40,rot:.05})}
+    return}
+  // go outside... the last time someone held one in during my appointment, the whole
+  if(t<31.5){door(W/2,CY+80,1.0,t);label('JUST GO OUTSIDE',W/2,205,t,30.4,{bg:'#2a9d8f',fg:'#fff',size:48})}
+  else{ // the doctor's office slowly filling with green
+    ctx.save();ctx.beginPath();ctx.roundRect(150,CY+80,780,40,10);P('#b5835a',6);ctx.restore();
+    ctx.save();ctx.beginPath();ctx.roundRect(W/2-90,CY-120,180,200,20);P('#7b9ccf',6);ctx.restore();
+    const g=clamp((t-31.6)/3.4);ctx.save();ctx.globalAlpha=.75*g;cloudPuff(W/2,CY-20,1.5+3*g,'#9ef01a');ctx.restore();
+    label("DR. GRUMBLES' OFFICE",W/2,215,t,31.6,{bg:'#fff',size:40});
+  }
+}
+</script></body></html>

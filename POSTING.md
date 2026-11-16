@@ -117,6 +117,24 @@ Send this to whoever hasn't changed theirs. 🧽🦠 #kitchensponge #germs #lear
 ```
 **Pinned comment:** `No. I'm not finishing the toothbrush sentence.`
 
+### Ep 14: Your stomach is digesting itself  *(first cold-open episode)*
+**File:** `episodes/ep14-stomach-digests-itself/ep14-stomach-digests-itself.mp4`
+**Caption:**
+```
+It's happening right now. 🫠 #stomach #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `Your stomach has a harder job than you. Discuss.`
+**Check after 2–3 days:** retention at 0:01–0:02 (was ~30% on earlier episodes).
+
+### Ep 15: You fart up to 20 times a day  *(cold open + cut-off ending)*
+**File:** `episodes/ep15-farts/ep15-farts.mp4`
+**Caption:**
+```
+Yes. You. And it gets worse. 💨 #fart #bodyfacts #learnontiktok #science #funny
+```
+**Pinned comment:** `No, I'm not finishing that story.`
+**Check after 2–3 days:** retention at 0:01–0:02.
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -133,3 +151,5 @@ Send this to whoever hasn't changed theirs. 🧽🦠 #kitchensponge #germs #lear
 - **Sleep 30 days (ep 11):** sleep increases clearance of brain waste via the glymphatic system (Xie et al., *Science*, 2013, in mice). Sleep supports memory consolidation. Short sleep raises ghrelin and lowers leptin (Spiegel et al., *Annals of Internal Medicine*, 2004; Taheri et al., *PLOS Medicine*, 2004). Sleep deprivation increases amygdala reactivity (Yoo et al., *Current Biology*, 2007). The week-by-week framing is a storytelling device; these effects come from regular sleep, not a fixed schedule.
 - **Gross edition (ep 12):** no evidence for "swallowing spiders in your sleep" (the oft-quoted statistic has no source). Mucus is ~90–95% water. Nails don't grow after death; dehydrating skin retracts. A large share of house dust is tracked/blown in from outdoors (e.g. Layton & Beamer, *Environmental Science & Technology*, 2009); shed skin contributes. Earwax is produced by ceruminous glands (modified apocrine sweat glands) plus sebaceous secretions and dead skin. The stomach protects itself with mucus and bicarbonate; surface lining cells are replaced every few days.
 - **Kitchen sponge (ep 13):** up to 5.4 × 10^10 bacterial cells per cm³ in used kitchen sponges; regularly "sanitized" sponges did not have lower loads; authors suggest replacing sponges weekly (Cardinale et al., *Scientific Reports*, 2017).
+- **Stomach (ep 14):** gastric acid (pH ~1.5–3.5); the mucus-bicarbonate layer neutralizes acid at the epithelial surface; surface epithelial cells are replaced every few days (≈3–5); a breakdown of this barrier leads to peptic ulcers.
+- **Farts (ep 15):** healthy adults pass gas roughly 14–23 times a day; most intestinal gas is swallowed air plus gases from bacterial fermentation; under ~1% is odorous sulfur compounds; intestinal gases such as hydrogen are absorbed into the blood and exhaled (the basis of hydrogen breath tests).
