@@ -24,6 +24,8 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
   p.on('pageerror', e => { console.error('PAGE ERROR', e.message); process.exitCode = 1; });
   await p.goto('file://' + path.join(ep, 'scene.html'));
   await p.evaluate(() => document.fonts.ready);
+  const pauses = rd(path.join(ep, 'pauses.json')) || [];
+  await p.evaluate(ps => { window.PAUSES = ps; }, pauses);
   const args = [words, env, DUR, vis, outro.env, outro.vis, outro.len];
   await p.evaluate(a => setup(...a), args);
   const tail = await p.evaluate(() => window.outroLen ? window.outroLen() : 0);

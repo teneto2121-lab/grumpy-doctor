@@ -147,7 +147,7 @@ function poseAt(t){let i=0;for(let k=0;k<POSES.length;k++)if(t>=POSES[k][0])i=k;
 let VIS=[];
 function visAt(t){let lo=0,hi=VIS.length-1;while(lo<=hi){const m=(lo+hi)>>1;if(VIS[m][1]<t)lo=m+1;else if(VIS[m][0]>t)hi=m-1;else return VIS[m][2]}return null}
 // punch-in close-ups: window.PUNCH=[[start,end],...]  (fast cut in, quick cut out)
-function punchAt(t){let v=0;(window.PUNCH||[]).forEach(([a,b])=>{v=Math.max(v,Math.min(clamp((t-a)/.08),clamp((b-t)/.12)))});if(window.OUTRO&&window.OUTRO_AT)v=Math.max(v,clamp((t-window.OUTRO_AT)/.08));return v}
+function punchAt(t){let v=0;(window.PUNCH||[]).forEach(([a,b])=>{v=Math.max(v,Math.min(clamp((t-a)/.08),clamp((b-t)/.12)))});return v}
 // impact shakes: window.SHAKES=[seconds,...] -> the card content shakes briefly
 function shakeAt(t){let a=0;(window.SHAKES||[]).forEach(s0=>{const d=t-s0;if(d>=0&&d<.4)a=Math.max(a,Math.exp(-d*9))});return a?[Math.sin(t*95)*16*a,Math.cos(t*80)*12*a]:null}
 // squash & stretch entrance: returns [sx,sy] for an object that drops in at time s
@@ -262,26 +262,31 @@ function drawCard(t,INTRO,alpha){
   followBanner(t);
   ctx.restore();
 }
+// ---------- pauses: window.PAUSES=[[storyTime,seconds],...] (set by render.js from <episode>/pauses.json) ----------
+// The audio has silence inserted at those points; the story (scene) clock holds still while video time runs on.
+function toScript(t){let off=0;for(const [p,d] of (window.PAUSES||[])){if(t<p+off)return t-off;if(t<p+off+d)return p;off+=d}return t-off}
+function toVideo(s){let off=0;for(const [p,d] of (window.PAUSES||[])){if(s<p)break;off+=d}return s+off}
 const TSTEP=.28;
 function render(t){
   if(window.TEASER&&!window.__tz&&t<window.TEASER.length*TSTEP){const k=Math.floor(t/TSTEP);
     // the flashed moment is shown smaller and lower, so the hook text above stays clean
-    window.__tz=1;ctx.save();wall(t);ctx.translate(W/2,H/2+190);ctx.scale(.8,.8);ctx.rotate((k%2?.02:-.02));ctx.translate(-W/2,-H/2);render(window.TEASER[k]);ctx.restore();window.__tz=0;
+    window.__tz=1;ctx.save();wall(t);ctx.translate(W/2,H/2+190);ctx.scale(.8,.8);ctx.rotate((k%2?.02:-.02));ctx.translate(-W/2,-H/2);render(toVideo(window.TEASER[k]));ctx.restore();window.__tz=0;
     ctx.fillStyle='rgba(0,0,0,.12)';ctx.fillRect(0,0,W,H);
     const f=(t%TSTEP)/TSTEP;if(f<.18){ctx.fillStyle=`rgba(255,255,255,${.5*(1-f/.18)})`;ctx.fillRect(0,0,W,H)}
     hookText(t,99);captions(t,1560);
     ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);return}
   return renderMain(t)}
 function renderMain(t){
+  const s=toScript(t);window.__rt=t;
   const INTRO=window.INTRO_END||4.9;ctx.clearRect(0,0,W,H);wall(t);
   // camera: intro close-up on doctor, then doctor moves to bottom with card above
-  const intro=easeInOut(prog(t,INTRO-.5,.8));
+  const intro=easeInOut(prog(s,INTRO-.5,.8));
   const cardA=intro;
-  const pf=punchAt(t),jo=joltAt(t),out=window.OUTRO&&window.OUTRO_AT&&t>=window.OUTRO_AT;
-  const mood=clamp(track(MOOD,t)+.35*jo+(out?.3:0)),env=out?outroEnvAt(t):envAt(t);
-  const pose=out?{...poseAtName('point'),name:'point'}:poseAt(t);
+  const out=window.OUTRO&&window.OUTRO_AT&&t>=window.OUTRO_AT,pf=Math.max(punchAt(s),out?clamp((t-window.OUTRO_AT)/.08):0),jo=joltAt(s);
+  const mood=clamp(track(MOOD,s)+.35*jo+(out?.3:0)),env=out?outroEnvAt(t):envAt(t);
+  const pose=out?{...poseAtName('point'),name:'point'}:poseAt(s);
   const sh=out?outroVisAt(t):visAt(t);
-  const intoCard=t>=INTRO;
+  const intoCard=s>=INTRO;
   const look=pf>.5?[0,0]:(intoCard&&LOOK[pose.name])||[0,0];
   const p={mood,open:clamp(env*1.15),shape:env>.08?sh:'M',blink:jo>.3?0:blinkAt(t),lift:env*10+jo*25,L:pose.L,R:pose.R,kL:pose.kL,kR:pose.kR,rFront:pose.rFront,look,
     tilt:Math.sin(t*2.3)*.025+env*.03*Math.sin(t*9)+(pose.name==='facepalm'?.08:0),bob:-env*10+Math.sin(t*2)*4-jo*40};
@@ -291,19 +296,19 @@ function renderMain(t){
   const PX=540,PY=1560,PS=2.05;
   dx=lerp(dx,PX,pf);dy=lerp(dy,PY,pf);ds=lerp(ds,PS,pf);
   // card + content (content draws in intro too, over the doctor's head area)
-  if(t<INTRO){if(pf>0)punchFX(t,pf,false);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(t);ctx.restore();hookText(t,INTRO)}
+  if(s<INTRO){if(pf>0)punchFX(t,pf,false);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(s);ctx.restore();hookText(s,INTRO)}
   else{
-    if(pf<1){ctx.save();ctx.globalAlpha=1-pf;drawCard(t,INTRO,cardA);ctx.restore()}
+    if(pf<1){ctx.save();ctx.globalAlpha=1-pf;drawCard(s,INTRO,cardA);ctx.restore()}
     if(pf>0)punchFX(t,pf,out);
     ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();
     if(out)outroFX(t);
-    const pw=punchWord(t);if(pw&&pf>.5){ctx.save();ctx.translate(W/2,400);ctx.rotate(-.05);ctx.scale(1+.04*Math.sin(t*18),1);text(pw[0],0,0,Math.min(190,1500/pw[0].length),{fill:'#ffd60a',sw:28,scale:pop(pw[1],0,.25)});ctx.restore()}
+    const pw=punchWord(s);if(pw&&pf>.5){ctx.save();ctx.translate(W/2,400);ctx.rotate(-.05);ctx.scale(1+.04*Math.sin(t*18),1);text(pw[0],0,0,Math.min(190,1500/pw[0].length),{fill:'#ffd60a',sw:28,scale:pop(pw[1],0,.25)});ctx.restore()}
   }
   // name tag: window.NAMETAG=[start,end]
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
     text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
-  if(!out&&!window.__tz)captions(t,t<INTRO||pf>.5?1560:1060);
+  if(!out&&!window.__tz)captions(t,s<INTRO||pf>.5?1560:1060);
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }
 // ---------- hook text (#4): on screen from the very first frame ----------
@@ -333,6 +338,8 @@ function outroFX(t){const u=t-window.OUTRO_AT;
   const f=prog(u,OUT_LEN-.35,.3);if(f>0&&window.__firstFrame){ctx.save();ctx.globalAlpha=f;ctx.drawImage(window.__firstFrame,0,0);ctx.restore()}
 }
 window.setup=(w,e,d,vis,oenv,ovis,olen)=>{WORDS=w;ENV=e;DUR=d;VIS=vis||[];OUT_ENV=oenv||[];OUT_VIS=ovis||[];if(olen)OUT_LEN=olen;buildChunks();
-  if(!window.__SFX0)window.__SFX0=window.SFX||[];window.SFX=window.__SFX0;
-  if(window.OUTRO){window.OUTRO_AT=w[w.length-1].e+.25;window.SFX=window.__SFX0.concat([[window.OUTRO_AT+.25,'stamp'],[window.OUTRO_AT+.35,'next_patient',2.0]])}};
+  if(!window.__SFX0)window.__SFX0=window.SFX||[];window.SFX=window.__SFX0.map(c=>[toVideo(c[0]),...c.slice(1)]);
+  // soft clock ticks during longer pauses (the viewer's "guess" beat). window.PAUSE_TICKS=false disables.
+  if(window.PAUSE_TICKS!==false){let off=0;(window.PAUSES||[]).forEach(([p,d])=>{const v0=p+off;if(d>=.7)for(let k=.1;k<d-.1;k+=.25)window.SFX.push([v0+k,'tick',.6]);off+=d})}
+  if(window.OUTRO){window.OUTRO_AT=w[w.length-1].e+.25;window.SFX=window.SFX.concat([[window.OUTRO_AT+.25,'stamp'],[window.OUTRO_AT+.35,'next_patient',2.0]])}};
 window.outroLen=()=>window.OUTRO?OUT_LEN+.25:0;window.render=render;

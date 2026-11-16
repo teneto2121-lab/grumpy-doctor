@@ -72,6 +72,13 @@
 - `<episode>/voice.json` `{"speed":1.2}` for faster delivery; aim for ~3+ words/second
 - `window.board(t)`: a fixed panel in the card (e.g. the Myth-or-Fact scoreboard)
 
+## Breathing room
+- After a question/claim and after a verdict/answer, give the viewer a beat: ~0.8s to guess, ~0.55s to react.
+- `python3 tools/pause.py episodes/<ep> 5.92:0.8 6.54:0.55 ...` inserts silence at those story times (pick gaps
+  between words). The scene clock holds during each pause while the doctor keeps breathing; author scenes and
+  SFX in story time as usual. Longer pauses get soft clock ticks automatically.
+- Animations that should keep moving during a pause can use video time: `window.__rt`, `toVideo(storyTime)`.
+
 ## Format: MYTH OR FACT? (ep 10 pilot)
 - Hook "Myth or fact? [X] edition. And it gets weirder." + teaser
 - 5–7 numbered cases: CASE card → claim box → guess window (buttons pulse) → verdict stamp → 1–2 explanation beats

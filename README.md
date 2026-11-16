@@ -21,6 +21,8 @@ tools/voice.py        script.txt  ->  voice.wav + words.json + env.json + viseme
 tools/render.js       scene.html  ->  <name>.mp4  (or preview stills); mixes in sound effects
 tools/make_sfx.py     synthesizes the sound-effect library into engine/sfx/
 tools/mix.py          mixes voice + effect cues (called by render.js)
+tools/pause.py        inserts guess/reaction pauses into a finished voiceover (no re-recording)
+tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 ```
 
 ## Making a new episode
@@ -56,6 +58,6 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
 | 07 | Why do we get goosebumps? | 35s |
 | 08 | Why does your leg fall asleep? | 36s |
 | 09 | Why does your stomach growl? | 42s |
-| 10 | MYTH OR FACT? Body edition (format pilot) | 49s |
+| 10 | MYTH OR FACT? Body edition (format pilot) | 57s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

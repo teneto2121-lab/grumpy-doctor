@@ -38,13 +38,13 @@ window.board=function(t){
   // which case are we in, and is it in the "guess" window?
   let cur=-1;CASES.forEach((c,i)=>{if(t>=c.s)cur=i});const C=CASES[cur],guess=C&&t>C.s+.8&&t<C.v;
   Object.entries(COLS).forEach(([k,{x,c}])=>{
-    const lit=C&&t>=C.v&&t<C.v+1.2&&C.verdict===k;const pulse=guess?1+.05*Math.sin(t*10+x):1;
+    const rt=window.__rt||t,lit=C&&t>=C.v&&t<C.v+1.2&&C.verdict===k;const pulse=guess?1+.06*Math.sin(rt*10+x):1;
     ctx.save();ctx.translate(x,828);ctx.scale(pulse*(lit?1.12:1),pulse*(lit?1.12:1));ctx.beginPath();ctx.roundRect(-115,-26,230,52,16);P(lit?c:mixHex(c.slice(1),'ffffff',.15),6);ctx.shadowColor='rgba(0,0,0,0)';text(k,0,2,34,{fill:'#fff',shadow:false});ctx.restore();
-    if(guess)text('?',x+100,800,34,{fill:c,shadow:false,alpha:.5+.5*Math.sin(t*8)});
+    if(guess)text('?',x+100,800,34,{fill:c,shadow:false,alpha:.5+.5*Math.sin(rt*8)});
   });
   // decided cases drop into their column
   const slots={FACT:0,MYTH:0,KINDA:0};
-  CASES.forEach(c=>{if(t<c.v)return;const col=COLS[c.verdict],n=slots[c.verdict]++;const tx=col.x,ty=885+n*44,u=easeInOut(clamp((t-c.v-.15)/.5));
+  CASES.forEach(c=>{if(t<c.v)return;const col=COLS[c.verdict],n=slots[c.verdict]++;const tx=col.x,ty=885+n*44,u=easeInOut(clamp(((window.__rt||t)-toVideo(c.v)-.15)/.5));
     if(u<=0)return;pill(lerp(540,tx,u),lerp(460,ty,u),c.tag,col.c,lerp(1.6,1,u))});
 };
 
