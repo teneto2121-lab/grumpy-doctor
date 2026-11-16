@@ -1,0 +1,17 @@
+<!doctype html><html><head><meta charset="utf-8"><style>html,body{margin:0}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../engine/core.js"></script>
+<script>
+// Profile picture: 1080x1080, safe inside TikTok's circle crop
+window.MOOD=[[0,0]];window.POSES=[[0,'rest']];
+function avatar(mood,bg1,bg2,pose){
+  cv.width=1080;cv.height=1080;
+  const g=ctx.createRadialGradient(540,480,80,540,540,760);g.addColorStop(0,bg1);g.addColorStop(1,bg2);ctx.fillStyle=g;ctx.fillRect(0,0,1080,1080);
+  ctx.fillStyle='rgba(255,255,255,.16)';for(let y=60;y<1080;y+=160)for(let x=(y/160%2)*80+40;x<1080;x+=160){ctx.fillRect(x-14,y-4,28,8);ctx.fillRect(x-4,y-14,8,28)}
+  const P=POSE[pose];
+  ctx.save();ctx.translate(540,830);ctx.scale(1.55,1.55);
+  doctor({mood,open:mood>.6?.55:0,blink:0,lift:0,L:P[0],R:P[1],kL:HANDS[pose][0],kR:HANDS[pose][1],tilt:-.04,bob:0},0.3);
+  ctx.restore();
+}
+window.avatar=avatar;
+</script></body></html>
