@@ -138,10 +138,15 @@ function wall(t){
   const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#bfe3e8');g.addColorStop(1,'#6fb3c0');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
   ctx.fillStyle='rgba(255,255,255,.18)';for(let y=60;y<H;y+=160)for(let x=(y/160%2)*80+40;x<W;x+=160){ctx.fillRect(x-14,y-4,28,8);ctx.fillRect(x-4,y-14,8,28)}
 }
-function card(alpha,{dark=false}={}){
+function card(alpha,{dark=false,tint=null}={}){
   if(alpha<=0)return;ctx.save();ctx.globalAlpha=alpha;
   ctx.fillStyle='rgba(0,0,0,.18)';ctx.beginPath();ctx.roundRect(52,132,W-104,860,46);ctx.fill();
-  ctx.beginPath();ctx.roundRect(44,118,W-88,860,46);P(dark?'#14161a':'#fffdf7',8);ctx.restore();
+  ctx.beginPath();ctx.roundRect(44,118,W-88,860,46);
+  let fill=dark?'#14161a':'#fffdf7';
+  if(tint&&!dark){const g=ctx.createLinearGradient(0,118,0,978);g.addColorStop(0,'#fffdf7');g.addColorStop(1,tint);fill=g}
+  P(fill,8);
+  if(!dark){ctx.save();ctx.beginPath();ctx.roundRect(44,118,W-88,860,46);ctx.clip();ctx.fillStyle='rgba(43,33,24,.045)';for(let y=150;y<978;y+=44)for(let x=70+((y/44)%2)*22;x<W-44;x+=44){ctx.beginPath();ctx.arc(x,y,4,0,7);ctx.fill()}ctx.restore()}
+  ctx.restore();
 }
 // joint diagram centered at (cx,cy). gap = bones separation, bub = bubble radius
 function bone(x,y,len,dir,col='#f3ead7'){ // dir=-1 left bone (knob at right end)
@@ -188,6 +193,30 @@ function captions(t,y){
   parts.forEach((p,i)=>{const w=c[i];const on=t>=w.s&&t<(c[i+1]?c[i+1].s:c.e);text(p,x+ws[i]/2,y,size,{fill:on?'#ffd60a':'#fff',sw:20,scale:on?1.1:1});x+=ws[i]+sp});ctx.restore()}
 
 // ---------- FRAME ----------
+// ---------- card with scenes ----------
+// window.SCENES: start times of each card scene (after the intro); window.TINTS: card tint per scene.
+// Between scenes the old one (frozen at its last moment) slides out left as the new one slides in.
+function sceneIndex(t){const S=window.SCENES||[];let i=-1;for(let k=0;k<S.length;k++)if(t>=S[k])i=k;return i}
+function drawScene(t,start){
+  const S=window.SCENES;if(!S){content(t);return}
+  const z=1+.035*clamp((t-start)/5);           // slow push-in
+  ctx.save();ctx.translate(W/2,548);ctx.scale(z,z);ctx.translate(-W/2,-548);
+  ctx.shadowColor='rgba(43,33,24,.16)';ctx.shadowOffsetY=12;ctx.shadowBlur=0;  // flat drop shadow under props
+  content(t);ctx.restore();
+}
+function drawCard(t,INTRO,alpha){
+  const S=window.SCENES,T=window.TINTS||[];
+  if(!S){card(alpha);ctx.save();content(t);ctx.restore();return}
+  const i=sceneIndex(t),start=i>=0?S[i]:INTRO,lt=t-start,TR=.38;
+  const tint=T[Math.max(0,i)]||null;
+  card(alpha,{tint});
+  ctx.save();ctx.beginPath();ctx.roundRect(48,122,W-96,852,42);ctx.clip();
+  if(i>0&&lt<TR){const u=easeInOut(lt/TR),prevStart=S[i-1];
+    ctx.save();ctx.translate(-u*W,0);ctx.globalAlpha=1-u*.5;drawScene(S[i]-1e-3,prevStart);ctx.restore();
+    ctx.save();ctx.translate((1-u)*W*.9,0);drawScene(t,start);ctx.restore();}
+  else drawScene(t,start);
+  ctx.restore();
+}
 function render(t){
   const INTRO=window.INTRO_END||4.9;ctx.clearRect(0,0,W,H);wall(t);
   // camera: intro close-up on doctor, then doctor moves to bottom with card above
@@ -200,7 +229,7 @@ function render(t){
   const dx=lerp(540,540,intro),dy=lerp(1380,1660,intro),ds=lerp(1.45,1.12,intro);
   // card + content (content draws in intro too, over the doctor's head area)
   if(t<INTRO){ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(t);ctx.restore()}
-  else{card(cardA);ctx.save();content(t);ctx.restore();ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore()}
+  else{drawCard(t,INTRO,cardA);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore()}
   // name tag: window.NAMETAG=[start,end]
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});

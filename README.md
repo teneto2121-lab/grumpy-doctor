@@ -6,7 +6,8 @@ Each video is code: a voiceover from ElevenLabs plus a scene file that draws eve
 ## Folder layout
 ```
 STYLE-GUIDE.md        decisions about character, voice, tone, content rules, visuals
-engine/core.js        shared parts: the doctor, props (bones, gauge, trophy…), captions, renderer
+engine/core.js        shared parts: the doctor, props (bones, gauge, trophy…), captions, renderer, scene transitions
+engine/anatomy.js     shaded anatomy props with cartoon faces (brain, blood vessel, head, mouth, intestine…)
 episodes/<name>/
   script.txt          the narration, with emotion tags like [annoyed] [sighs] [shouting]
   scene.html          this episode's timeline: doctor's mood + poses, and what appears on the card

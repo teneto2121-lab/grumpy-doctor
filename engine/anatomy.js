@@ -1,0 +1,153 @@
+// Reusable, shaded anatomy props + cartoon faces. Load after core.js.
+// All props draw centred on (x,y) with scale s.
+
+// ---------- shading helpers ----------
+function shadeFill(x0,y0,x1,y1,light,dark){const g=ctx.createLinearGradient(x0,y0,x1,y1);g.addColorStop(0,light);g.addColorStop(1,dark);return g}
+function radial(x,y,r,inner,outer){const g=ctx.createRadialGradient(x-r*.35,y-r*.4,r*.05,x,y,r);g.addColorStop(0,inner);g.addColorStop(1,outer);return g}
+function gloss(x,y,rx,ry,rot=-.5,a=.55){E(x,y,rx,ry,rot);ctx.fillStyle=`rgba(255,255,255,${a})`;ctx.fill()}
+function noShadow(){ctx.shadowColor='rgba(0,0,0,0)'}
+function groundShadow(x,y,rx,ry=rx*.18,a=.16){E(x,y,rx,ry);ctx.fillStyle=`rgba(43,33,24,${a})`;ctx.fill()}
+
+// ---------- cartoon face ----------
+// expr: 'calm' | 'happy' | 'worried' | 'scared' | 'confused' | 'smug' | 'annoyed'
+function face(x,y,s,expr,t,{look=[0,0],blink=true}={}){
+  ctx.save();noShadow();ctx.translate(x,y);ctx.scale(s,s);
+  const b=blink&&((t*0.9+x*.001)%3.1)<.12?.1:1;
+  const wide=expr==='scared'||expr==='worried'?1.15:1;
+  [-1,1].forEach(d=>{
+    E(d*26,0,16*wide,19*wide*b);P('#fff',4);
+    if(b>.5){E(d*26+look[0]*6,3+look[1]*6,8,9);P(OL,0);E(d*26+look[0]*6-3,0+look[1]*6,3,3);P('#fff',0)}
+    // brows
+    ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();
+    const by=-28*wide;
+    if(expr==='annoyed'){ctx.moveTo(d*40,by-4);ctx.lineTo(d*12,by+6)}
+    else if(expr==='worried'||expr==='scared'){ctx.moveTo(d*40,by+4);ctx.lineTo(d*12,by-6)}
+    else if(expr==='confused'){d<0?(ctx.moveTo(-40,by),ctx.lineTo(-12,by)):(ctx.moveTo(12,by-10),ctx.lineTo(40,by-2))}
+    else if(expr==='smug'){ctx.moveTo(d*40,by);ctx.lineTo(d*12,by+2)}
+    ctx.stroke();
+  });
+  ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.lineCap='round';ctx.beginPath();
+  if(expr==='happy'){ctx.arc(0,26,16,.2,Math.PI-.2)}
+  else if(expr==='smug'){ctx.moveTo(-14,32);ctx.quadraticCurveTo(4,40,18,26)}
+  else if(expr==='worried'||expr==='annoyed'){ctx.moveTo(-16,38);ctx.quadraticCurveTo(0,28,16,38)}
+  else if(expr==='confused'){ctx.moveTo(-16,34);ctx.lineTo(-4,30);ctx.lineTo(8,35);ctx.lineTo(18,31)}
+  else if(expr==='scared'){ctx.stroke();E(0,36,10,13);P('#5a1e1e',4);ctx.restore();return}
+  else {ctx.moveTo(-12,32);ctx.lineTo(12,32)}
+  ctx.stroke();ctx.restore();
+}
+
+// ---------- brain (side view, facing right) ----------
+function brain(x,y,s,{t=0,expr=null,look=[0,0],tint='#ffafcc'}={}){
+  ctx.save();ctx.translate(x,y);ctx.scale(s,s);
+  // brain stem + cerebellum
+  ctx.beginPath();ctx.moveTo(-30,70);ctx.bezierCurveTo(-20,150,-50,200,-70,240);ctx.lineTo(-20,240);ctx.bezierCurveTo(10,190,30,140,40,80);ctx.closePath();P(shadeFill(-60,80,40,240,'#f4a3bf','#d97a9c'),7);
+  E(-140,105,95,58,-.1);P(radial(-140,105,100,'#ffc2d6','#e78aac'),7);
+  ctx.save();E(-140,105,95,58,-.1);ctx.clip();ctx.strokeStyle='rgba(140,40,80,.4)';ctx.lineWidth=5;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.ellipse(-140,105+i*16,100,30,-.1,.1,Math.PI-.1);ctx.stroke()}ctx.restore();
+  // cerebrum
+  const shape=()=>curve([[-235,30],[-245,-60],[-185,-150],[-65,-198],[70,-192],[180,-140],[242,-50],[238,40],[175,92],[60,100],[-60,96],[-175,92]]);
+  shape();P(radial(0,-60,300,'#ffd1e1',tint),8);noShadow();
+  ctx.save();shape();ctx.clip();
+  ctx.strokeStyle='rgba(150,45,90,.42)';ctx.lineWidth=7;ctx.lineCap='round';
+  for(let r=0;r<7;r++){const yy=-170+r*42;ctx.beginPath();for(let xx=-260;xx<=260;xx+=8){const w=Math.sin(xx/22+r*1.7)*13+Math.sin(xx/9+r)*4;xx===-260?ctx.moveTo(xx,yy+w):ctx.lineTo(xx,yy+w)}ctx.stroke()}
+  ctx.lineWidth=9;ctx.strokeStyle='rgba(130,35,80,.55)';ctx.beginPath();ctx.moveTo(-120,40);ctx.bezierCurveTo(-40,-10,60,10,170,-20);ctx.stroke(); // lateral sulcus
+  ctx.beginPath();ctx.moveTo(20,-195);ctx.bezierCurveTo(0,-120,40,-70,10,-10);ctx.stroke(); // central sulcus
+  ctx.restore();
+  shape();ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke();
+  gloss(-90,-140,60,22,-.35,.45);
+  if(expr)face(90,-40,1.05,expr,t,{look});
+  ctx.restore();
+}
+
+// ---------- red blood cell (biconcave disc) ----------
+function rbc(x,y,r,tilt=0){ctx.save();ctx.translate(x,y);ctx.scale(1,lerp(1,.35,Math.abs(Math.sin(tilt))));
+  E(0,0,r,r);P(radial(0,0,r,'#ff5d73','#b5172f'),4);E(0,0,r*.5,r*.5);ctx.fillStyle='rgba(120,10,30,.35)';ctx.fill();gloss(-r*.35,-r*.4,r*.3,r*.15,-.5,.45);ctx.restore()}
+
+// ---------- blood vessel cutaway ----------
+// squeeze 0..1 narrows it (cold), flood 0..1 widens it with warm blood
+function bloodVessel(cx,cy,t,{len=860,R0=105,squeeze=0,flood=0,cold=0}={}){
+  const R=R0*(1-.6*squeeze)*(1+.32*flood),wall=30,x0=cx-len/2,x1=cx+len/2;
+  // outer wall (cylinder shading)
+  ctx.beginPath();ctx.roundRect(x0,cy-R-wall,len,2*(R+wall),R+wall);
+  ctx.fillStyle=shadeFill(0,cy-R-wall,0,cy+R+wall,'#ffd0c8','#e8907f');ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke();
+  ctx.save();noShadow();
+  // lumen
+  ctx.save();ctx.beginPath();ctx.roundRect(x0+16,cy-R,len-32,2*R,R);ctx.clip();
+  ctx.fillStyle=shadeFill(0,cy-R,0,cy+R,flood>0?mixHex('7a1020','c8381e',flood):'#7a1020','#4a0712');ctx.fillRect(x0,cy-R,len,2*R);
+  const r=rng(12),sp=lerp(130,560,flood)*(1-.75*squeeze);
+  for(let i=0;i<26;i++){const x=x0+((t*sp*(.8+r()*.4)+r()*len)%len),y=cy+(r()-.5)*R*1.5,rr=lerp(26,30,flood)*(1-.25*squeeze);rbc(x,y,rr,t*2+i)}
+  ctx.restore();
+  ctx.beginPath();ctx.roundRect(x0+16,cy-R,len-32,2*R,R);ctx.strokeStyle='rgba(43,33,24,.5)';ctx.lineWidth=5;ctx.stroke();
+  // highlight streak along the top
+  ctx.strokeStyle='rgba(255,255,255,.55)';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(x0+60,cy-R-wall*.55);ctx.lineTo(x1-60,cy-R-wall*.55);ctx.stroke();
+  // muscle rings squeezing
+  if(squeeze>.05){ctx.strokeStyle=`rgba(76,201,240,${clamp(squeeze*1.4)})`;ctx.lineWidth=16;for(let i=1;i<6;i++){const xx=x0+i*len/6;ctx.beginPath();ctx.ellipse(xx,cy,18,R+wall+6,0,0,Math.PI*2);ctx.stroke()}}
+  if(cold>0){const g=ctx.createRadialGradient(cx,cy,10,cx,cy,len*.6);g.addColorStop(0,`rgba(160,230,255,${.35*cold})`);g.addColorStop(1,'rgba(160,230,255,0)');ctx.fillStyle=g;ctx.fillRect(x0-40,cy-R-120,len+80,2*R+240)}
+  if(flood>0){const g=ctx.createRadialGradient(cx,cy,10,cx,cy,len*.6);g.addColorStop(0,`rgba(255,120,60,${.25*flood})`);g.addColorStop(1,'rgba(255,120,60,0)');ctx.fillStyle=g;ctx.fillRect(x0-40,cy-R-120,len+80,2*R+240)}
+  ctx.restore();
+}
+
+// ---------- head profile (facing right) with brain, palate and nerve ----------
+function headProfile(cx,cy,s,t,{pulse=0,fore=0,brainExpr='calm',look=[0,0],cold=0}={}){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  const sil=()=>curve([[-205,-110],[-185,-235],[-85,-305],[55,-305],[170,-245],[215,-145],[222,-70],[272,-5],[232,22],[238,52],[252,72],[236,92],[248,112],[226,145],[214,190],[150,218],[92,222],[66,330],[-125,330],[-150,205],[-212,60]]);
+  sil();P(shadeFill(-200,-300,250,300,'#f6d2b3','#e4ad86'),8);noShadow();
+  // ear
+  E(-45,15,38,58,.1);P('#eab48f',7);ctx.strokeStyle='rgba(43,33,24,.4)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(-40,15,24,-1.2,1.6);ctx.stroke();
+  // skull window for the brain
+  ctx.save();sil();ctx.clip();
+  E(-5,-165,215,135);ctx.fillStyle='rgba(255,240,245,.85)';ctx.fill();ctx.strokeStyle='rgba(43,33,24,.25)';ctx.lineWidth=6;ctx.setLineDash([16,12]);ctx.stroke();ctx.setLineDash([]);
+  if(fore>0){const g=ctx.createRadialGradient(185,-185,10,185,-185,170);g.addColorStop(0,`rgba(255,40,40,${.8*fore})`);g.addColorStop(1,'rgba(255,40,40,0)');ctx.fillStyle=g;ctx.fillRect(0,-360,320,360)}
+  // mouth cavity + palate + tongue
+  E(150,72,95,40);ctx.fillStyle='#8a1c2b';ctx.fill();
+  ctx.beginPath();ctx.moveTo(55,62);ctx.quadraticCurveTo(150,25,240,58);ctx.lineWidth=16;ctx.strokeStyle=cold>0?mixHex('ff7f93','9be7ff',cold):'#ff7f93';ctx.stroke();
+  E(150,98,85,22);ctx.fillStyle='#ef6f86';ctx.fill();
+  ctx.restore();
+  sil();ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke();
+  // eye + brow
+  ctx.save();ctx.translate(150,-82);E(0,0,22,15);P('#fff',5);E(8,2,9,9);P(OL,0);ctx.restore();
+  ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(125,-115);ctx.lineTo(178,-110);ctx.stroke();
+  brain(-10,-150,.5,{t,expr:brainExpr,look});
+  // nerve with branch to forehead
+  const nerve=[[150,40],[95,-10],[50,-60],[15,-110]],branch=[[95,-10],[150,-90],[190,-185]];
+  [nerve,branch].forEach(pts=>{ctx.beginPath();pts.forEach(([x,y],i)=>i?ctx.lineTo(x,y):ctx.moveTo(x,y));ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=OL;ctx.lineWidth=16;ctx.stroke();ctx.strokeStyle='#ffd60a';ctx.lineWidth=9;ctx.stroke()});
+  if(pulse>0){for(let k=0;k<3;k++){const u=((t*1.3+k/3)%1),seg=u*3,i=Math.min(2,Math.floor(seg)),f=seg-i;const x=lerp(nerve[i][0],nerve[i+1][0],f),y=lerp(nerve[i][1],nerve[i+1][1],f);ctx.globalAlpha=pulse;E(x,y,18,18);P('#ff595e',5);ctx.globalAlpha=1}}
+  ctx.restore();
+}
+
+// ---------- open mouth (front view) ----------
+function mouthOpen(cx,cy,s,t,{frost=0}={}){
+  ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  // lips
+  E(0,0,350,265);P(shadeFill(0,-265,0,265,'#f28b9b','#d45a6f'),9);noShadow();
+  E(0,0,305,222);P(radial(0,40,320,'#6e1022','#3d0611'),7);
+  ctx.save();E(0,0,305,222);ctx.clip();
+  // palate
+  ctx.beginPath();ctx.ellipse(0,-200,285,150,0,0,Math.PI);
+  const pal=frost>0?mixHex('ff8c9a','b8ecff',frost):'#ff8c9a';ctx.fillStyle=shadeFill(0,-200,0,-50,pal,frost>0?mixHex('e8667a','7fcff0',frost):'#e8667a');ctx.fill();ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.stroke();
+  ctx.strokeStyle='rgba(120,30,50,.3)';ctx.lineWidth=5;for(let i=0;i<4;i++){ctx.beginPath();ctx.arc(0,-205,80+i*45,.35,Math.PI-.35);ctx.stroke()}
+  // uvula + throat
+  E(0,10,70,55);ctx.fillStyle='#1f0208';ctx.fill();
+  ctx.beginPath();ctx.moveTo(-18,-55);ctx.quadraticCurveTo(-22,10,0,18);ctx.quadraticCurveTo(22,10,18,-55);ctx.closePath();P('#ff8c9a',5);
+  // tongue
+  E(0,175,215,125);P(shadeFill(0,60,0,260,'#ff8fa3','#e05b74'),7);ctx.strokeStyle='rgba(120,30,50,.35)';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(0,80);ctx.lineTo(0,170);ctx.stroke();gloss(-70,110,50,16,-.2,.35);
+  // gums + teeth
+  ctx.beginPath();ctx.ellipse(0,-205,300,38,0,0,Math.PI);ctx.fillStyle='#ff9fb0';ctx.fill();
+  for(let i=-4;i<=4;i++){ctx.beginPath();ctx.roundRect(i*60-26,-232,52,64,14);P(shadeFill(0,-232,0,-168,'#ffffff','#e9e4d6'),5)}
+  for(let i=-3;i<=3;i++){ctx.beginPath();ctx.roundRect(i*60-26,172,52,60,14);P(shadeFill(0,172,0,232,'#ffffff','#e9e4d6'),5)}
+  ctx.restore();
+  E(0,0,305,222);ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke();
+  ctx.restore();
+}
+
+// ---------- intestine tube along a path, with a travelling squeeze wave ----------
+// path(u) -> [x,y]; wave: position 0..1 of the squeeze; returns nothing, draws tube
+function intestine(path,t,{R=70,waves=[],N=180}={}){
+  const pts=[];for(let i=0;i<=N;i++){const u=i/N;let r=R;waves.forEach(w=>{const d=(u-w)/0.045;r*=1-.38*Math.exp(-d*d)});pts.push([...path(u),r])}
+  const pass=(extra,fill)=>{ctx.fillStyle=fill;pts.forEach(([x,y,r])=>{ctx.beginPath();ctx.arc(x,y,Math.max(4,r+extra),0,Math.PI*2);ctx.fill()})};
+  ctx.save();pass(8,OL);noShadow();pass(0,'#f7a8b8');
+  // shading: lighter top band
+  ctx.fillStyle='rgba(255,255,255,.28)';pts.forEach(([x,y,r])=>{ctx.beginPath();ctx.arc(x-r*.15,y-r*.3,r*.45,0,Math.PI*2);ctx.fill()});
+  // muscle ring marks at the squeeze points
+  waves.forEach(w=>{const u=clamp(w,0,1),[x,y]=path(u),[x2,y2]=path(clamp(u+.01,0,1)),a=Math.atan2(y2-y,x2-x);ctx.save();ctx.translate(x,y);ctx.rotate(a);ctx.strokeStyle='#c9184a';ctx.lineWidth=12;ctx.beginPath();ctx.ellipse(0,0,10,R*.75,0,0,Math.PI*2);ctx.stroke();ctx.restore()});
+  ctx.restore();
+}

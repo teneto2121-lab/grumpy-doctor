@@ -36,6 +36,14 @@
 - TikTok captions: about 3 words at a time, active word in yellow, thick black outline
 - Quick zoom and flash on scene cuts, progress bar at the top
 
+## Explainer card (from ep 02 on)
+- Use the shaded props in `engine/anatomy.js` (brain, bloodVessel, headProfile, mouthOpen, intestine, rbc, face)
+- Props get cartoon faces whose expressions react to the story (calm, worried, scared, confused, smug, happy, annoyed)
+- Every prop gets shading: gradient fill + gloss highlight; the card adds a flat drop shadow automatically
+- Fill the card: main subject big and centered, max 2–3 labels on screen at once
+- Define `window.SCENES` (scene start times) and `window.TINTS` (card color per scene) to get slide transitions,
+  a slow push-in, and tinted backgrounds
+
 ## Sound
 - Synthesized effects (no licensing issues), mixed under the voice
 - Whoosh on every scene change, blip when a label pops in, plus effects tied to the story (crack, pop, ding, tada…)
