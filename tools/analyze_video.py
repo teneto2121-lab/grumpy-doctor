@@ -29,18 +29,23 @@ def probe(key):
 W0, H0 = [int(x) for x in probe("width,height").split(",")[:2]]
 num, den = probe("r_frame_rate").split("/")
 FPS = float(num) / float(den)
+# long videos: analyse at a lower frame rate so every (sampled) frame still fits in memory
+LEN = float(subprocess.run(["ffprobe", "-v", "error", "-show_entries", "format=duration", "-of", "csv=p=0", src], capture_output=True, text=True).stdout.strip() or 0)
+VF = ""
+if LEN > 120: FPS = 10.0; VF = "fps=10,"
+
 SW = 180; SH = int(SW * H0 / W0) // 2 * 2  # small analysis size
 
 # ---- every frame, small, as raw RGB ----
-raw = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", f"scale={SW}:{SH}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+raw = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", f"{VF}scale={SW}:{SH}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                      capture_output=True).stdout
-frames = np.frombuffer(raw, np.uint8).reshape(-1, SH, SW, 3).astype(np.int16)
+frames = np.frombuffer(raw, np.uint8).reshape(-1, SH, SW, 3)
 N = len(frames)
 dur = N / FPS
 
 # motion = mean abs difference to previous frame; cuts = big spikes relative to local motion
 motion = np.zeros(N)
-motion[1:] = np.abs(frames[1:] - frames[:-1]).mean(axis=(1, 2, 3))
+for i in range(1, N): motion[i] = np.abs(frames[i].astype(np.int16) - frames[i - 1]).mean()
 hist = lambda f: np.histogram(f[..., 0] // 32 * 64 + f[..., 1] // 32 * 8 + f[..., 2] // 32, bins=512, range=(0, 512))[0] / f[..., 0].size
 hd = np.zeros(N)
 H = [hist(f) for f in frames]
@@ -84,7 +89,7 @@ for s in range(int(dur) + 1): x = s * FPS / N * 1600; d.text((x + 2, 2), f"{s}s"
 G.save(os.path.join(out, "motion.png"))
 
 # ---- contact sheets over the whole video (every STEP frames), full-res frames, timestamped ----
-STEP = 4
+STEP = 4 if FPS > 20 else 3
 CW = 216; CH = int(CW * H0 / W0) // 2 * 2
 idx = list(range(0, N, STEP))
 per = 24  # 6 x 4 per sheet
@@ -93,7 +98,7 @@ except Exception: font = None
 
 
 # decode every frame once at contact-sheet size (fast, and covers the whole video)
-big = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", f"scale={CW}:{CH}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
+big = subprocess.run(["ffmpeg", "-v", "error", "-i", src, "-vf", f"{VF}scale={CW}:{CH}", "-f", "rawvideo", "-pix_fmt", "rgb24", "-"],
                      capture_output=True).stdout
 BIG = np.frombuffer(big, np.uint8).reshape(-1, CH, CW, 3)
 
