@@ -16,7 +16,9 @@ episodes/<name>/
   <name>.mp4          the finished video
 design/               character design explorations
 tools/voice.py        script.txt  ->  voice.wav + words.json + env.json
-tools/render.js       scene.html  ->  <name>.mp4  (or preview stills)
+tools/render.js       scene.html  ->  <name>.mp4  (or preview stills); mixes in sound effects
+tools/make_sfx.py     synthesizes the sound-effect library into engine/sfx/
+tools/mix.py          mixes voice + effect cues (called by render.js)
 ```
 
 ## Making a new episode
@@ -28,11 +30,13 @@ tools/render.js       scene.html  ->  <name>.mp4  (or preview stills)
    - `MOOD`: keyframes `[seconds, 0..1]` (0 = mildly grumpy, 1 = red-faced with steam)
    - `POSES`: keyframes `[seconds, 'rest'|'point'|'up'|'shrug'|'chin']`
    - `content(t)`: what's on the explainer card at time `t`
+   - `window.SFX`: sound cues `[seconds, name, volume]`. Available: crack, pop, blip, ding, whoosh,
+     stamp, sparkle, fall, tick, beep, tada, steam
 5. Check a few frames: `node tools/render.js episodes/ep02-... stills 3 15 30`
 6. Render the video: `node tools/render.js episodes/ep02-...`
 
 ## Requirements
-- Node 18+ with Playwright (Chromium), Python 3, ffmpeg
+- Node 18+ with Playwright (Chromium), Python 3 with numpy + scipy, ffmpeg
 - The Inter Display font installed (for captions and text)
 - An ElevenLabs API key (`ELEVENLABS_API_KEY`, or saved as a network secret in a Claude cloud environment)
 

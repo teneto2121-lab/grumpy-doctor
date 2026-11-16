@@ -27,3 +27,12 @@
 - Flat 2D vector cartoon with dark outlines, bold Inter Display Black text
 - TikTok captions: about 3 words at a time, active word in yellow, thick black outline
 - Quick zoom and flash on scene cuts, progress bar at the top
+
+## Sound
+- Synthesized effects (no licensing issues), mixed under the voice
+- Whoosh on every scene change, blip when a label pops in, plus effects tied to the story (crack, pop, ding, tada…)
+- Steam hiss when the doctor boils over
+- No background music baked in: add a trending sound in the TikTok app at low volume instead (better for reach)
+
+## Doctor poses
+rest (hands at sides) · point (right hand points up at the card) · up (both arms raised, outraged) · shrug · chin (fist at belly)

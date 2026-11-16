@@ -36,9 +36,17 @@ const DUR = Math.ceil((words[words.length - 1].e + 0.9) * 10) / 10;
       await p.screenshot({path: path.join(dir, `f${String(i).padStart(4, '0')}.jpg`), type: 'jpeg', quality: 92});
       if (i % 150 === 0) console.log(`frame ${i}/${N}`);
     }
+    // sound effects: mix window.SFX cues under the voice
+    let audio = path.join(ep, 'voice.wav');
+    const sfx = await p.evaluate(() => window.SFX || []);
+    if (sfx.length) {
+      fs.writeFileSync(path.join(ep, 'sfx.json'), JSON.stringify(sfx));
+      execFileSync('python3', [path.join(__dirname, 'mix.py'), ep], {stdio: 'inherit'});
+      audio = path.join(ep, 'mix.wav');
+    }
     const out = path.join(ep, path.basename(ep) + '.mp4');
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(dir, 'f%04d.jpg'),
-      '-i', path.join(ep, 'voice.wav'), '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
+      '-i', audio, '-c:v', 'libx264', '-preset', 'medium', '-crf', '19', '-pix_fmt', 'yuv420p',
       '-c:a', 'aac', '-b:a', '192k', '-af', 'apad', '-shortest', '-movflags', '+faststart', out]);
     fs.rmSync(dir, {recursive: true, force: true});
     console.log('wrote', out, `(${DUR}s)`);

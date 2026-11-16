@@ -58,25 +58,45 @@ function dMouth(x,y,w,open,mood){
   E(x,cy+ry*.75,rx*.6,ry*.45);ctx.fillStyle='#e05a5a';ctx.fill();ctx.restore();
   E(x,cy,rx,ry);ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.stroke();
 }
-function hand(x,y,ang,point,r=32){
-  ctx.save();ctx.translate(x,y);ctx.rotate(ang);
-  if(point){E(r*1.45,-2,r*1.05,r*.36);P(SKIN,6)}
-  E(0,0,r,r*.95);P(SKIN,6);
-  if(point){ctx.strokeStyle=OL;ctx.lineWidth=5;ctx.beginPath();ctx.arc(r*.25,r*.3,r*.35,-.5,1.2);ctx.stroke()}
+// ---- hands: kinds 'open' | 'spread' | 'point' | 'fist'. Local frame: +x runs from wrist to fingertips.
+function capsule(x1,y1,x2,y2,w){ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=w+12;ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();ctx.strokeStyle=SKIN;ctx.lineWidth=w;ctx.stroke()}
+function hand(x,y,ang,kind,side){
+  ctx.save();ctx.translate(x,y);ctx.rotate(ang);ctx.scale(1,side);
+  if(kind==='open'||kind==='spread'){
+    const fan=kind==='spread'?.16:.05,len=kind==='spread'?34:28;
+    [-19,-6,7,19].forEach((fy,i)=>{const a=(i-1.5)*fan;capsule(34,fy,34+Math.cos(a)*len,fy+Math.sin(a)*len*(kind==='spread'?2.2:1),14)});
+    capsule(14,-20,14+Math.cos(-1.1)*30,-20+Math.sin(-1.1)*30,15);
+    ctx.beginPath();ctx.roundRect(-6,-27,48,54,20);P(SKIN,6);
+    ctx.fillStyle=SKIN;ctx.fillRect(28,-22,12,44);
+  } else {
+    if(kind==='point')capsule(34,-15,82,-15,15);
+    ctx.beginPath();ctx.roundRect(-6,-26,46,52,20);P(SKIN,6);
+    (kind==='point'?[-1,10,21]:[-15,-3,9,20]).forEach(fy=>{E(42,fy,9,7);P(SKIN,5)});
+    capsule(10,-18,30,-6,13);
+  }
   ctx.restore()}
-function arm(sx,sy,ex,ey,point){
-  const mx=(sx+ex)/2+(ex>sx?25:-25),my=(sy+ey)/2+45;
-  ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=74;ctx.beginPath();ctx.moveTo(sx,sy);ctx.quadraticCurveTo(mx,my,ex,ey);ctx.stroke();
-  ctx.strokeStyle=COAT;ctx.lineWidth=60;ctx.stroke();
+// two-bone arm: shoulder (sx,sy) -> hand (ex,ey); elbow bends outward. side: -1 left, 1 right
+function arm(sx,sy,ex,ey,kind,side){
+  const a=150,b=150,dx=ex-sx,dy=ey-sy,d=Math.hypot(dx,dy),dd=Math.min(d,a+b-2);
+  const th=Math.atan2(dy,dx),al=Math.acos(clamp((a*a+dd*dd-b*b)/(2*a*dd),-1,1));
+  const el=[th+al,th-al].map(g=>[sx+a*Math.cos(g),sy+a*Math.sin(g)]).sort((p,q)=>(side*q[0]+.5*q[1])-(side*p[0]+.5*p[1]))[0];
+  const fa=Math.atan2(ey-el[1],ex-el[0]),ux=Math.cos(fa),uy=Math.sin(fa);
+  ctx.lineCap='round';ctx.lineJoin='round';
+  ctx.strokeStyle=OL;ctx.lineWidth=72;ctx.beginPath();ctx.moveTo(sx,sy);ctx.lineTo(el[0],el[1]);ctx.lineTo(ex,ey);ctx.stroke();
+  ctx.strokeStyle=COAT;ctx.lineWidth=58;ctx.stroke();
+  // sleeve fold at the elbow
+  ctx.strokeStyle='rgba(43,33,24,.35)';ctx.lineWidth=5;ctx.beginPath();ctx.arc(el[0],el[1],16,fa+1.2,fa+2.4);ctx.stroke();
   // cuff
-  hand(ex,ey,Math.atan2(ey-my,ex-mx),point);
+  ctx.lineCap='butt';ctx.strokeStyle=OL;ctx.lineWidth=70;ctx.beginPath();ctx.moveTo(ex-ux*20,ey-uy*20);ctx.lineTo(ex+ux*2,ey+uy*2);ctx.stroke();
+  ctx.strokeStyle='#dfe7f0';ctx.lineWidth=58;ctx.stroke();ctx.lineCap='round';
+  hand(ex+ux*6,ey+uy*6,fa,kind,side);
 }
 function steam(x,y,s,t){ctx.strokeStyle='#ffffff';ctx.lineWidth=10;ctx.lineCap='round';[[-1,0],[1,.5]].forEach(([d,o])=>{ctx.beginPath();for(let i=0;i<=20;i++){const u=i/20;const xx=x+d*s*(.6+u*.5)+Math.sin(u*9+o*5+t*12)*s*.12,yy=y-u*s*1.1;i?ctx.lineTo(xx,yy):ctx.moveTo(xx,yy)}ctx.stroke()})}
 function vein(x,y,s,k){ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.strokeStyle='#c0392b';ctx.lineWidth=7;ctx.lineCap='round';[0,1.6].forEach(r=>{ctx.save();ctx.rotate(r);ctx.beginPath();ctx.moveTo(-s,0);ctx.quadraticCurveTo(-s*.3,-s*.5,0,0);ctx.quadraticCurveTo(s*.3,-s*.5,s,0);ctx.stroke();ctx.restore()});ctx.restore()}
 
-// pose: {mood,open,blink,lift,L:[x,y],R:[x,y],pointR,pointL,tilt,bob}
+// pose: {mood,open,blink,lift,L:[x,y],R:[x,y],kL,kR (hand kinds),tilt,bob}
 function doctor(p,t){
-  const {mood,open,blink,lift,L,R,pointR,pointL,tilt,bob}=p;
+  const {mood,open,blink,lift,L,R,tilt,bob}=p;
   ctx.save();ctx.translate(0,bob);
   // body
   const w=420,h=330;
@@ -88,7 +108,7 @@ function doctor(p,t){
   poly([[w*.18,h*.48],[w*.38,h*.48],[w*.38,h*.66],[w*.18,h*.66]]);P(COAT,5);
   ctx.strokeStyle='#3a3f47';ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-w*.17,0);ctx.bezierCurveTo(-w*.3,h*.4,-w*.05,h*.75,w*.02,h*.7);ctx.stroke();ctx.beginPath();ctx.moveTo(w*.17,0);ctx.bezierCurveTo(w*.12,h*.2,w*.06,h*.5,w*.02,h*.7);ctx.stroke();
   E(w*.02,h*.76,24,24);P('#b8c0cc',6);E(w*.02,h*.76,12,12);P('#8a94a3',0);
-  arm(-200,60,L[0],L[1],pointL);arm(200,60,R[0],R[1],pointR);
+  arm(-200,60,L[0],L[1],p.kL||'open',-1);arm(200,60,R[0],R[1],p.kR||'open',1);
   // head
   ctx.save();ctx.translate(0,-210);ctx.rotate(tilt);
   const face=mixHex('f2c9a5','f0907a',clamp((mood-.55)/.4));
@@ -106,9 +126,10 @@ function doctor(p,t){
   ctx.restore();ctx.restore();
 }
 
-const POSE={rest:[[-150,250],[150,250]],point:[[-150,250],[300,-150]],up:[[-330,-150],[300,-110]],shrug:[[-290,40],[290,40]],chin:[[-150,250],[60,-120]]};
+const HANDS={rest:['open','open'],point:['open','point'],up:['spread','point'],shrug:['spread','spread'],chin:['open','fist']};
+const POSE={rest:[[-235,300],[235,300]],point:[[-235,300],[300,-150]],up:[[-330,-150],[300,-110]],shrug:[[-290,40],[290,40]],chin:[[-235,300],[40,150]]};
 function poseAt(t){let i=0;for(let k=0;k<POSES.length;k++)if(t>=POSES[k][0])i=k;const cur=POSE[POSES[i][1]];const prev=i>0?POSE[POSES[i-1][1]]:cur;const u=easeOut(prog(t,POSES[i][0],.28));
-  return {L:[lerp(prev[0][0],cur[0][0],u),lerp(prev[0][1],cur[0][1],u)],R:[lerp(prev[1][0],cur[1][0],u),lerp(prev[1][1],cur[1][1],u)],pointR:POSES[i][1]==='point'||POSES[i][1]==='up',pointL:false}}
+  return {L:[lerp(prev[0][0],cur[0][0],u),lerp(prev[0][1],cur[0][1],u)],R:[lerp(prev[1][0],cur[1][0],u),lerp(prev[1][1],cur[1][1],u)],kL:HANDS[POSES[i][1]][0],kR:HANDS[POSES[i][1]][1]}}
 function envAt(t){const i=t*FPS;const a=ENV[Math.floor(i)]||0,b=ENV[Math.floor(i)+1]||0;return lerp(a,b,i%1)}
 function blinkAt(t){const per=[];for(let b=2.1;b<600;b+=2.6+((b*7.3)%2.2))per.push(b);for(const b of per){const d=t-b;if(d>0&&d<.16)return Math.sin(d/.16*Math.PI)}return 0}
 
@@ -174,7 +195,7 @@ function render(t){
   const cardA=intro;
   const mood=track(MOOD,t),env=envAt(t);
   const pose=poseAt(t);
-  const p={mood,open:clamp(env*1.15),blink:blinkAt(t),lift:env*10,L:pose.L,R:pose.R,pointR:pose.pointR,pointL:false,tilt:Math.sin(t*2.3)*.025+env*.03*Math.sin(t*9),bob:-env*10+Math.sin(t*2)*4};
+  const p={mood,open:clamp(env*1.15),blink:blinkAt(t),lift:env*10,L:pose.L,R:pose.R,kL:pose.kL,kR:pose.kR,tilt:Math.sin(t*2.3)*.025+env*.03*Math.sin(t*9),bob:-env*10+Math.sin(t*2)*4};
   // doctor placement
   const dx=lerp(540,540,intro),dy=lerp(1380,1660,intro),ds=lerp(1.45,1.12,intro);
   // card + content (content draws in intro too, over the doctor's head area)
