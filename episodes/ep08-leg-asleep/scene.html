@@ -1,0 +1,103 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 08: Why does your leg fall asleep? =====
+window.INTRO_END=2.2;
+window.HOOK=[['WHY DOES YOUR LEG','#fff',84],['FALL ASLEEP?','#ffd60a',120]];
+window.SCENES=[2.2,5.1,7.6,11.8,20.1,28.8];
+window.TINTS=['#fff1cc','#e6f0ff','#fff6d6','#e6eefc','#ffe0ec','#e3f7e9'];
+window.PUNCH=[[27.1,28.8,'PINS & NEEDLES!']];
+window.JOLTS=[13.2,24.75];
+window.OUTRO=true;
+window.SFX=[[0.6,'pop',.5],[2.2,'whoosh'],[3.2,'stamp',.8],[5.1,'whoosh',.8],[5.75,'stamp'],[6.6,'blip'],[7.6,'whoosh',.8],[8.6,'blip'],[9.4,'beep',.5],[9.9,'beep',.5],
+ [11.8,'whoosh',.8],[13.2,'stamp'],[14.6,'blip'],[16.9,'fall',.7],[19.6,'blip'],[20.1,'whoosh',.8],[20.5,'whoosh',.6],[22.9,'beep'],[23.3,'beep'],[23.7,'beep'],[24.75,'sparkle'],[24.8,'pop',1.1],
+ [25.3,'tick'],[25.5,'tick'],[25.7,'tick'],[25.9,'tick'],[27.15,'stamp'],[27.2,'steam',.8],[28.8,'whoosh',.8],[29.0,'blip'],[29.7,'ding',.5],[31.0,'blip'],[32.6,'stamp',.8]];
+const MOOD=[[0,.2],[2.3,.3],[5.7,.35],[7.6,.25],[13.2,.3],[19.5,.3],[22.5,.35],[24.7,.5],[27.1,.95],[28.8,.4],[30.2,.3],[32.8,.35],[33.4,.35]];
+const POSES=[[0,'chin'],[2.2,'hips'],[4.3,'point'],[7.6,'point'],[11.8,'cross'],[13.0,'point'],[20.1,'shrug'],[21.2,'point'],[27.1,'up'],[28.8,'point'],[30.2,'hips'],[32,'point']];
+
+// ---- episode props ----
+// side view leg: hip (left) -> knee -> foot (right). numb 0..1 tints it; wiggle shakes the foot
+const LEGY=640;
+function legSide(t,{numb=0,wiggle=0}={}){
+  const skin=numb>0?mixHex('f6d2b3','b8c7e0',numb):'#f6d2b3',skin2=numb>0?mixHex('e4ad86','8fa3c4',numb):'#e4ad86';
+  ctx.save();
+  // thigh in shorts
+  ctx.beginPath();ctx.moveTo(80,LEGY-100);ctx.lineTo(560,LEGY-80);ctx.quadraticCurveTo(620,LEGY-70,620,LEGY);ctx.quadraticCurveTo(620,LEGY+80,560,LEGY+85);ctx.lineTo(80,LEGY+100);ctx.closePath();P(shadeFill(0,LEGY-100,0,LEGY+100,skin,skin2),8);
+  noShadow();
+  ctx.beginPath();ctx.moveTo(80,LEGY-100);ctx.lineTo(330,LEGY-92);ctx.lineTo(330,LEGY+95);ctx.lineTo(80,LEGY+100);ctx.closePath();P(shadeFill(0,LEGY-100,0,LEGY+100,'#4cc9f0','#2a7ab0'),8);
+  // shin
+  ctx.beginPath();ctx.moveTo(580,LEGY-62);ctx.lineTo(880,LEGY-48);ctx.lineTo(880,LEGY+52);ctx.lineTo(580,LEGY+70);ctx.closePath();P(shadeFill(0,LEGY-62,0,LEGY+70,skin,skin2),8);
+  // foot
+  ctx.save();ctx.translate(880,LEGY);ctx.rotate(Math.sin(t*22)*.18*wiggle);
+  ctx.beginPath();ctx.moveTo(-10,-52);ctx.quadraticCurveTo(60,-60,70,-140);ctx.quadraticCurveTo(110,-150,120,-110);ctx.quadraticCurveTo(140,20,40,55);ctx.lineTo(-10,52);ctx.closePath();P(shadeFill(0,-150,0,55,skin,skin2),8);
+  ctx.restore();ctx.restore();
+}
+// nerve "cable" inside the leg, up to a little brain. block 0..1 (pinched), fire 0..1 (everything at once)
+function nervePath(u){ // 0 at brain, 1 at toes
+  const pts=[[200,250],[200,420],[150,LEGY-10],[560,LEGY+10],[880,LEGY+5],[960,LEGY-60]];
+  const L=pts.length-1,f=u*L,i=Math.min(L-1,Math.floor(f)),k=f-i;return [lerp(pts[i][0],pts[i+1][0],k),lerp(pts[i][1],pts[i+1][1],k)]}
+function nerve(t,{block=0,fire=0,pinchX=330,blood=0}={}){
+  ctx.save();noShadow();ctx.lineCap='round';ctx.lineJoin='round';
+  // blood vessel (red) runs alongside
+  if(blood>0){ctx.globalAlpha=blood;ctx.strokeStyle=OL;ctx.lineWidth=16;ctx.beginPath();ctx.moveTo(150,LEGY+40);ctx.lineTo(900,LEGY+35);ctx.stroke();ctx.strokeStyle='#e63946';ctx.lineWidth=9;ctx.stroke();ctx.globalAlpha=1}
+  [[OL,20],['#ffd60a',11]].forEach(([c,w])=>{ctx.strokeStyle=c;ctx.lineWidth=w;ctx.beginPath();for(let i=0;i<=60;i++){const [x,y]=nervePath(i/60);let yy=y;if(block>0&&Math.abs(x-pinchX)<40&&y>LEGY-60)yy+=0;i?ctx.lineTo(x,yy):ctx.moveTo(x,yy)}ctx.stroke()});
+  // pinch marker
+  if(block>0){ctx.globalAlpha=block;ctx.strokeStyle='#e63946';ctx.lineWidth=12;[-1,1].forEach(d=>{ctx.beginPath();ctx.moveTo(pinchX-30,LEGY-10+d*42);ctx.lineTo(pinchX+30,LEGY-10+d*14);ctx.stroke()});ctx.globalAlpha=1}
+  // signals
+  const n=fire>0?26:6;for(let k=0;k<n;k++){let u=fire>0?((k/n+t*.15)%1):((t*.35+k/n)%1);if(k%2)u=1-u;const [x,y]=nervePath(u);
+    if(block>.5&&x>pinchX-10&&y>LEGY-80)continue; // signals stop at the pinch
+    const r=fire>0?12+6*Math.sin(t*30+k):11;E(x,y,r,r);P(fire>0?'#ff595e':'#4cc9f0',4)}
+  ctx.restore()}
+function weight(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.scale(s,s);poly([[-130,80],[130,80],[95,-70],[-95,-70]]);P(shadeFill(0,-70,0,80,'#6c757d','#343a40'),8);noShadow();text('YOU',0,8,64,{fill:'#fff',sw:10,shadow:false});
+  ctx.beginPath();ctx.roundRect(-40,-110,80,44,20);P('#495057',7);ctx.restore()}
+function zzz(x,y,t,k){if(k<=0)return;ctx.save();ctx.globalAlpha=k;['z','Z','Z'].forEach((c,i)=>text(c,x+i*45,y-i*55-((t*30)%20),44+i*14,{fill:'#7b5ea7',sw:8}));ctx.restore()}
+function pin(x,y,s,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s,s);ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(0,-70);ctx.stroke();ctx.strokeStyle='#ced4da';ctx.lineWidth=4;ctx.stroke();E(0,-78,16,16);P(radial(0,-78,16,'#ff6b6b','#c0182c'),5);ctx.restore()}
+function miniBrain(t,expr){brain(200,240,.32,{t,expr})}
+
+function content(t){
+  const CY=560;
+  if(t<2.2){ // intro
+    ctx.save();ctx.translate(0,-80);zzz(780,620,t,pop(t,.6));ctx.restore();
+    return}
+  if(t<5.1){ // you sat on it
+    legSide(t);weight(330,LEGY-170,1.0*easeOut(prog(t,2.4,.5))+0*0,t);
+    if(t<2.9){ctx.save();ctx.globalAlpha=1-prog(t,2.4,.5);ctx.restore()}
+    label('LET ME GUESS...',W/2,205,t,2.3,{bg:'#fff',size:50});
+    if(t>3.15)label('YOU SAT ON IT',760,330,t,3.2,{bg:'#ffd60a',size:52,rot:.05});
+    return}
+  if(t<7.6){ // not asleep
+    legSide(t,{numb:.6});zzz(760,420,t,1);
+    stamp('NOT ASLEEP',W/2,330,t,5.75,96,-.08);
+    if(t>6.55)label("IT'S A NERVE PROBLEM",W/2,880,t,6.6,{bg:'#ffd60a',size:48});
+    return}
+  if(t<11.8){ // nerves are cables
+    legSide(t);nerve(t);miniBrain(t,'calm');
+    label('NERVES = CABLES',650,250,t,8.6,{bg:'#ffd60a',size:52,rot:.03});
+    if(t>9.3)text('messages: leg ⇄ brain',650,360,40,{fill:'#5c677d',shadow:false,alpha:prog(t,9.4,.3)});
+    return}
+  if(t<20.1){ // squash -> blocked -> numb
+    const sq=easeOut(prog(t,13.2,.3)),numb=easeInOut(prog(t,18.6,1.0));
+    legSide(t,{numb});nerve(t,{block:sq,blood:prog(t,14.6,.4)});miniBrain(t,numb>.3?'confused':'calm');
+    weight(330,lerp(-200,LEGY-170,sq),1.0,t);
+    if(t>14.6)label('BLOOD SUPPLY',600,LEGY+150,t,14.6,{bg:'#e63946',fg:'#fff',size:42,rot:-.03});
+    if(t>16.9)label('MESSAGES BLOCKED',700,300,t,17.0,{bg:'#fff',size:44,rot:.04});
+    if(t>19.5){zzz(880,560,t,1);label('NUMB',W/2,905,t,19.6,{bg:'#b8c7e0',size:60})}
+    return}
+  if(t<28.8){ // stand up -> reboot -> all at once -> pins and needles
+    const up=easeIn(prog(t,20.4,.5)),fire=t>24.75?1:0;
+    legSide(t,{numb:1-prog(t,24.6,.4)});nerve(t,{fire});miniBrain(t,fire?'scared':'worried');
+    weight(330,lerp(LEGY-170,-260,up),1.0,t);
+    if(t>22.8&&t<24.75){const p=prog(t,22.9,1.6);ctx.save();noShadow();ctx.beginPath();ctx.roundRect(W/2-250,260,500,60,30);P('#fff',6);ctx.beginPath();ctx.roundRect(W/2-242,268,484*p,44,22);ctx.fillStyle='#7ae582';ctx.fill();ctx.restore();text('REBOOTING...',W/2,215,48,{fill:OL,shadow:false})}
+    if(fire){label('ALL AT ONCE!',W/2,235,t,24.8,{bg:'#e63946',fg:'#fff',size:56,rot:-.03});const r=rng(8);const n=Math.floor(clamp((t-25.2)/1.2)*16);for(let i=0;i<16;i++){if(i>=n)break;const u=.35+r()*.6,[x,y]=nervePath(u);pin(x+(r()-.5)*40,y-60-r()*50,.9,(r()-.5)*.8)}}
+    return}
+  // wiggle + a minute + real doctor
+  legSide(t,{wiggle:t<31?1:0});
+  label('WIGGLE IT',300,300,t,29.0,{bg:'#7ae582',size:50,rot:-.05});
+  if(t>29.6){ctx.save();ctx.translate(780,320);const k=pop(t,29.65);ctx.scale(k*.8,k*.8);E(0,0,95,95);P(radial(0,0,95,'#ffffff','#dee2e6'),8);noShadow();const a=-Math.PI/2+(t-29.6)*2;ctx.strokeStyle=OL;ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*65,Math.sin(a)*65);ctx.stroke();ctx.restore();label('~1 MINUTE',780,440,t,29.7,{bg:'#fff',size:42,rot:.04})}
+  if(t>31.0){label('NO REASON? SEE A REAL DOCTOR',W/2,895,t,31.0,{bg:'#2a9d8f',fg:'#fff',size:38})}
+}
+function easeIn(x){return x*x*x}
+</script></body></html>

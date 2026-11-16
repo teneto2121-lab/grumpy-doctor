@@ -54,5 +54,7 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
 | 05 | Why does your funny bone hurt? | 40s |
 | 06 | Why do we hiccup? | 40s |
 | 07 | Why do we get goosebumps? | 35s |
+| 08 | Why does your leg fall asleep? | 36s |
+| 09 | Why does your stomach growl? | 42s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

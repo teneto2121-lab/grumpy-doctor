@@ -69,6 +69,22 @@ Your body is bluffing. With nothing. 🐱❄️ #goosebumps #bodyfacts #learnont
 ```
 **Pinned comment:** `What gives you goosebumps? (Besides me.)`
 
+### Ep 08: Why does your leg fall asleep?
+**File:** `episodes/ep08-leg-asleep/ep08-leg-asleep.mp4`
+**Caption:**
+```
+It's not asleep. It's REBOOTING. 🦵⚡ #legfellasleep #pinsandneedles #bodyfacts #learnontiktok #science
+```
+**Pinned comment:** `Where were you sitting when it happened? Be honest.`
+
+### Ep 09: Why does your stomach growl?
+**File:** `episodes/ep09-stomach-growl/ep09-stomach-growl.mp4`
+**Caption:**
+```
+It has a name. And sometimes it's just CLEANING. 🫃🧹 #stomachgrowl #bodyfacts #learnontiktok #science #funfacts
+```
+**Pinned comment:** `Worst place your stomach has ever growled? Go.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -79,3 +95,5 @@ Your body is bluffing. With nothing. 🐱❄️ #goosebumps #bodyfacts #learnont
 - **Funny bone:** the ulnar nerve passes through the cubital tunnel behind the medial epicondyle of the humerus, covered only by skin and fat; it supplies the little finger and half of the ring finger. The humerus/"humorous" pun is a popular explanation for the name, not a proven origin.
 - **Hiccups:** involuntary spasm of the diaphragm followed by sudden closure of the glottis (the "hic"). Common triggers: large or fast meals, carbonated drinks, swallowing air. Fetal hiccups are seen on ultrasound. Charles Osborne holds the Guinness record: hiccupping from 1922 to 1990 (68 years). Hiccups lasting over 48 hours ("persistent hiccups") warrant medical evaluation.
 - **Goosebumps:** arrector pili muscles attached to hair follicles contract under sympathetic nervous system activation (cold, fear, strong emotion), raising the hairs and the skin around them. In furry mammals this traps insulating air and makes the animal look bigger.
+- **Leg falling asleep:** sustained pressure compresses a nerve (and its blood supply), disrupting signal transmission and causing numbness; when pressure is released the nerve resumes firing irregularly, producing "pins and needles" (transient paresthesia). Frequent or unexplained episodes warrant medical evaluation.
+- **Stomach growling:** borborygmi are sounds from gas and fluid moved by gut contractions (peristalsis); they're louder with an empty gut. In the fasting state the migrating motor complex sweeps the stomach and small intestine roughly every 90–120 minutes.

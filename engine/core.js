@@ -274,7 +274,7 @@ function render(t){
 // ---------- hook text (#4): on screen from the very first frame ----------
 // window.HOOK=[['LINE',color,size],...]
 function hookText(t,INTRO){const H_=window.HOOK;if(!H_)return;const a=1-prog(t,INTRO-.6,.35);if(a<=0)return;
-  let y=170;H_.forEach(([str,col,size=110],i)=>{y+=size*.6;const b=1+.04*Math.sin(t*5+i);text(str,W/2,y,size,{fill:col||'#fff',sw:size*.17,scale:b,rot:(i%2?.025:-.03),alpha:a});y+=size*.55})}
+  let y=170;H_.forEach(([str,col,size0=110],i)=>{ctx.font=`900 ${size0}px ${FONT}`;const size=size0*Math.min(1,960/ctx.measureText(str).width);y+=size*.6;const b=1+.04*Math.sin(t*5+i);text(str,W/2,y,size,{fill:col||'#fff',sw:size*.17,scale:b,rot:(i%2?.025:-.03),alpha:a});y+=size*.55})}
 // ---------- punch-in look ----------
 function punchWord(t){for(const q of (window.PUNCH||[]))if(q[2]&&t>=q[0]&&t<q[1])return [q[2],t-q[0]];return null}
 function punchFX(t,pf,out){ctx.save();ctx.globalAlpha=pf;

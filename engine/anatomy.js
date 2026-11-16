@@ -233,3 +233,15 @@ function skinHair(cx,cy,s,t,{pull=0,n=3,cold=0}={}){ctx.save();ctx.translate(cx,
     const thick=lerp(16,26,pull);ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=thick+10;ctx.beginPath();ctx.moveTo(fx+10,fy);ctx.quadraticCurveTo((fx+mx)/2+20,(fy+my)/2+30*(1-pull),mx,my);ctx.stroke();ctx.strokeStyle=pull>0?mixHex('e76f51','c1121f',pull):'#e76f51';ctx.lineWidth=thick;ctx.stroke();
   });
   ctx.restore();ctx.restore()}
+
+// ---------- stomach (front view) with optional face ----------
+function stomachOrgan(x,y,s,t,{expr=null,fill=0,shake=0}={}){ctx.save();ctx.translate(x,y);ctx.rotate(Math.sin(t*5)*.04*shake);ctx.scale(s,s);
+  ctx.lineCap='round';ctx.strokeStyle=OL;ctx.lineWidth=74;ctx.beginPath();ctx.moveTo(70,-330);ctx.lineTo(40,-150);ctx.stroke();ctx.strokeStyle='#f7a8b8';ctx.lineWidth=58;ctx.stroke();
+  ctx.strokeStyle=OL;ctx.lineWidth=64;ctx.beginPath();ctx.moveTo(-170,130);ctx.quadraticCurveTo(-260,200,-300,120);ctx.stroke();ctx.strokeStyle='#f7a8b8';ctx.lineWidth=48;ctx.stroke();
+  const shape=()=>curve([[-40,-170],[60,-160],[150,-80],[250,30],[220,160],[80,220],[-90,200],[-200,120],[-160,40],[-80,-40]]);
+  shape();P(radial(40,20,260,'#ffc8d6','#f07896'),8);ctx.save();noShadow();
+  if(fill>0){ctx.save();shape();ctx.clip();const r=rng(21);for(let i=0;i<26*fill;i++){const fx=-180+r()*400,fy=200-r()*260*fill;E(fx,fy,26+r()*14,20+r()*10,r()*3);ctx.fillStyle=['#f4a261','#90be6d','#e9c46a','#e76f51'][i%4];ctx.fill();ctx.strokeStyle='rgba(43,33,24,.5)';ctx.lineWidth=4;ctx.stroke()}ctx.restore();shape();ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.stroke()}
+  ctx.strokeStyle='rgba(180,60,100,.35)';ctx.lineWidth=6;[[-20,-60,140],[0,20,170],[20,100,150]].forEach(([dx,dy,w])=>{ctx.beginPath();ctx.moveTo(dx-w/2,dy);ctx.quadraticCurveTo(dx,dy+30,dx+w/2,dy);ctx.stroke()});
+  gloss(80,-60,50,20,.5,.4);if(expr)face(60,40,1.1,expr,t);ctx.restore();ctx.restore()}
+// sound waves radiating from a point; k = loudness 0..1
+function soundWaves(x,y,t,k,col='#7b5ea7'){if(k<=0)return;ctx.save();noShadow();for(let i=0;i<4;i++){const u=((t*1.6+i/4)%1);ctx.globalAlpha=(1-u)*k;ctx.strokeStyle=col;ctx.lineWidth=10;ctx.lineCap='round';[-1,1].forEach(d=>{ctx.beginPath();ctx.arc(x,y,40+u*170*k,d>0?-.6:Math.PI-.6,d>0?.6:Math.PI+.6);ctx.stroke()})}ctx.restore()}

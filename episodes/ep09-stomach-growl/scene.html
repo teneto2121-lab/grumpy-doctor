@@ -1,0 +1,85 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 09: Why does your stomach growl? =====
+window.INTRO_END=4.6;
+window.HOOK=[['WHY DOES YOUR','#fff',88],['STOMACH GROWL?','#ffd60a',112]];
+window.SCENES=[4.6,9.6,17.0,22.1,26.6,33.7];
+window.TINTS=['#efe6ff','#ffe3ef','#fff1cc','#e6f0ff','#e3f7e9','#ffe8e0'];
+window.PUNCH=[[35.9,37.85,'CLEANING!']];
+window.JOLTS=[6.5,17.2];
+window.OUTRO=true;
+window.SFX=[[1.2,'fall',.4],[2.4,'blip'],[4.6,'whoosh'],[5.3,'blip'],[6.5,'stamp'],[6.55,'sparkle',.6],[9.14,'stamp',.6],[9.6,'whoosh',.8],[14.6,'blip'],[15.3,'blip'],[16.0,'pop',.6],
+ [17.0,'whoosh',.8],[17.2,'pop'],[18.2,'blip'],[19.4,'fall',.5],[20.5,'blip'],[22.1,'whoosh',.8],[22.6,'blip'],[23.7,'blip'],[24.8,'blip'],[26.0,'blip'],
+ [26.6,'whoosh',.8],[29.9,'blip'],[30.6,'tick'],[30.8,'tick'],[31.0,'tick'],[31.6,'whoosh',.6],[33.7,'whoosh',.8],[34.7,'stamp',.7],[35.95,'stamp'],[36.0,'steam',.8],[38.0,'blip'],[38.9,'beep',.5]];
+const MOOD=[[0,.2],[3.5,.3],[6.5,.35],[9,.3],[17,.25],[22,.3],[30,.3],[34,.45],[35.9,.95],[37.8,.6],[38.7,.4],[39.6,.4]];
+const POSES=[[0,'chin'],[2.4,'point'],[4.6,'point'],[8.6,'facepalm'],[9.7,'point'],[17.1,'shrug'],[18.2,'point'],[22.1,'point'],[26.6,'cross'],[27.4,'point'],[33.7,'hips'],[35.9,'up'],[37.9,'pinch']];
+
+// ---- episode props ----
+function growl(x,y,t,k,size=70){if(k<=0)return;ctx.save();ctx.globalAlpha=k;text('GRRRR',x+Math.sin(t*30)*4*k,y,size,{fill:'#7b5ea7',sw:12,rot:-.06});ctx.restore()}
+function gutPath(u){return [140+800*u,620+Math.sin(u*Math.PI*2)*120]}
+function bubble(x,y,r){E(x,y,r,r);P('rgba(255,255,255,.85)',5);gloss(x-r*.35,y-r*.35,r*.25,r*.15,-.5,.8)}
+function drop(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.moveTo(0,-34);ctx.bezierCurveTo(26,-4,26,26,0,26);ctx.bezierCurveTo(-26,26,-26,-4,0,-34);P(shadeFill(0,-34,0,26,'#9be7ff','#3a86ff'),5);ctx.restore()}
+function broom(x,y,s,t){ctx.save();ctx.translate(x,y);ctx.rotate(-.5+Math.sin(t*10)*.25);ctx.scale(s,s);ctx.strokeStyle=OL;ctx.lineWidth=18;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,-160);ctx.lineTo(0,0);ctx.stroke();ctx.strokeStyle='#b5835a';ctx.lineWidth=9;ctx.stroke();
+  poly([[-45,0],[45,0],[70,90],[-70,90]]);P(shadeFill(0,0,0,90,'#ffd166','#e9a23b'),7);noShadow();ctx.strokeStyle='rgba(120,70,20,.5)';ctx.lineWidth=4;for(let i=-3;i<=3;i++){ctx.beginPath();ctx.moveTo(i*14,10);ctx.lineTo(i*20,86);ctx.stroke()}ctx.restore()}
+function crumbs(x0,x1,y,t,seed,k){const r=rng(seed);for(let i=0;i<14;i++){const x=lerp(x0,x1,r())+k*240,yy=y+(r()-.5)*40;if(x>1000)continue;E(x,yy,9+r()*7,7+r()*5,r()*3);P(['#e9c46a','#f4a261','#90be6d'][i%3],3)}}
+function meetingHead(x,y,t,expr,col){ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.roundRect(-70,40,140,120,40);P(shadeFill(0,40,0,160,col,mixHex(col.slice(1),'1d3557',.35)),7);noShadow();E(0,0,62,66);P(radial(0,0,66,'#f6d2b3','#e4ad86'),7);face(0,4,.7,expr,t,{look:[1,0]});ctx.restore()}
+
+function content(t){
+  const CY=560;
+  if(t<4.6){ // intro: growl in a quiet room
+    if(t>1.0){growl(780,620,t,easeOut(prog(t,1.1,.3)),80);soundWaves(780,620,t,.8)}
+    if(t>2.4)label('QUIET ROOM',260,640,t,2.45,{bg:'#fff',size:46,rot:-.06});
+    return}
+  if(t<9.6){ // it has a name
+    label('IT HAS A NAME',W/2,215,t,5.3,{bg:'#fff',size:52});
+    if(t>6.45){const syl=['BOR','BO','RYG','MI'];let x=W/2-330;syl.forEach((s_,i)=>{const k=pop(t,6.5+i*.12,.35);ctx.save();ctx.translate(x+i*220,CY);ctx.rotate((i%2?.05:-.05));ctx.scale(k,k);ctx.beginPath();ctx.roundRect(-100,-80,200,160,26);P(['#ffd60a','#ff8fab','#4cc9f0','#7ae582'][i],8);noShadow();text(s_,0,6,70,{fill:OL,shadow:false});ctx.restore()})}
+    if(t>7.4)text('borborygmi',W/2,CY+170,52,{fill:'#5c677d',shadow:false,alpha:prog(t,7.5,.3)});
+    stamp('REALLY.',W/2,CY+310,t,9.14,80,-.06,'#7b5ea7');
+    return}
+  if(t<17.0){ // gut = muscle tube squeezing food, liquid, gas
+    const base=(t-9.6)*.07,items=[0,.2,.4,.6,.8].map(k=>(base+k)%1);
+    intestine(gutPath,t,{R:80,waves:items.map(u=>u-.07)});
+    items.forEach((u,i)=>{const [x,y]=gutPath(u);ctx.save();if(i%3===0){E(x,y,30,24);P(radial(x,y,30,'#ffd166','#e76f51'),5)}else if(i%3===1)drop(x,y,1.1);else bubble(x,y,24);ctx.restore()});
+    text('YOUR GUT: A MUSCLE TUBE',W/2,205,52,{fill:OL,shadow:false});
+    if(t>12.6)label('SQUEEZES ALL THE TIME',W/2,320,t,12.7,{bg:'#ff8fab',size:46});
+    label('FOOD',250,880,t,14.6,{bg:'#ffd166',size:42,rot:-.05});label('LIQUID',W/2,900,t,15.3,{bg:'#9be7ff',size:42});label('GAS',830,880,t,16.0,{bg:'#fff',size:42,rot:.05});
+    return}
+  if(t<22.1){ // gas + squeeze = gurgle
+    const r=rng(3);
+    ctx.save();ctx.translate(200,CY-60);const k1=pop(t,17.2);ctx.scale(k1,k1);for(let i=0;i<5;i++)bubble((r()-.5)*120,(r()-.5)*120,22+r()*16);ctx.restore();
+    text('+',360,CY-60,110,{fill:OL,shadow:false,scale:pop(t,17.9)});
+    ctx.save();ctx.translate(530,CY-60);const k2=pop(t,18.2);ctx.scale(k2,k2);[-1,1].forEach(d=>{poly([[d*110,-40],[d*40,-40],[d*40,-70],[0,0],[d*40,70],[d*40,40],[d*110,40]]);P('#ff8fab',6)});ctx.restore();
+    text('=',690,CY-60,110,{fill:OL,shadow:false,scale:pop(t,18.9)});
+    if(t>19.3){text('BLORP',880,CY-60,72,{fill:'#7b5ea7',sw:12,scale:pop(t,19.4),rot:-.06});soundWaves(880,CY-60,t,.7)}
+    label('GAS',200,CY+110,t,17.3,{bg:'#fff',size:40});label('SQUEEZE',530,CY+110,t,18.3,{bg:'#ff8fab',size:40});
+    if(t>20.4)label('ALL DAY LONG',W/2,880,t,20.5,{bg:'#ffd60a',size:56});
+    return}
+  if(t<26.6){ // full = muffled, empty = loud
+    stomachOrgan(300,CY+40,.62,t,{fill:1,expr:'happy'});stomachOrgan(790,CY+40,.62,t,{fill:0,expr:'worried'});
+    label('FULL',300,240,t,22.6,{bg:'#90be6d',size:52,rot:-.04});
+    if(t>23.6){growl(300,CY+250,t,.35,40);label('MUFFLED',300,900,t,23.7,{bg:'#fff',size:42})}
+    label('EMPTY',790,240,t,24.8,{bg:'#e63946',fg:'#fff',size:52,rot:.04});
+    if(t>25.0){soundWaves(790,CY+40,t,1);growl(790,CY+250,t,1,62)}
+    if(t>25.9)label('LOUD',790,900,t,26.0,{bg:'#ffd60a',size:46});
+    return}
+  if(t<33.7){ // cleanup wave
+    const sweep=easeInOut(prog(t,31.4,1.6));
+    intestine(gutPath,t,{R:80,waves:[(t-26.6)*.12%1]});
+    crumbs(180,520,640,t,5,sweep);
+    const [bx,by]=gutPath(clamp(.15+(t-27)*.11,0,.95));broom(bx,by-40,.75,t);
+    if(t>29.8)label('CLEANUP WAVE',W/2,215,t,29.9,{bg:'#7ae582',size:56});
+    if(t>30.5){ctx.save();ctx.translate(880,300);const k=pop(t,30.55);ctx.scale(k*.6,k*.6);E(0,0,95,95);P(radial(0,0,95,'#ffffff','#dee2e6'),8);noShadow();const a=-Math.PI/2+(t-30.5)*3;ctx.strokeStyle=OL;ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(Math.cos(a)*65,Math.sin(a)*65);ctx.stroke();ctx.restore();label('EVERY ~2 HRS',880,400,t,30.6,{bg:'#fff',size:36,rot:.05})}
+    if(t>31.5)label('SWEEPING LEFTOVERS',W/2,895,t,31.6,{bg:'#fff',size:44});
+    return}
+  // not always hunger -> meetings
+  if(t<37.9){stomachOrgan(W/2,CY+130,.62,t,{expr:'smug'});broom(W/2+230,CY+60,.8,t);stamp('NOT ALWAYS HUNGER',W/2,250,t,34.7,64,-.05,'#7b5ea7');return}
+  ctx.save();noShadow();ctx.beginPath();ctx.roundRect(140,CY+120,800,90,30);P(shadeFill(0,CY+120,0,CY+210,'#b5835a','#7f5539'),8);ctx.restore();
+  meetingHead(280,CY-20,t,'confused','#4cc9f0');meetingHead(W/2,CY-50,t,'annoyed','#7b5ea7');meetingHead(800,CY-20,t,'confused','#2a9d8f');
+  growl(W/2,300,t,1,70);
+  label('LOUDLY. IN MEETINGS.',W/2,895,t,38.0,{bg:'#ffd60a',size:46});
+}
+</script></body></html>
