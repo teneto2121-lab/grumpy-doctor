@@ -36,10 +36,10 @@ function label(str,x,y,t,s,{bg='#ffd60a',fg='#111',size=60,rot=-.03,alpha=1}={})
 
 // ---------- DOCTOR (design A, parametric) ----------
 const SKIN='#f2c9a5',HAIR='#f4f4f4',COAT='#f7f9fb';
-function dEye(x,y,r,mood,side,blink){
+function dEye(x,y,r,mood,side,blink,look=[0,0]){
   const wide=clamp((mood-.45)/.35);const ry=r*(.95+.25*wide);
   E(x,y,r,ry);P('#fff',5);
-  const pr=r*lerp(.42,.3,wide),px=x+side*-r*.12*(1-wide),py=y+r*.1*(1-wide);
+  const pr=r*lerp(.42,.3,wide),px=x+side*-r*.12*(1-wide)*(1-Math.abs(look[0]))+look[0]*r*.38,py=y+r*.1*(1-wide)+look[1]*r*.32;
   E(px,py,pr,pr);P(OL,0);E(px-pr*.35,py-pr*.35,pr*.3,pr*.3);P('#fff',0);
   const lid=Math.max(blink,lerp(.47,0,wide));
   if(lid>0.01){ctx.save();E(x,y,r,ry);ctx.clip();ctx.fillStyle=SKIN;ctx.fillRect(x-r-5,y-ry-5,2*r+10,2*ry*lid+5);ctx.restore();
@@ -50,12 +50,21 @@ function dBrow(x,y,w,h,mood,side,lift){
   ctx.beginPath();const n=7;ctx.moveTo(-w/2,h*.3);
   for(let i=0;i<=n;i++){const tx=-w/2+w*i/n;ctx.quadraticCurveTo(tx-w/n*.5,-h*(.9+((i*37)%5)/10),tx,-h*.2)}
   ctx.lineTo(w/2,h*.4);ctx.quadraticCurveTo(0,h*.8,-w/2,h*.3);P(HAIR,5);ctx.restore()}
-function dMouth(x,y,w,open,mood){
-  if(open<.06){ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();const f=lerp(.16,.24,mood);ctx.moveTo(x-w*.38,y+w*.12);ctx.quadraticCurveTo(x,y-w*f,x+w*.38,y+w*.14);ctx.stroke();return}
-  const rx=w*lerp(.3,.5,clamp(mood*.6+open*.5)),ry=w*.45*open+4,cy=y+ry*.4;
+function dMouth(x,y,w,open,mood,shape=null){
+  if(shape==='M')open=0;
+  if(open<.06){ctx.strokeStyle=OL;ctx.lineWidth=8;ctx.lineCap='round';ctx.beginPath();const f=lerp(.16,.24,mood)*(shape==='M'?.4:1);ctx.moveTo(x-w*.38,y+w*.12);ctx.quadraticCurveTo(x,y-w*f,x+w*.38,y+w*.14);ctx.stroke();return}
+  let rx=w*lerp(.3,.5,clamp(mood*.6+open*.5)),ry=w*.45*open+4;
+  if(shape==='O'){rx=w*.24+w*.06*open;ry=Math.max(ry,w*.28)}
+  else if(shape==='E'){rx=w*.5;ry=w*.2*open+5}
+  else if(shape==='F'){rx=w*.38;ry=w*.13+3}
+  else if(shape==='A'){rx=w*.42+w*.08*mood;ry=Math.max(ry,w*.3)}
+  else if(shape==='C'){rx=w*.36;ry=w*.32*open+4}
+  const cy=y+ry*.4;
   E(x,cy,rx,ry);P('#5a1e1e',6);
   ctx.save();E(x,cy,rx,ry);ctx.clip();ctx.fillStyle='#fff';ctx.fillRect(x-rx,cy-ry,2*rx,Math.min(ry*.45,w*.13));
-  E(x,cy+ry*.75,rx*.6,ry*.45);ctx.fillStyle='#e05a5a';ctx.fill();ctx.restore();
+  if(shape==='F'||shape==='E'){ctx.fillRect(x-rx,cy+ry*.55,2*rx,ry)}
+  else{E(x,cy+ry*.75,rx*.6,ry*.45);ctx.fillStyle='#e05a5a';ctx.fill()}
+  ctx.restore();
   E(x,cy,rx,ry);ctx.strokeStyle=OL;ctx.lineWidth=6;ctx.stroke();
 }
 // ---- hands: kinds 'open' | 'spread' | 'point' | 'fist'. Local frame: +x runs from wrist to fingertips.
@@ -108,7 +117,7 @@ function doctor(p,t){
   poly([[w*.18,h*.48],[w*.38,h*.48],[w*.38,h*.66],[w*.18,h*.66]]);P(COAT,5);
   ctx.strokeStyle='#3a3f47';ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-w*.17,0);ctx.bezierCurveTo(-w*.3,h*.4,-w*.05,h*.75,w*.02,h*.7);ctx.stroke();ctx.beginPath();ctx.moveTo(w*.17,0);ctx.bezierCurveTo(w*.12,h*.2,w*.06,h*.5,w*.02,h*.7);ctx.stroke();
   E(w*.02,h*.76,24,24);P('#b8c0cc',6);E(w*.02,h*.76,12,12);P('#8a94a3',0);
-  arm(-200,60,L[0],L[1],p.kL||'open',-1);arm(200,60,R[0],R[1],p.kR||'open',1);
+  arm(-200,60,L[0],L[1],p.kL||'open',-1);if(!p.rFront)arm(200,60,R[0],R[1],p.kR||'open',1);
   // head
   ctx.save();ctx.translate(0,-210);ctx.rotate(tilt);
   const face=mixHex('f2c9a5','f0907a',clamp((mood-.55)/.4));
@@ -117,19 +126,30 @@ function doctor(p,t){
   [-1,1].forEach(d=>{ctx.save();ctx.scale(d,1);ctx.rotate(Math.sin(t*3+d)*.02*(1+mood*3));curve([[130,-90],[200,-110],[190,-60],[230,-40],[185,0],[215,40],[160,40],[140,-20]]);P(HAIR,6);ctx.restore()});
   E(-50,-120,40,18,-.3);ctx.fillStyle='rgba(255,255,255,.45)';ctx.fill();
   if(mood>.75){const k=clamp((mood-.75)/.15);vein(70,-110,24,k);ctx.globalAlpha=k;steam(0,-190,70,t);ctx.globalAlpha=1}
-  dEye(-52,-10,30,mood,-1,blink);dEye(52,-10,30,mood,1,blink);
+  dEye(-52,-10,30,mood,-1,blink,p.look);dEye(52,-10,30,mood,1,blink,p.look);
   dBrow(-58,-62,105,34,mood,1,lift);dBrow(58,-62,105,34,mood,-1,lift);
   ctx.strokeStyle=OL;ctx.lineWidth=5;E(-34,44,24,18);ctx.stroke();E(34,44,24,18);ctx.stroke();ctx.beginPath();ctx.moveTo(-10,42);ctx.lineTo(10,42);ctx.stroke();
   curve([[0,0],[28,30],[34,60],[0,74],[-34,60],[-28,30]]);P('#e8a98a',6);
-  dMouth(0,112+open*6,70,open,mood);
+  dMouth(0,112+open*6,70,open,mood,p.shape);
   ctx.save();ctx.translate(0,-open*6);curve([[0,78],[50,72],[90,96],[60,108],[0,96],[-60,108],[-90,96],[-50,72]]);P(HAIR,6);ctx.restore();
-  ctx.restore();ctx.restore();
+  ctx.restore();
+  if(p.rFront)arm(200,60,R[0],R[1],p.kR||'open',1);
+  ctx.restore();
 }
 
-const HANDS={rest:['open','open'],point:['open','point'],up:['spread','point'],shrug:['spread','spread'],chin:['open','fist']};
-const POSE={rest:[[-235,300],[235,300]],point:[[-235,300],[300,-150]],up:[[-330,-150],[300,-110]],shrug:[[-290,40],[290,40]],chin:[[-235,300],[40,150]]};
+const HANDS={rest:['open','open'],point:['open','point'],up:['spread','point'],shrug:['spread','spread'],chin:['open','fist'],facepalm:['open','open'],pinch:['open','fist'],cross:['fist','fist'],hips:['fist','fist'],lean:['fist','fist']};
+const FRONT={facepalm:1,pinch:1};
+const LOOK={point:[.35,-.85],up:[.2,-.7],lean:[0,0],facepalm:[0,0]};
+const POSE={rest:[[-235,300],[235,300]],point:[[-235,300],[300,-150]],up:[[-330,-150],[300,-110]],shrug:[[-290,40],[290,40]],chin:[[-235,300],[40,150]],facepalm:[[-235,300],[30,-235]],pinch:[[-235,300],[10,-205]],cross:[[95,165],[-95,140]],hips:[[-170,215],[170,215]],lean:[[-170,215],[170,215]]};
 function poseAt(t){let i=0;for(let k=0;k<POSES.length;k++)if(t>=POSES[k][0])i=k;const cur=POSE[POSES[i][1]];const prev=i>0?POSE[POSES[i-1][1]]:cur;const u=easeOut(prog(t,POSES[i][0],.28));
-  return {L:[lerp(prev[0][0],cur[0][0],u),lerp(prev[0][1],cur[0][1],u)],R:[lerp(prev[1][0],cur[1][0],u),lerp(prev[1][1],cur[1][1],u)],kL:HANDS[POSES[i][1]][0],kR:HANDS[POSES[i][1]][1]}}
+  return {L:[lerp(prev[0][0],cur[0][0],u),lerp(prev[0][1],cur[0][1],u)],R:[lerp(prev[1][0],cur[1][0],u),lerp(prev[1][1],cur[1][1],u)],kL:HANDS[POSES[i][1]][0],kR:HANDS[POSES[i][1]][1],name:POSES[i][1],rFront:!!FRONT[POSES[i][1]]&&u>.5,lean:(POSES[i][1]==='lean'?u:0)+(i>0&&POSES[i-1][1]==='lean'?1-u:0)}}
+// visemes: window VIS = [[start,end,shape],...]
+let VIS=[];
+function visAt(t){let lo=0,hi=VIS.length-1;while(lo<=hi){const m=(lo+hi)>>1;if(VIS[m][1]<t)lo=m+1;else if(VIS[m][0]>t)hi=m-1;else return VIS[m][2]}return null}
+// punch-in close-ups: window.PUNCH=[[start,end],...]  (fast cut in, quick cut out)
+function punchAt(t){let v=0;(window.PUNCH||[]).forEach(([a,b])=>{v=Math.max(v,Math.min(clamp((t-a)/.08),clamp((b-t)/.12)))});if(window.OUTRO&&window.OUTRO_AT)v=Math.max(v,clamp((t-window.OUTRO_AT)/.08));return v}
+// jolts: window.JOLTS=[seconds,...] -> the doctor jumps and his eyes go wide
+function joltAt(t){let v=0;(window.JOLTS||[]).forEach(a=>{const d=t-a;if(d>=0&&d<.6)v=Math.max(v,Math.exp(-d*7)*(d<.05?d/.05:1))});return v}
 function envAt(t){const i=t*FPS;const a=ENV[Math.floor(i)]||0,b=ENV[Math.floor(i)+1]||0;return lerp(a,b,i%1)}
 function blinkAt(t){const per=[];for(let b=2.1;b<600;b+=2.6+((b*7.3)%2.2))per.push(b);for(const b of per){const d=t-b;if(d>0&&d<.16)return Math.sin(d/.16*Math.PI)}return 0}
 
@@ -222,19 +242,60 @@ function render(t){
   // camera: intro close-up on doctor, then doctor moves to bottom with card above
   const intro=easeInOut(prog(t,INTRO-.5,.8));
   const cardA=intro;
-  const mood=track(MOOD,t),env=envAt(t);
-  const pose=poseAt(t);
-  const p={mood,open:clamp(env*1.15),blink:blinkAt(t),lift:env*10,L:pose.L,R:pose.R,kL:pose.kL,kR:pose.kR,tilt:Math.sin(t*2.3)*.025+env*.03*Math.sin(t*9),bob:-env*10+Math.sin(t*2)*4};
-  // doctor placement
-  const dx=lerp(540,540,intro),dy=lerp(1380,1660,intro),ds=lerp(1.45,1.12,intro);
+  const pf=punchAt(t),jo=joltAt(t),out=window.OUTRO&&window.OUTRO_AT&&t>=window.OUTRO_AT;
+  const mood=clamp(track(MOOD,t)+.35*jo+(out?.3:0)),env=out?outroEnvAt(t):envAt(t);
+  const pose=out?{...poseAtName('point'),name:'point'}:poseAt(t);
+  const sh=out?outroVisAt(t):visAt(t);
+  const intoCard=t>=INTRO;
+  const look=pf>.5?[0,0]:(intoCard&&LOOK[pose.name])||[0,0];
+  const p={mood,open:clamp(env*1.15),shape:env>.08?sh:'M',blink:jo>.3?0:blinkAt(t),lift:env*10+jo*25,L:pose.L,R:pose.R,kL:pose.kL,kR:pose.kR,rFront:pose.rFront,look,
+    tilt:Math.sin(t*2.3)*.025+env*.03*Math.sin(t*9)+(pose.name==='facepalm'?.08:0),bob:-env*10+Math.sin(t*2)*4-jo*40};
+  // doctor placement: intro close-up -> bottom; punch-ins jump to a big close-up
+  let dx=540,dy=lerp(1380,1660,intro),ds=lerp(1.45,1.12,intro)*(1+.08*(pose.lean||0))*(1+.05*jo);
+  dy-=40*(pose.lean||0);
+  const PX=540,PY=1560,PS=2.05;
+  dx=lerp(dx,PX,pf);dy=lerp(dy,PY,pf);ds=lerp(ds,PS,pf);
   // card + content (content draws in intro too, over the doctor's head area)
-  if(t<INTRO){ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(t);ctx.restore()}
-  else{drawCard(t,INTRO,cardA);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore()}
+  if(t<INTRO){if(pf>0)punchFX(t,pf,false);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(t);ctx.restore();hookText(t,INTRO)}
+  else{
+    if(pf<1){ctx.save();ctx.globalAlpha=1-pf;drawCard(t,INTRO,cardA);ctx.restore()}
+    if(pf>0)punchFX(t,pf,out);
+    ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();
+    if(out)outroFX(t);
+  }
   // name tag: window.NAMETAG=[start,end]
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
     text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
-  captions(t,t<INTRO?1560:1060);
+  if(!out)captions(t,t<INTRO||pf>.5?1560:1060);
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }
-window.setup=(w,e,d)=>{WORDS=w;ENV=e;DUR=d;buildChunks()};window.render=render;
+// ---------- hook text (#4): on screen from the very first frame ----------
+// window.HOOK=[['LINE',color,size],...]
+function hookText(t,INTRO){const H_=window.HOOK;if(!H_)return;const a=1-prog(t,INTRO-.6,.35);if(a<=0)return;
+  let y=250;H_.forEach(([str,col,size=110],i)=>{const b=1+.04*Math.sin(t*5+i);text(str,W/2,y,size,{fill:col||'#fff',sw:size*.17,scale:b,rot:(i%2?.025:-.03),alpha:a});y+=size*1.08})}
+// ---------- punch-in look ----------
+function punchFX(t,pf,out){ctx.save();ctx.globalAlpha=pf;
+  const g=ctx.createRadialGradient(W/2,H*.55,200,W/2,H*.55,1200);g.addColorStop(0,out?'#ffe08a':'#ffb4a2');g.addColorStop(1,out?'#f4a261':'#e63946');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  ctx.translate(W/2,H*.5);ctx.rotate(t*.15);ctx.fillStyle='rgba(255,255,255,.18)';for(let i=0;i<24;i++){ctx.rotate(Math.PI/12);ctx.beginPath();ctx.moveTo(0,0);ctx.lineTo(1500,-60);ctx.lineTo(1500,60);ctx.closePath();ctx.fill()}
+  ctx.restore()}
+// ---------- signature outro (#6): "Next patient!" + loop back to the first frame (#5) ----------
+// window.OUTRO=true. Audio + mouth data for the line come from engine/voice (passed in by render.js).
+let OUT_ENV=[],OUT_VIS=[],OUT_LEN=1.9;
+function outroEnvAt(t){const i=(t-window.OUTRO_AT-.35)*FPS;if(i<0)return 0;const a=OUT_ENV[Math.floor(i)]||0,b=OUT_ENV[Math.floor(i)+1]||0;return lerp(a,b,i%1)}
+function outroVisAt(t){const tt=t-window.OUTRO_AT-.35;for(const v of OUT_VIS)if(tt>=v[0]&&tt<=v[1])return v[2];return null}
+function poseAtName(n){return {L:POSE[n][0],R:POSE[n][1],kL:HANDS[n][0],kR:HANDS[n][1],rFront:false}}
+function clipboard(x,y,s,rot){ctx.save();ctx.translate(x,y);ctx.rotate(rot);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-150,-200,300,400,24);P('#b5835a',8);ctx.beginPath();ctx.roundRect(-125,-160,250,340,10);P('#fffdf7',6);
+  ctx.beginPath();ctx.roundRect(-60,-225,120,60,14);P('#adb5bd',7);ctx.strokeStyle='rgba(43,33,24,.35)';ctx.lineWidth=8;for(let i=0;i<6;i++){ctx.beginPath();ctx.moveTo(-95,-110+i*48);ctx.lineTo(95-(i%3)*30,-110+i*48);ctx.stroke()}ctx.restore()}
+function outroFX(t){const u=t-window.OUTRO_AT;
+  // clipboard slams down at ~0.25s
+  const k=easeOut(clamp((u-.05)/.2));if(k>0)clipboard(860,lerp(2400,1560,k),1.05,.2-.1*k);
+  if(u>.25&&u<.6){burst(860,1440,lerp(80,220,easeOut((u-.25)/.35)),'#ffd60a')}
+  if(u>.3){const a=1-prog(u,OUT_LEN-.45,.3);text('NEXT',W/2,330,170,{fill:'#fff',sw:26,scale:pop(u,.3),rot:-.05,alpha:a});text('PATIENT!',W/2,520,170,{fill:'#ffd60a',sw:26,scale:pop(u,.45),rot:.04,alpha:a})}
+  // final beat: fade toward the episode's first frame so the loop feels seamless
+  const f=prog(u,OUT_LEN-.35,.3);if(f>0&&window.__firstFrame){ctx.save();ctx.globalAlpha=f;ctx.drawImage(window.__firstFrame,0,0);ctx.restore()}
+}
+window.setup=(w,e,d,vis,oenv,ovis,olen)=>{WORDS=w;ENV=e;DUR=d;VIS=vis||[];OUT_ENV=oenv||[];OUT_VIS=ovis||[];if(olen)OUT_LEN=olen;buildChunks();
+  if(!window.__SFX0)window.__SFX0=window.SFX||[];window.SFX=window.__SFX0;
+  if(window.OUTRO){window.OUTRO_AT=w[w.length-1].e+.25;window.SFX=window.__SFX0.concat([[window.OUTRO_AT+.25,'stamp'],[window.OUTRO_AT+.35,'next_patient',2.0]])}};
+window.outroLen=()=>window.OUTRO?OUT_LEN+.25:0;window.render=render;

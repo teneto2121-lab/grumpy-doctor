@@ -7,6 +7,7 @@ Each video is code: a voiceover from ElevenLabs plus a scene file that draws eve
 ```
 STYLE-GUIDE.md        decisions about character, voice, tone, content rules, visuals
 engine/core.js        shared parts: the doctor, props (bones, gauge, trophy…), captions, renderer, scene transitions
+engine/voice/         voice config + the "Next patient!" outro line
 engine/anatomy.js     shaded anatomy props with cartoon faces (brain, blood vessel, head, mouth, intestine…)
 episodes/<name>/
   script.txt          the narration, with emotion tags like [annoyed] [sighs] [shouting]
@@ -16,7 +17,7 @@ episodes/<name>/
   env.json            loudness per frame (mouth movement)
   <name>.mp4          the finished video
 design/               character design explorations
-tools/voice.py        script.txt  ->  voice.wav + words.json + env.json
+tools/voice.py        script.txt  ->  voice.wav + words.json + env.json + visemes.json   (--outro: signature line)
 tools/render.js       scene.html  ->  <name>.mp4  (or preview stills); mixes in sound effects
 tools/make_sfx.py     synthesizes the sound-effect library into engine/sfx/
 tools/mix.py          mixes voice + effect cues (called by render.js)
@@ -31,6 +32,7 @@ tools/mix.py          mixes voice + effect cues (called by render.js)
    - `MOOD`: keyframes `[seconds, 0..1]` (0 = mildly grumpy, 1 = red-faced with steam)
    - `POSES`: keyframes `[seconds, 'rest'|'point'|'up'|'shrug'|'chin']`
    - `content(t)`: what's on the explainer card at time `t`
+   - `window.HOOK`, `window.PUNCH`, `window.JOLTS`, `window.OUTRO`: see STYLE-GUIDE.md (Doctor performance / Endings)
    - `window.SFX`: sound cues `[seconds, name, volume]`. Available: crack, pop, blip, ding, whoosh,
      stamp, sparkle, fall, tick, beep, tada, steam
 5. Check a few frames: `node tools/render.js episodes/ep02-... stills 3 15 30`,

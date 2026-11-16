@@ -25,7 +25,10 @@ for cue in json.load(open(os.path.join(ep, "sfx.json"))):
     at, name = cue[0], cue[1]
     vol = cue[2] if len(cue) > 2 else 1.0
     if name not in cache:
-        _, s = wavfile.read(os.path.join(lib, name + ".wav")); cache[name] = s.astype(np.float32) / 32768
+        f = os.path.join(lib, name + ".wav")
+        if not os.path.exists(f): f = os.path.join(root, "engine", "voice", name + ".wav")
+        _, s = wavfile.read(f); s = s.astype(np.float32) / 32768
+        cache[name] = s.mean(axis=1) if s.ndim > 1 else s
     s = cache[name] * 0.45 * vol          # effects sit under the voice
     i = int(at * SR); mix[i:i + len(s)] += s[:len(mix) - i]
 

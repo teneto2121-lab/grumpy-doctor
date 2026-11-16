@@ -22,7 +22,8 @@
 - Running disclaimer gag: "I'm not YOUR doctor. Go see one."
 
 ## Voice
-- ElevenLabs voice **Brian** (`nPczCjzI2devNBz1zQrb`), model `eleven_v3`, stability 0.0
+- Voice settings live in `engine/voice/config.json` (currently stock voice **Brian**, `eleven_v3`, stability 0.0)
+- A custom/library voice needs a paid ElevenLabs plan (API restriction on the free plan)
 - Emotion tags in scripts: [annoyed], [sighs], [shouting], [grumbling], and so on
 - **Pace: faster than the default.** The API speed setting has no effect on v3, so every
   voiceover gets sped up afterwards with ffmpeg `atempo` (pitch-preserving). Default rate: **1.12×** (chosen).
@@ -43,6 +44,23 @@
 - Fill the card: main subject big and centered, max 2–3 labels on screen at once
 - Define `window.SCENES` (scene start times) and `window.TINTS` (card color per scene) to get slide transitions,
   a slow push-in, and tinted backgrounds
+
+## Doctor performance (from ep 06 on)
+- **Hook on frame 1:** set `window.HOOK=[['LINE',color,size],...]`; it is fully visible from the first frame
+  (that frame is often the thumbnail). Don't also draw the title in the intro content.
+- **Punch-ins:** `window.PUNCH=[[start,end],...]` cuts to a big close-up with a speed-burst background.
+  Use on every outburst / punchline (1–3 per episode).
+- **Jolts:** `window.JOLTS=[seconds,...]` makes him jump with wide eyes (for ZAP!, POP!, surprises).
+- **Poses:** rest, point, up, shrug, chin, facepalm, pinch (bridge of nose), cross (arms crossed),
+  hips (hands on hips), lean (leans toward camera). Vary them; facepalm/pinch on sighs, cross/hips while waiting.
+- He looks up at the card automatically while pointing, and at the camera during punch-ins.
+- **Lip sync:** `tools/voice.py` writes `visemes.json` (mouth shapes from letter timings); used automatically.
+
+## Endings
+- **Signature outro:** `window.OUTRO=true` adds the "NEXT PATIENT!" clipboard slam (voice line in
+  `engine/voice/next_patient.wav`; re-record with `python3 tools/voice.py --outro` after a voice change).
+- **Loop:** the outro dissolves into the episode's first frame. Write scripts so "Next patient!" flows into
+  the opening line (the opening should address the viewer as the next patient, e.g. "You. Yes, you.").
 
 ## Sound
 - Synthesized effects (no licensing issues), mixed under the voice
