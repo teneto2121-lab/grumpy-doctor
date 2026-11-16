@@ -1,5 +1,13 @@
 # Grumpy Doctor channel: style guide (work in progress)
 
+## TikTok account
+- Handle: **@AngryDoctorExplains** (tiktok.com/@AngryDoctorExplains)
+- Display name: **Dr. Grumbles | Body Facts**
+- Bio: *50 years a doctor. Still explaining your body. Still annoyed. Not YOUR doctor.*
+- Profile picture: `brand/avatar-grumpy.png` (yellow)
+- Personal/Creator account, not Business (keeps trending music available)
+- Turn on TikTok's "AI-generated content" label when posting (AI voice)
+
 ## Concept
 - Faceless, animated TikToks, 9:16, roughly 30–60 seconds
 - Niche: human body and medicine facts
@@ -7,7 +15,7 @@
 
 ## Mascot
 - Design **A ("The Classic")**: bald, wild white side hair, giant bushy eyebrows, tiny glasses on a big nose, walrus mustache, red bow tie, lab coat, stethoscope
-- Name: still to be decided
+- Name: **Dr. Grumbles**
 - Personality: exasperated old doctor who has seen it all and secretly cares
   - Anger is aimed at the body's silly design and the viewer's bad habits, never at sick people
   - Grumpiness level changes from video to video (mild ↔ fully outraged)
