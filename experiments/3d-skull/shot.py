@@ -5,7 +5,18 @@ args=sys.argv[sys.argv.index('--')+1:] if '--' in sys.argv else []
 bpy.ops.wm.read_factory_settings(use_empty=True)
 sc=bpy.context.scene
 FPS=30;SEC=8;sc.render.fps=FPS;sc.frame_start=1;sc.frame_end=FPS*SEC
-sc.render.engine='CYCLES';sc.cycles.device='CPU';sc.cycles.samples=int(dict(enumerate(args)).get(2,40));sc.cycles.use_denoising=True;sc.cycles.denoiser='OPENIMAGEDENOISE'
+sc.render.engine='CYCLES';sc.cycles.device='CPU'
+import os
+if os.environ.get('GPU'):   # GPU=1 on a Mac (Apple Silicon -> Metal) or a PC with NVIDIA (OPTIX/CUDA)
+    pr=bpy.context.preferences.addons['cycles'].preferences
+    for kind in ('METAL','OPTIX','CUDA','HIP'):
+        try:
+            pr.compute_device_type=kind;pr.get_devices()
+            if any(d.type==kind for d in pr.devices):
+                for d in pr.devices:d.use=True
+                sc.cycles.device='GPU';print('Rendering on',kind);break
+        except Exception:pass
+sc.cycles.samples=int(dict(enumerate(args)).get(2,40));sc.cycles.use_denoising=True;sc.cycles.denoiser='OPENIMAGEDENOISE'
 sc.cycles.max_bounces=4;sc.cycles.use_adaptive_sampling=True;sc.cycles.adaptive_threshold=0.03;sc.render.use_persistent_data=True;sc.cycles.diffuse_bounces=2;sc.cycles.glossy_bounces=2;sc.cycles.transmission_bounces=2
 sc.render.resolution_x=1080;sc.render.resolution_y=1920;sc.render.resolution_percentage=int(dict(enumerate(args)).get(3,100))
 sc.render.use_motion_blur=True;sc.render.motion_blur_shutter=0.5
