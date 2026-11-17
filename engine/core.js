@@ -305,11 +305,13 @@ function renderMain(t){
   let dx=540,dy=lerp(1380,1660,intro),ds=lerp(1.45,1.12,intro)*(1+.08*(pose.lean||0))*(1+.05*jo);
   dy-=40*(pose.lean||0);
   const PX=540,PY=1560,PS=2.05;
+  // FULLSCREEN mode (window.FULLSCREEN + window.stage(s,t)): the story fills the screen, the doctor sits small in a corner
+  const FS=window.FULLSCREEN&&intoCard;if(FS){const c=window.DOC_CORNER||[200,1600,.55];dx=c[0];dy=c[1];ds=c[2]*(1+.05*jo)}
   dx=lerp(dx,PX,pf);dy=lerp(dy,PY,pf);ds=lerp(ds,PS,pf);
   // card + content (content draws in intro too, over the doctor's head area)
   if(s<INTRO){if(pf>0)punchFX(t,pf,false);ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();ctx.save();ctx.globalAlpha=1;content(s);ctx.restore();hookText(s,INTRO)}
   else{
-    if(pf<1){ctx.save();ctx.globalAlpha=1-pf;drawCard(s,INTRO,cardA);ctx.restore()}
+    if(pf<1){ctx.save();ctx.globalAlpha=1-pf;if(FS){const sh=shakeAt(s);if(sh)ctx.translate(sh[0],sh[1]);window.stage(s,t)}else drawCard(s,INTRO,cardA);ctx.restore()}
     if(pf>0)punchFX(t,pf,out);
     ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();
     if(out)outroFX(t);
@@ -319,7 +321,7 @@ function renderMain(t){
   if(window.NAMETAG){const[a,b]=window.NAMETAG;if(t>=a&&t<b){const al=1-prog(t,b-.25,.25);
     label('DR. GRUMBLES',300,720,t,a,{bg:'#fff',size:54,rot:-.05,alpha:al});
     text('50 years a doctor',300,805,36,{fill:'#fff',sw:10,alpha:al*prog(t,a+.25,.3),shadow:false});}}
-  if(!out&&!window.__tz)captions(t,s<INTRO||pf>.5?1560:1060);
+  if(!out&&!window.__tz)captions(t,s<INTRO||pf>.5?1560:(window.FULLSCREEN?(window.CAP_Y||1330):1060));
   if(window.COLD_OPEN){const d=s-window.COLD_OPEN.end;if(d>=0&&d<.15){ctx.fillStyle=`rgba(255,255,255,${.9*(1-d/.15)})`;ctx.fillRect(0,0,W,H)}}
   ctx.fillStyle='rgba(255,255,255,.35)';ctx.fillRect(0,0,W,10);ctx.fillStyle='#ffd60a';ctx.fillRect(0,0,W*clamp(t/DUR),10);
 }

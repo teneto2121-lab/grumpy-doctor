@@ -159,6 +159,14 @@ Close your left eye. Stare at the cross. 👁️ #blindspot #bodyfacts #learnont
 ```
 **Pinned comment:** `Did the dot vanish? (If not, move closer. Slowly.)`
 
+### Ep 19: Phineas Gage  *(NEW FULL-SCREEN FORMAT: story fills the screen, doctor in the corner)*
+**File:** `episodes/ep19-phineas-gage/ep19-phineas-gage.mp4`
+**Caption:**
+```
+An iron rod went through his skull. Then he sat up. 🤯 #phineasgage #medicalhistory #brain #bodyfacts #truestory
+```
+**Pinned comment:** `What's the craziest medical story you know? I'll cover the best one.`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -180,3 +188,4 @@ Close your left eye. Stare at the cross. 👁️ #blindspot #bodyfacts #learnont
 - **Shorter at night (ep 16):** intervertebral discs lose fluid under daytime compression; people are roughly 1 cm (often 1–2 cm) shorter in the evening and regain it lying down overnight. Astronauts' spines lengthen in microgravity (up to ~3%, about 5 cm), reversing after return (NASA).
 - **Swallowing (ep 17):** the pharynx is shared by the airway and food passage; during swallowing the epiglottis folds over the laryngeal inlet and the vocal folds close, causing a brief swallow apnea (~0.5–1 s). Adults swallow several hundred times a day. Aspiration triggers the cough reflex.
 - **Blind spot (ep 18):** the optic disc, where the optic nerve leaves the retina, has no photoreceptors; each eye has a blind spot about 15° to the side of the centre of vision, and the brain fills it in (perceptual filling-in).
+- **Phineas Gage (ep 19):** 13 September 1848, Cavendish, Vermont. Tamping iron ~1.1 m (3 ft 7 in), ~6 kg (13.25 lb), entered below the left cheekbone, passed behind the left eye and exited the top of the skull, landing ~25 m (80 ft) away; Gage was conscious and spoke within minutes and rode in an oxcart to town. Physician John Harlow (1868) reported personality changes: friends said he was 'no longer Gage'. Skull and iron are at the Warren Anatomical Museum, Harvard Medical School. (Later research suggests he partly recovered and worked as a stagecoach driver in Chile.)
