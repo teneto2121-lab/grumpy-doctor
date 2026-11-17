@@ -65,5 +65,8 @@ tools/analyze_video.py  deep frame-by-frame analysis of reference videos
 | 13 | The dirtiest thing in your house isn't your toilet (cut-off ending) | 44s |
 | 14 | Your stomach is digesting itself (cold open) | 41s |
 | 15 | You fart up to 20 times a day (cold open, cut-off ending) | 36s |
+| 16 | You're shorter tonight than this morning (cold open, cut-off ending) | 41s |
+| 17 | You can't swallow and breathe at the same time (interactive) | 38s |
+| 18 | You have a blind spot right now (interactive test) | 39s |
 
 Captions, hashtags and posting steps: see `POSTING.md`.

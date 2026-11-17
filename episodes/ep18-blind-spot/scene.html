@@ -1,0 +1,54 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 18: You have a blind spot right now (interactive test, cold open + cut-off ending) =====
+window.COLD_OPEN={end:3.0,bg:'#03045e',text:[['EACH OF YOUR EYES','#fff',100],['HAS A BLIND SPOT','#ffd60a',120],['RIGHT NOW.','#fff',96,2.3]],draw:coldOpen};
+window.INTRO_END=4.18;
+window.SCENES=[4.18,13.49,23.26,28.98,33.84];
+window.TINTS=['#ffffff','#e6f0ff','#fff3d6','#ffe8e0','#efe6ff'];
+window.PUNCH=[[11.88,13.45,'THE DOT VANISHED!']];
+window.JOLTS=[11.95];window.SHAKES=[12.0];
+window.KEYWORDS=['blind','nerve','hole','guess','entire'];
+window.ENDING='cut';window.FOLLOW_AT=14.0;
+window.SFX=[[0,'pop',1],[.5,'blip',.6],[1.0,'blip',.6],[1.5,'blip',.6],[2.3,'stamp',.7],[3.0,'whoosh'],
+ [4.18,'whoosh',.8],[4.3,'blip'],[5.4,'blip'],[7.4,'blip'],[11.9,'stamp'],[12.0,'steam'],[13.49,'whoosh',.8],[16.5,'blip'],[18.5,'beep',.5],[19.9,'blip'],
+ [23.26,'whoosh',.8],[25.8,'sparkle',.6],[28.0,'blip'],[28.98,'whoosh',.8],[30.4,'blip'],[32.4,'ding',.5],[33.84,'whoosh',.6]];
+const MOOD=[[0,.3],[3,.45],[4.2,.3],[11.8,.9],[13.5,.4],[19.8,.45],[23.2,.35],[28.9,.5],[31.5,.6],[33.8,.7]];
+const POSES=[[0,'rest'],[3,'lean'],[4.2,'point'],[7.3,'point'],[11.9,'up'],[13.5,'point'],[19.8,'shrug'],[23.2,'chin'],[25.7,'point'],[28.9,'hips'],[31.5,'facepalm'],[33.8,'point']];
+
+const fin=(t,t0,d=.4)=>easeOut(clamp((t-t0)/d));
+// eyeball cross-section, cornea on the left, optic nerve leaving at the back (right)
+function eyeball(cx,cy,s,t,{spot=0,look=0}={}){ctx.save();ctx.translate(cx,cy);ctx.scale(s,s);
+  ctx.beginPath();ctx.moveTo(250,-40);ctx.quadraticCurveTo(420,-60,520,-20);ctx.lineTo(520,40);ctx.quadraticCurveTo(420,60,250,40);P(shadeFill(250,-40,250,40,'#ffd6a5','#f4a261'),6);
+  E(0,0,270,270);P(radial(-60,-80,300,'#ffffff','#dbe7f3'),8);
+  // retina: dots along the back wall, none where the nerve leaves
+  for(let i=0;i<34;i++){const a=-1.25+i*(2.5/33);if(Math.abs(a)<.2)continue;E(Math.cos(a)*240,Math.sin(a)*240,9,9);P('#e63946',3)}
+  ctx.save();ctx.beginPath();ctx.arc(-270,0,110,-.95,.95,true);ctx.lineWidth=0;ctx.restore();E(-250,0,40,110);P(radial(-250,-30,110,'#bde0fe','#4d96ff'),6);E(-170,0,30,80);P('#caf0f8',5);
+  if(spot>0){ctx.save();noShadow();ctx.globalAlpha=spot;ctx.strokeStyle='#111';ctx.lineWidth=8;ctx.setLineDash([12,10]);ctx.beginPath();ctx.arc(250,0,62,0,Math.PI*2);ctx.stroke();ctx.restore()}
+  ctx.restore()}
+function coldOpen(t){const g=ctx.createRadialGradient(W/2,H*.62,80,W/2,H*.62,1100);g.addColorStop(0,'#0077b6');g.addColorStop(1,'#03045e');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // a giant eye; a black hole blinks somewhere in the view every half second
+  ctx.save();ctx.translate(W/2,1300);E(0,0,420,250);P('#fff',10);E(0,0,180,180);P(radial(-40,-40,180,'#48cae4','#023e8a'),8);E(0,0,80,80);ctx.fillStyle='#111';ctx.fill();ctx.save();noShadow();gloss(-50,-60,30,18);ctx.restore();ctx.restore();
+  const k=Math.floor(t/.5),pos=[[260,980],[820,1050],[300,1620],[780,1640],[540,900],[200,1300]][k%6];const pu=(t%.5)/.5;ctx.save();ctx.globalAlpha=1-pu*.6;E(pos[0],pos[1],60+pu*30,60+pu*30);ctx.fillStyle='#000';ctx.fill();ctx.strokeStyle='#ffd60a';ctx.lineWidth=6;ctx.setLineDash([10,8]);ctx.stroke();ctx.restore()}
+
+function content(t){const CY=560;
+  if(t<4.18)return;
+  if(t<13.49){ // the test: plain white, cross on the left, dot on the right
+    const cx=210,dx=880,y=CY-10;ctx.save();ctx.strokeStyle='#111';ctx.lineWidth=16;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(cx-40,y);ctx.lineTo(cx+40,y);ctx.moveTo(cx,y-40);ctx.lineTo(cx,y+40);ctx.stroke();ctx.restore();
+    E(dx,y,42,42);ctx.fillStyle='#111';ctx.fill();
+    const steps=[[4.18,'1. CLOSE YOUR LEFT EYE'],[5.36,'2. STARE AT THE + (RIGHT EYE)'],[7.39,'3. MOVE YOUR PHONE CLOSER']];let i=-1;steps.forEach(([s0],k)=>{if(t>=s0)i=k});
+    if(i>=0)label(steps[i][1],W/2,215,t,steps[i][0],{bg:'#ffd60a',size:40});label('KEEP STARING AT THE +',W/2,CY+330,t,8.6,{bg:'#fff',size:34});return}
+  if(t<23.26){eyeball(W/2-40,CY,1.0,t,{spot:fin(t,16.4)});if(t>14.8){label('NERVE TO BRAIN',W/2+250,CY-260,t,14.9,{bg:'#ffd6a5',size:36,rot:.04})}
+    if(t>16.4)label('NO LIGHT SENSORS',W/2+200,CY+300,t,16.5,{bg:'#e63946',fg:'#fff',size:36,rot:-.03});if(t>18.48)label('A HOLE IN YOUR VISION',W/2,205,t,18.5,{bg:'#fff',size:46});
+    if(t>19.87)label('BOTH EYES',W/2-280,CY-280,t,19.9,{bg:'#bde0fe',size:38,rot:-.05});return}
+  if(t<28.98){const fill=easeInOut(clamp((t-25.9)/1.4));for(let r=0;r<7;r++)for(let c=0;c<9;c++){const x=150+c*100,y=CY-300+r*95;ctx.fillStyle=(r+c)%2?'#ffadad':'#ffd6a5';ctx.fillRect(x,y,100,95)}
+    ctx.save();ctx.beginPath();ctx.arc(W/2+120,CY,110,0,Math.PI*2);ctx.clip();ctx.fillStyle='#111';ctx.globalAlpha=1-fill;ctx.fillRect(0,0,W,H);ctx.restore();
+    if(fill>0&&fill<1){ctx.save();ctx.strokeStyle='#7209b7';ctx.lineWidth=10;ctx.setLineDash([16,10]);ctx.beginPath();ctx.arc(W/2+120,CY,115,0,Math.PI*2*fill);ctx.stroke();ctx.restore()}
+    label("WHY NO BLACK HOLES?",W/2,205,t,23.4,{bg:'#fff',size:46});if(t>25.79)label('YOUR BRAIN FILLS IT IN',W/2,CY+380,t,25.8,{bg:'#ffd60a',size:40});if(t>27.89)label('WITH A GUESS',W/2+250,CY-200,t,27.9,{bg:'#7209b7',fg:'#fff',size:38,rot:.05});return}
+  if(t<33.84){brain(W/2,CY+40,1.2,{t,expr:t<31.5?'smug':'happy'});if(t>30.3)label("HOPES YOU DON'T NOTICE",W/2,205,t,30.4,{bg:'#fff',size:44});if(t>31.9)label('FOR YOUR ENTIRE LIFE',W/2,CY+320,t,32.4,{bg:'#ffd60a',size:40});return}
+  brain(W/2,CY+40,1.1,{t,expr:'smug',look:[.3,0]});label('SO NEXT TIME YOU "SAW" SOMETHING...',W/2,205,t,34.0,{bg:'#fff',size:36});
+}
+</script></body></html>

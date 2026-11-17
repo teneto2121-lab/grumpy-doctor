@@ -1,0 +1,61 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 16: You're shorter tonight than this morning (cold open + cut-off ending) =====
+window.COLD_OPEN={end:2.9,bg:'#14213d',text:[["YOU'RE SHORTER",'#fff',110],['TONIGHT','#ffd60a',150],['THAN THIS MORNING','#fff',84,1.1]],draw:coldOpen};
+window.INTRO_END=5.97;
+window.SCENES=[5.97,12.1,17.96,20.29,27.65,34.85];
+window.TINTS=['#e6f0ff','#fff3d6','#ffe8e0','#e9e3ff','#e0f7ff','#fff3d6'];
+window.PUNCH=[[34.85,37.7,'MEASURE IN THE MORNING!']];
+window.JOLTS=[34.9];window.SHAKES=[35.0];
+window.KEYWORDS=['discs','water','centimetre','five','morning'];
+window.ENDING='cut';window.FOLLOW_AT=20.4;
+window.SFX=[[0,'pop',1],[.5,'tick',.7],[1.0,'tick',.7],[1.5,'tick',.7],[2.0,'stamp',.7],[2.9,'whoosh'],
+ [5.97,'whoosh',.8],[7.3,'pop',.5],[9.1,'blip'],[12.1,'whoosh',.8],[13.6,'fall',.5],[16.0,'pop',.5],[17.96,'whoosh',.8],[19.6,'ding',.6],
+ [20.29,'whoosh',.8],[23.9,'pop',.5],[26.0,'tada',.5],[27.65,'whoosh',.8],[29.0,'blip'],[32.4,'ding',.6],[34.85,'stamp'],[35.0,'steam'],[37.78,'whoosh',.6],[38.4,'blip']];
+const MOOD=[[0,.3],[2.9,.45],[5.97,.3],[12,.35],[17.9,.45],[20.3,.25],[27.6,.3],[34.8,.95],[37.7,.6],[40,.75]];
+const POSES=[[0,'rest'],[2.9,'hips'],[4.0,'point'],[5.97,'point'],[12.1,'chin'],[13.4,'point'],[17.9,'point'],[20.3,'shrug'],[22,'point'],[27.6,'point'],[34.85,'up'],[37.7,'cross'],[38.4,'point']];
+
+// ---------- props ----------
+function vertebra(x,y,w){ctx.beginPath();ctx.roundRect(x-w/2,y-34,w,68,22);P(shadeFill(x-w/2,y,x+w/2,y,'#fff1d6','#e9c46a'),6);ctx.save();noShadow();gloss(x-w*.2,y-12,w*.18,8);ctx.restore()}
+function disc(x,y,w,th,t){ctx.save();E(x,y,w*.46,Math.max(5,th));P(radial(x-w*.1,y-th*.3,w*.4,'#bde0fe','#4d96ff'),5);ctx.restore()}
+// stack of n vertebrae with discs of thickness th (0..1 squash), bottom at y
+function spine(x,y,n,squash,t,{w=200,drips=0}={}){const th=lerp(18,8,squash);let yy=y;for(let i=0;i<n;i++){vertebra(x,yy,w);yy-=34+th;if(i<n-1){disc(x,yy,w,th,t);
+    if(drips>0){for(let k=0;k<2;k++){const u=((t*.9+k*.5+i*.13)%1);ctx.save();ctx.globalAlpha=drips*(1-u);E(x+(k?1:-1)*(w*.5+u*60),yy+u*30,9,12);P('#4d96ff',3);ctx.restore()}}yy-=th+34}}return yy}
+function ruler(x,y0,h,t){ctx.save();ctx.beginPath();ctx.roundRect(x-34,y0-h,68,h,8);P('#ffd166',6);ctx.strokeStyle=OL;ctx.lineWidth=3;for(let i=0;i<=h;i+=20){ctx.beginPath();ctx.moveTo(x-34,y0-i);ctx.lineTo(x-34+(i%100?18:34),y0-i);ctx.stroke()}ctx.restore()}
+function sunMoon(x,y,isMoon,s=1){ctx.save();ctx.translate(x,y);ctx.scale(s,s);if(!isMoon){E(0,0,46,46);P('#ffd60a',6);ctx.strokeStyle='#ffd60a';ctx.lineWidth=8;ctx.lineCap='round';for(let i=0;i<8;i++){const a=i/8*6.28;ctx.beginPath();ctx.moveTo(Math.cos(a)*64,Math.sin(a)*64);ctx.lineTo(Math.cos(a)*84,Math.sin(a)*84);ctx.stroke()}}
+  else{ctx.beginPath();ctx.arc(0,0,46,0,Math.PI*2);ctx.arc(-20,-14,40,0,Math.PI*2,true);P('#f1faee',6)}ctx.restore()}
+function bedProp(x,y,s){ctx.save();ctx.translate(x,y);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-300,-40,600,80,16);P('#bc6c25',7);ctx.beginPath();ctx.roundRect(-290,-90,580,60,20);P('#f1faee',6);ctx.beginPath();ctx.roundRect(-280,-140,140,60,26);P('#fff',6);ctx.beginPath();ctx.roundRect(-330,-160,40,200,10);P('#9c5a1a',6);ctx.restore()}
+function astronaut(x,y,s,t){ctx.save();ctx.translate(x,y+Math.sin(t*1.5)*14);ctx.rotate(Math.sin(t*.8)*.12);ctx.scale(s,s);ctx.beginPath();ctx.roundRect(-70,-40,140,170,50);P('#f8f9fa',7);E(0,-100,86,86);P('#f8f9fa',7);E(0,-100,62,54);P(radial(-20,-120,70,'#90e0ef','#023e8a'),6);ctx.save();noShadow();gloss(-24,-122,18,10);ctx.restore();
+  ctx.beginPath();ctx.roundRect(-20,10,40,30,6);P('#e63946',4);ctx.restore()}
+
+// ---------- cold open: a person shrinking from morning to night ----------
+function coldOpen(t){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,lerpCol('#4cc9f0','#14213d',clamp(t/2.2)));g.addColorStop(1,lerpCol('#ffd166','#3a0ca3',clamp(t/2.2)));ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const k=easeInOut(clamp(t/2.2)),sx=lerp(220,860,k),sy=980-Math.sin(k*Math.PI)*260;sunMoon(sx,sy,k>.5,1.2);
+  ruler(330,1720,560,t);const steps=Math.min(4,Math.floor(t/.5)),hgt=1-steps*.03;person(620,1720,1.55*hgt,t,{expr:steps>=3?'worried':'calm',shirt:'#f77f00',squish:steps>=1&&((t%.5)<.15)?.08:0});
+  ctx.save();ctx.setLineDash([16,12]);ctx.strokeStyle='#fff';ctx.lineWidth=6;ctx.beginPath();ctx.moveTo(330,1720-560+20);ctx.lineTo(820,1720-560+20);ctx.stroke();ctx.restore();
+  text(['7 AM','11 AM','3 PM','7 PM','11 PM'][steps],820,1240,70,{fill:'#fff',sw:12})}
+function lerpCol(a,b,u){const p=c=>[1,3,5].map(i=>parseInt(c.slice(i,i+2),16));const A=p(a),Bc=p(b);return '#'+A.map((v,i)=>Math.round(lerp(v,Bc[i],u)).toString(16).padStart(2,'0')).join('')}
+
+function content(t){const CY=560;
+  if(t<5.97)return;
+  if(t<12.1){spine(W/2,CY+300,5,0,t);label('YOUR SPINE',W/2,205,t,6.5,{bg:'#fff',size:52});if(t>8.6){ping(W/2,CY+300-34-18-0,0,t,{});label('SQUISHY DISCS',W/2+290,CY+120,t,9.1,{bg:'#bde0fe',size:40,rot:.04})}
+    if(t>10.4)label('LIKE JELLY CUSHIONS',W/2-200,CY-230,t,10.6,{bg:'#ffd60a',size:38,rot:-.05});return}
+  if(t<17.96){const sq=easeInOut(clamp((t-13.4)/2.5));const top=spine(W/2,CY+330,5,sq,t,{drips:clamp((t-15.9)/.5)});
+    E(W/2,top-60-lerp(0,20,sq),110,90);P(radial(W/2-30,top-90,110,'#ffd6a5','#e07a5f'),7);ctx.save();noShadow();face(W/2,top-60,.9,sq>.5?'annoyed':'calm',t);ctx.restore();
+    ctx.save();ctx.fillStyle='#e63946';for(let i=0;i<3;i++){const y=top-260+((t*80+i*40)%80);ctx.beginPath();ctx.moveTo(W/2-260,y);ctx.lineTo(W/2-230,y+40);ctx.lineTo(W/2-200,y);ctx.fill()}ctx.restore();
+    label('GRAVITY',W/2-230,top-300,t,12.8,{bg:'#e63946',fg:'#fff',size:38});if(t>15.9)label('WATER SQUEEZES OUT',W/2,CY+420,t,16.0,{bg:'#bde0fe',size:40});return}
+  if(t<20.29){ruler(W/2-80,CY+380,620,t);const d=easeInOut(clamp((t-18.6)/1.0))*30;ctx.save();ctx.setLineDash([14,10]);ctx.strokeStyle='#2a9d8f';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(W/2-120,CY-200);ctx.lineTo(W/2+240,CY-200);ctx.stroke();ctx.strokeStyle='#e63946';ctx.beginPath();ctx.moveTo(W/2-120,CY-200+d);ctx.lineTo(W/2+240,CY-200+d);ctx.stroke();ctx.restore();
+    sunMoon(W/2+330,CY-200,false,.7);if(t>18.8)sunMoon(W/2+330,CY-80,true,.7);label('BY THE EVENING',W/2,205,t,18.1,{bg:'#fff',size:48});if(t>19.4)counter(W/2+150,CY+150,t,19.4,.6,0,-1,{size:100,fmt:v=>(v<-.5?'-1':'0')+' CM',col:'#e63946'});return}
+  if(t<27.65){bedProp(W/2,CY+260,1.1);const fill=easeInOut(clamp((t-23.3)/2.4));ctx.save();ctx.translate(W/2-250,CY+150);ctx.rotate(Math.PI/2);spine(0,0,5,1-fill,t,{w:130});ctx.restore();
+    for(let k=0;k<5;k++){const u=((t*.8+k/5)%1);if(t>23.3&&t<26){ctx.save();ctx.globalAlpha=1-u;E(W/2-260+k*130,CY+20-60*(1-u),9,12);P('#4d96ff',3);ctx.restore()}}
+    sunMoon(W/2+330,CY-260,t<25.3,.7);label(t<25.3?'LIE DOWN = PRESSURE OFF':'TALL AGAIN!',W/2,205,t,t<25.3?20.6:25.4,{bg:t<25.3?'#fff':'#7ae582',size:46});return}
+  if(t<34.85){astronaut(W/2-80,CY+120,1.5,t);ruler(W/2+250,CY+380,640,t);const g=easeInOut(clamp((t-31.6)/1.2));ctx.save();ctx.setLineDash([14,10]);ctx.strokeStyle='#2a9d8f';ctx.lineWidth=7;ctx.beginPath();ctx.moveTo(W/2+150,CY-160);ctx.lineTo(W/2+330,CY-160);ctx.stroke();ctx.restore();
+    if(g>0)counter(W/2+250,CY-260,t,31.9,.8,0,5,{size:80,fmt:v=>'+'+Math.round(v)+' CM',col:'#2a9d8f'});label('NO GRAVITY',W/2-80,205,t,28.8,{bg:'#e0f7ff',size:48});if(t>33.5)label('FOR A WHILE',W/2-120,CY+420,t,33.6,{bg:'#fff',size:38});return}
+  if(t<37.78){ruler(W/2,CY+380,620,t);sunMoon(W/2+260,CY-200,false,.9);return}
+  person(W/2,CY+380,1.2,t,{expr:'annoyed',shirt:'#9d8189',squish:.12});label('STOP SLOUCHING',W/2,205,t,38.4,{bg:'#e63946',fg:'#fff',size:52});
+}
+</script></body></html>

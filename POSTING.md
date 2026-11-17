@@ -135,6 +135,30 @@ Yes. You. And it gets worse. 💨 #fart #bodyfacts #learnontiktok #science #funn
 **Pinned comment:** `No, I'm not finishing that story.`
 **Check after 2–3 days:** retention at 0:01–0:02.
 
+### Ep 16: You're shorter tonight than this morning  *(cold open + cut-off ending)*
+**File:** `episodes/ep16-shorter-at-night/ep16-shorter-at-night.mp4`
+**Caption:**
+```
+Measure yourself in the morning. Trust me. 📏 #bodyfacts #learnontiktok #science #spine #funfacts
+```
+**Pinned comment:** `Go measure yourself tonight and tomorrow morning. Report back.`
+
+### Ep 17: You can't swallow and breathe at the same time  *(interactive, cold open + cut-off ending)*
+**File:** `episodes/ep17-swallow-breathe/ep17-swallow-breathe.mp4`
+**Caption:**
+```
+Go on. Try it. I'll wait. 😤 #bodyfacts #learnontiktok #science #tryit #funfacts
+```
+**Pinned comment:** `Did you try it? Of course you did.`
+
+### Ep 18: You have a blind spot right now  *(interactive test, cold open + cut-off ending)*
+**File:** `episodes/ep18-blind-spot/ep18-blind-spot.mp4`
+**Caption:**
+```
+Close your left eye. Stare at the cross. 👁️ #blindspot #bodyfacts #learnontiktok #science #illusion
+```
+**Pinned comment:** `Did the dot vanish? (If not, move closer. Slowly.)`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -153,3 +177,6 @@ Yes. You. And it gets worse. 💨 #fart #bodyfacts #learnontiktok #science #funn
 - **Kitchen sponge (ep 13):** up to 5.4 × 10^10 bacterial cells per cm³ in used kitchen sponges; regularly "sanitized" sponges did not have lower loads; authors suggest replacing sponges weekly (Cardinale et al., *Scientific Reports*, 2017).
 - **Stomach (ep 14):** gastric acid (pH ~1.5–3.5); the mucus-bicarbonate layer neutralizes acid at the epithelial surface; surface epithelial cells are replaced every few days (≈3–5); a breakdown of this barrier leads to peptic ulcers.
 - **Farts (ep 15):** healthy adults pass gas roughly 14–23 times a day; most intestinal gas is swallowed air plus gases from bacterial fermentation; under ~1% is odorous sulfur compounds; intestinal gases such as hydrogen are absorbed into the blood and exhaled (the basis of hydrogen breath tests).
+- **Shorter at night (ep 16):** intervertebral discs lose fluid under daytime compression; people are roughly 1 cm (often 1–2 cm) shorter in the evening and regain it lying down overnight. Astronauts' spines lengthen in microgravity (up to ~3%, about 5 cm), reversing after return (NASA).
+- **Swallowing (ep 17):** the pharynx is shared by the airway and food passage; during swallowing the epiglottis folds over the laryngeal inlet and the vocal folds close, causing a brief swallow apnea (~0.5–1 s). Adults swallow several hundred times a day. Aspiration triggers the cough reflex.
+- **Blind spot (ep 18):** the optic disc, where the optic nerve leaves the retina, has no photoreceptors; each eye has a blind spot about 15° to the side of the centre of vision, and the brain fills it in (perceptual filling-in).
