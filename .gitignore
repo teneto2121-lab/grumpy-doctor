@@ -9,3 +9,6 @@ design/voice/*.mp3
 demo-new-features.mp4
 voice-audition/
 analysis/
+experiments/3d-skull/model/
+experiments/3d-skull/frames/
+experiments/3d-skull/render.log
