@@ -188,6 +188,12 @@ Illustrations: Servier Medical Art (smart.servier.com), CC BY 4.0. Footage: Pixa
 ```
 **Pinned comment:** `Would you rather know, or never find out? 👀`
 
+### Loop tests (10s question -> reveal; add a trending sound in the TikTok app)
+Credit line for all three: `Illustrations: Servier Medical Art (smart.servier.com), CC BY 4.0.`
+- **D1** `loops/D1-smokers-lung.mp4`. Caption: `Look at the left one. 🫁 #lungs #smoking #bodyfacts #learnontiktok #health`. Pinned: `Would this make you quit?`
+- **D2** `loops/D2-ears-pop.mp4`. Caption: `That's the pop. ✈️ #ears #plane #bodyfacts #learnontiktok #science`. Pinned: `Yawning or swallowing helps open the tube. Which works for you?`
+- **D3** `loops/D3-lungs-cant-move.mp4`. Caption: `Your lungs are lazy. 😤 #lungs #breathing #bodyfacts #learnontiktok #science`. Pinned: `Did you know this?`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -212,3 +218,5 @@ Illustrations: Servier Medical Art (smart.servier.com), CC BY 4.0. Footage: Pixa
 - **Phineas Gage (ep 19):** 13 September 1848, Cavendish, Vermont. Tamping iron ~1.1 m (3 ft 7 in), ~6 kg (13.25 lb), entered below the left cheekbone, passed behind the left eye and exited the top of the skull, landing ~25 m (80 ft) away; Gage was conscious and spoke within minutes and rode in an oxcart to town. Physician John Harlow (1868) reported personality changes: friends said he was 'no longer Gage'. Skull and iron are at the Warren Anatomical Museum, Harvard Medical School. (Later research suggests he partly recovered and worked as a stagecoach driver in Chile.)
 - **Held-in sneeze (ep 20):** Yang W, Sahota RS, Das S. "Snap, crackle and pop: when sneezing leads to crackling in the neck." *BMJ Case Reports* 2018; doi:10.1136/bcr-2016-218906 (University Hospitals of Leicester). A previously healthy 34-year-old man pinched his nose and closed his mouth to stop a forceful sneeze; felt a popping sensation in his neck, which swelled; could barely speak and swallowing was painful; crepitus (crackling) from the neck down to the ribcage; CT showed air in the deep neck tissues and chest (pneumomediastinum) from a spontaneous perforation of the pharynx (pyriform sinus). Treated with tube feeding and IV antibiotics; discharged after 7 days. Authors list perforated eardrum and ruptured brain aneurysm among other possible complications and advise against blocking both nostrils and the mouth when sneezing.
 - **Fluid brain (ep 21):** Feuillet L, Dufour H, Pelletier J. "Brain of a white-collar worker." *The Lancet* 2007;370:262. A 44-year-old man presented with mild left leg weakness; he had a ventriculoatrial shunt at 6 months for postnatal hydrocephalus (revised at 14). CT/MRI showed massive enlargement of the lateral, third and fourth ventricles, with the brain compressed to a thin layer. He was married with two children and worked as a civil servant (IQ 75: verbal 84, performance 70). The authors suggest slow progression allowed the brain to adapt. (The brain was compressed, not literally missing; the video says this.) "10% of the brain" myth: see ep 10.
+
+- **Loops:** smoker's vs healthy lung is Servier's "Lung cancer: healthy lung / smoker's lung" illustration. Ear popping: the Eustachian (auditory) tube links the middle ear to the back of the throat (nasopharynx) and opens (e.g. when swallowing/yawning) to equalise pressure across the eardrum. Breathing: the lungs have no skeletal muscle and cannot expand themselves; inhalation happens when the diaphragm contracts and moves down and the external intercostal muscles lift the ribs, enlarging the chest cavity.

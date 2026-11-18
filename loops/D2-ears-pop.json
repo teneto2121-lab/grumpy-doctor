@@ -1,0 +1,4 @@
+{"image":"assets/servier/ear.png","dur":10,"question":"WHY DO YOUR EARS POP ON A PLANE?","q_until":2.8,
+ "focus":[0.55,0.55],"zoom":[1.0,1.15],
+ "labels":[["EARDRUM",0.625,0.566,300,360,3.2],["TUBE TO YOUR THROAT",0.86,0.8,720,470,3.7]],
+ "answer":"A tiny tube to your throat opens to even out the air pressure behind your eardrum. That's the pop.","answer_at":4.4,"answer_y":1560}

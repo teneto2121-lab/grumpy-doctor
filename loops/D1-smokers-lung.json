@@ -1,0 +1,4 @@
+{"image":"assets/servier/lungs-smoker.png","dur":10,"question":"WHAT DOES SMOKING DO TO YOUR LUNGS?","q_until":2.8,
+ "focus":[0.5,0.5],"zoom":[1.0,1.12],
+ "labels":[["SMOKER'S LUNG",0.33,0.6,300,470,3.2],["HEALTHY LUNG",0.7,0.6,790,520,3.7]],
+ "answer":"Left: a smoker's lung, dark and scarred, with a tumour. Right: a healthy one.","answer_at":4.4,"answer_y":1500}

@@ -1,0 +1,4 @@
+{"image":"assets/servier/breathing.png","dur":10,"question":"CAN YOUR LUNGS MOVE ON THEIR OWN?","q_until":2.8,
+ "focus":[0.5,0.55],"zoom":[0.8,0.9],
+ "labels":[["LUNGS",0.35,0.45,240,340,3.2],["DIAPHRAGM",0.56,0.74,820,340,3.7]],
+ "answer":"No. Your diaphragm pulls down and your ribs lift. That's what pulls your lungs open.","answer_at":4.4,"answer_y":1590}
