@@ -167,6 +167,14 @@ An iron rod went through his skull. Then he sat up. 🤯 #phineasgage #medicalhi
 ```
 **Pinned comment:** `What's the craziest medical story you know? I'll cover the best one.`
 
+### Ep 20: He held in a sneeze  *(FULL-SCREEN, medical-cutaway style with camera moves)*
+**File:** `episodes/ep20-held-sneeze/ep20-held-sneeze.mp4`
+**Caption:**
+```
+He held in a sneeze. It tore a hole in his throat. 😳 #sneeze #medicalcase #bodyfacts #truestory #doctorexplains
+```
+**Pinned comment:** `Be honest: do you hold your sneezes in? 👀`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -189,3 +197,4 @@ An iron rod went through his skull. Then he sat up. 🤯 #phineasgage #medicalhi
 - **Swallowing (ep 17):** the pharynx is shared by the airway and food passage; during swallowing the epiglottis folds over the laryngeal inlet and the vocal folds close, causing a brief swallow apnea (~0.5–1 s). Adults swallow several hundred times a day. Aspiration triggers the cough reflex.
 - **Blind spot (ep 18):** the optic disc, where the optic nerve leaves the retina, has no photoreceptors; each eye has a blind spot about 15° to the side of the centre of vision, and the brain fills it in (perceptual filling-in).
 - **Phineas Gage (ep 19):** 13 September 1848, Cavendish, Vermont. Tamping iron ~1.1 m (3 ft 7 in), ~6 kg (13.25 lb), entered below the left cheekbone, passed behind the left eye and exited the top of the skull, landing ~25 m (80 ft) away; Gage was conscious and spoke within minutes and rode in an oxcart to town. Physician John Harlow (1868) reported personality changes: friends said he was 'no longer Gage'. Skull and iron are at the Warren Anatomical Museum, Harvard Medical School. (Later research suggests he partly recovered and worked as a stagecoach driver in Chile.)
+- **Held-in sneeze (ep 20):** Yang W, Sahota RS, Das S. "Snap, crackle and pop: when sneezing leads to crackling in the neck." *BMJ Case Reports* 2018; doi:10.1136/bcr-2016-218906 (University Hospitals of Leicester). A previously healthy 34-year-old man pinched his nose and closed his mouth to stop a forceful sneeze; felt a popping sensation in his neck, which swelled; could barely speak and swallowing was painful; crepitus (crackling) from the neck down to the ribcage; CT showed air in the deep neck tissues and chest (pneumomediastinum) from a spontaneous perforation of the pharynx (pyriform sinus). Treated with tube feeding and IV antibiotics; discharged after 7 days. Authors list perforated eardrum and ruptured brain aneurysm among other possible complications and advise against blocking both nostrils and the mouth when sneezing.
