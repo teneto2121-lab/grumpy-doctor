@@ -1,0 +1,119 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 21: The man whose skull was mostly fluid (mixed media) =====
+// Source: Feuillet, Dufour & Pelletier, "Brain of a white-collar worker", The Lancet 2007;370:262
+window.FULLSCREEN=true;window.OUT_FPS=60;window.DOC_CORNER=[170,1650,.46];window.CAP_Y=1390;
+const fin=(t,t0,d=.35)=>easeOut(clamp((t-t0)/d));
+function tag(str,y,t,s0,o={}){label(str,o.x||W/2,y,t,s0,{bg:o.bg||'#ffd60a',fg:o.fg||'#111',size:o.size||56,rot:o.rot||-.02})}
+function grain(t,a=.06){const r=rng(Math.floor(t*60));ctx.save();ctx.globalAlpha=a;for(let i=0;i<500;i++){ctx.fillStyle=r()<.5?'#000':'#fff';ctx.fillRect(r()*W,r()*H,2,2)}ctx.restore()}
+function vig(a=.65){const g=ctx.createRadialGradient(W/2,800,350,W/2,800,1200);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,`rgba(0,0,0,${a})`);ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+function footage(t,{push=0,red=0,shake=0,gray=0}={}){const sh=shotAt(t);if(!sh)return false;const v=VID[sh[0]],z=1.04+push+kickAt(t);
+  ctx.save();ctx.translate(W/2+(shake?Math.sin(t*70)*shake:0),900);ctx.scale(z,z);ctx.translate(-W/2,-900);ctx.filter=`contrast(1.12) saturate(${gray?0:1.15}) brightness(.95)`;ctx.drawImage(v,0,0,W,H);ctx.restore();
+  ctx.save();ctx.globalCompositeOperation='soft-light';ctx.fillStyle='rgba(20,60,90,.35)';ctx.fillRect(0,0,W,H);ctx.restore();
+  if(red){ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgba(255,60,70,${red})`;ctx.fillRect(0,0,W,H);ctx.restore()}
+  vig();grain(t);return true}
+// zoom kick on keywords
+function kickAt(s){const KW=(window.KEYWORDS||[]).map(k=>k.toLowerCase().replace(/[^a-z0-9-]/g,''));let k=0;for(const w of (typeof WORDS!=='undefined'?WORDS:[])){const d=s-w.s;if(d>=0&&d<.5&&KW.includes(w.w.toLowerCase().replace(/[^a-z0-9-]/g,'')))k=Math.max(k,.04*Math.exp(-d*9))}return k}
+// ---------- illustration stage: draw a Servier image with a camera; UV(u,v) maps image coords (0..1) to screen ----------
+const ANC=[W/2,800];let IL={x:0,y:0,w:W,h:H};const UV=(u,v)=>[IL.x+u*IL.w,IL.y+v*IL.h];
+function illo(name,cu,cv,zoom,t,{bg='#0a1626',gray=0,red=0}={}){const im=IMG[name];
+  const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,bg);g.addColorStop(1,'#020408');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const z=zoom*(1+kickAt(t)),w=W*z,h=w*im.naturalHeight/im.naturalWidth,dx=Math.sin(t*.7)*5,dy=Math.cos(t*.5)*4;IL={x:ANC[0]-cu*w+dx,y:ANC[1]-cv*h+dy,w,h};
+  ctx.save();ctx.shadowColor='rgba(120,200,255,.35)';ctx.shadowBlur=50;if(gray)ctx.filter=`grayscale(${gray}) contrast(1.35) brightness(1.05)`;ctx.drawImage(im,IL.x,IL.y,w,h);ctx.restore();noShadow();
+  if(red){ctx.save();ctx.globalAlpha=red*(.18+.1*Math.sin(t*14));ctx.fillStyle='#ff1f3d';ctx.fillRect(0,0,W,H);ctx.restore()}}
+// eased camera between two framings across a time window
+function camLerp(s,s0,s1,a,b){const u=easeInOut(clamp((s-s0)/(s1-s0)));return[lerp(a[0],b[0],u),lerp(a[1],b[1],u),lerp(a[2],b[2],u)]}
+// ---------- overlays (screen space via UV) ----------
+function along(pts,u){let L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));const d=clamp(u)*L[L.length-1];let i=1;while(i<L.length-1&&L[i]<d)i++;const k=(d-L[i-1])/((L[i]-L[i-1])||1);return[lerp(pts[i-1][0],pts[i][0],k),lerp(pts[i-1][1],pts[i][1],k)]}
+function stream(paths,t,{n=70,col='rgba(150,225,255,',k=1,speed=.6,size=1}={}){const sp=paths.map(p=>p.map(q=>UV(...q)));ctx.save();noShadow();ctx.lineCap='round';
+  for(let i=0;i<n;i++){const r=rng(i+11),path=sp[i%sp.length],u=(t*speed*(.7+r()*.5)+r())%1,u2=Math.max(0,u-.05),a=k*(u<.08?u/.08:1)*(u>.92?(1-u)/.08:1),rad=(6+r()*6)*size*IL.w/1500;
+    const p=along(path,u),q=along(path,u2),g=ctx.createLinearGradient(q[0],q[1],p[0],p[1]);g.addColorStop(0,col+'0)');g.addColorStop(1,col+(.9*a)+')');
+    ctx.strokeStyle=g;ctx.lineWidth=rad*1.6;ctx.beginPath();ctx.moveTo(...q);ctx.lineTo(...p);ctx.stroke();ctx.fillStyle=col+a+')';E(p[0],p[1],rad,rad);ctx.fill()}ctx.restore()}
+function jam(c,t,p,{r=.05}={}){const [cx,cy]=UV(...c),R=r*IL.w;ctx.save();noShadow();const g=ctx.createRadialGradient(cx,cy,0,cx,cy,R*3);g.addColorStop(0,`rgba(255,40,60,${.6*p+.15*p*Math.sin(t*16)})`);g.addColorStop(1,'rgba(255,40,60,0)');ctx.fillStyle=g;E(cx,cy,R*3,R*3);ctx.fill();
+  const rr=rng(4);for(let i=0;i<40;i++){const a=rr()*6.28+t*(2+p*6),d=R*(.3+rr()*(.8+p*.8));E(cx+Math.cos(a)*d,cy+Math.sin(a)*d*1.5,4+5*p,4+5*p);ctx.fillStyle=p>.5?'rgba(255,110,120,.9)':'rgba(255,220,150,.85)';ctx.fill()}ctx.restore()}
+function xMark(pt,k){if(k<=0)return;const [x,y]=UV(...pt);ctx.save();noShadow();ctx.translate(x,y);ctx.scale(k,k);E(0,0,46,46);ctx.fillStyle='#e63946';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=11;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-17,-17);ctx.lineTo(17,17);ctx.moveTo(17,-17);ctx.lineTo(-17,17);ctx.stroke();ctx.restore()}
+function crack(pt,d,s=1){if(d<0)return;const [x,y]=UV(...pt),k=s*IL.w/2600;ctx.save();noShadow();ctx.strokeStyle='#fff3c4';ctx.shadowColor='#ffd60a';ctx.shadowBlur=40;ctx.lineWidth=12*k+3;ctx.lineCap='round';
+  drawOn([[x-10*k,y-90*k],[x+22*k,y-40*k],[x-8*k,y+5*k],[x+26*k,y+55*k],[x+4*k,y+110*k]],clamp(d/.3));ctx.restore();noShadow();
+  if(d<.8){const q=d/.8;ctx.save();ctx.globalAlpha=(1-q)*.9;ctx.strokeStyle='#fff';ctx.lineWidth=16*(1-q)+2;E(x,y,30+420*easeOut(q),30+420*easeOut(q));ctx.stroke();ctx.restore()}}
+function bubbles(regions,t,s0,{n=40,dark=false}={}){const r=rng(7);ctx.save();noShadow();for(let i=0;i<n;i++){const R=regions[i%regions.length],u=R[0]+(r()-.5)*R[2],v=R[1]+(r()-.5)*R[3],delay=(R[4]||0)+r()*1.2,rad=(8+r()*14)*IL.w/2000,k=pop(t,s0+delay,.35);if(k<=0)continue;
+    const [x,y]=UV(u,v);E(x+Math.sin(t*1.6+i)*4,y+Math.cos(t*1.9+i)*4,rad*k,rad*k);ctx.fillStyle=dark?'rgba(8,8,12,.95)':'rgba(235,250,255,.8)';ctx.fill();ctx.strokeStyle=dark?'#000':'#5aa9e6';ctx.lineWidth=3;ctx.stroke();if(!dark){E(x-rad*.3,y-rad*.3,rad*.25,rad*.25);ctx.fillStyle='#fff';ctx.fill()}}ctx.restore()}
+function glow(pt,r,col,a){const [x,y]=UV(...pt),R=r*IL.w;ctx.save();noShadow();const g=ctx.createRadialGradient(x,y,0,x,y,R);g.addColorStop(0,col.replace('A',a));g.addColorStop(1,col.replace('A',0));ctx.fillStyle=g;E(x,y,R,R);ctx.fill();ctx.restore()}
+function swell(pt,k,rx=.07,ry=.12){if(k<=0)return;const [x,y]=UV(...pt);ctx.save();ctx.beginPath();ctx.ellipse(x,y,rx*IL.w*k,ry*IL.h*k,0,0,7);ctx.fillStyle='#f3cdb3';ctx.fill();ctx.strokeStyle='#3a2a22';ctx.lineWidth=3;ctx.stroke();ctx.restore()}
+function pathOn(pts,f,col,w){ctx.save();noShadow();ctx.strokeStyle=col;ctx.lineWidth=w;ctx.lineCap='round';ctx.lineJoin='round';drawOn(pts.map(q=>UV(...q)),f);ctx.restore()}
+function callout(str,pt,lx,ly,t,s0,o={}){if(t<s0)return;const [px,py]=UV(...pt),k=fin(t,s0,.3);ctx.save();noShadow();ctx.strokeStyle=o.bg||'#fff';ctx.lineWidth=5;ctx.globalAlpha=k;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(lerp(px,lx,k),lerp(py,ly,k));ctx.stroke();E(px,py,11,11);ctx.fillStyle=o.bg||'#fff';ctx.fill();ctx.restore();label(str,lx,ly,t,s0+.1,{bg:o.bg||'#fff',fg:o.fg||'#111',size:o.size||46,rot:o.rot||0})}
+// ---------- ep21 specifics ----------
+const CSF_V=[.47,.36],BR_C=[.48,.31];
+// the swollen fluid spaces: a blue mass growing out of the ventricles until the brain is a thin rim (k 0..1)
+function hydro(k,t,{rim=true}={}){if(k<=0)return;const [cx,cy]=UV(...BR_C),rx=lerp(.1,.4,easeInOut(k))*IL.w,ry=lerp(.07,.19,easeInOut(k))*IL.h,wob=1+.015*Math.sin(t*3);
+  ctx.save();ctx.beginPath();ctx.ellipse(cx,cy,rx*wob,ry*wob,-.05,0,7);const g=ctx.createRadialGradient(cx,cy-ry*.3,10,cx,cy,Math.max(rx,ry));g.addColorStop(0,'#a9c6ea');g.addColorStop(1,'#7fa4d6');ctx.fillStyle=g;ctx.fill();ctx.lineWidth=4;ctx.strokeStyle='#2b2b3a';ctx.stroke();
+  // ripples to read as liquid
+  ctx.globalAlpha=.35;ctx.strokeStyle='#fff';ctx.lineWidth=3;for(let i=0;i<3;i++){const u=((t*.4+i/3)%1);ctx.beginPath();ctx.ellipse(cx,cy,rx*u,ry*u,-.05,0,7);ctx.stroke()}ctx.restore()}
+function brainGlow(t,k,{sweep=false}={}){if(k<=0)return;const [cx,cy]=UV(.5,.42);ctx.save();ctx.globalCompositeOperation='screen';const r=IL.w*.45;
+  const g=ctx.createRadialGradient(cx,cy,0,cx,cy,r);g.addColorStop(0,`rgba(255,214,10,${.35*k})`);g.addColorStop(1,'rgba(255,214,10,0)');ctx.fillStyle=g;ctx.fillRect(cx-r,cy-r,r*2,r*2);
+  if(sweep){const R=rng(5);for(let i=0;i<26;i++){const a=R()*6.28,d=R()*r*.8,ph=(t*1.5+R())%1;ctx.globalAlpha=k*(1-ph);E(cx+Math.cos(a)*d,cy+Math.sin(a)*d*.6,4+ph*10,4+ph*10);ctx.fillStyle='#fff3b0';ctx.fill()}}ctx.restore()}
+
+window.COLD_OPEN={end:4.45,bg:'#050b16',text:[['HIS SKULL WAS','#fff',110],['MOSTLY FLUID','#7fb2ff',130],['AND HE WAS FINE.','#ffd60a',100,2.6]],draw:coldOpen};
+window.INTRO_END=5.45;
+window.SCENES=[5.45,13.04,16.23,20.26,23.76,29.98,34.47,37.78,43.26,48.41];
+window.PUNCH=[[19.2,20.2,'MOSTLY FLUID?!'],[52.0,54.6,'WITH THE FULL—']];
+window.JOLTS=[19.25];window.SHAKES=[19.27];
+window.KEYWORDS=['fluid.','fluid!','44-year-old','leg','weak','scan','screen','balloons,','thin','layer','married.','kids.','baby,','tube','adapted.','ten','percent','all','taxes.'];
+window.ENDING='cut';window.FOLLOW_AT=30.0;
+window.SFX=[[0,'whoosh',.8],[1.2,'tick',.5],[2.6,'ding',.6],[4.45,'whoosh'],[5.45,'whoosh',.8],[5.9,'blip'],[6.4,'blip'],[9.2,'tick',.6],[10.6,'stamp',.6],
+ [13.04,'whoosh',.8],[13.4,'beep',.5],[14.3,'whoosh',.6],[16.23,'whoosh',.8],[18.35,'stamp',.8],[19.2,'stamp'],[19.25,'steam'],[20.26,'whoosh',.8],[21.5,'blip'],
+ [23.76,'whoosh',.8],[24.9,'pop',.7],[27.4,'stamp',.6],[29.98,'whoosh',.8],[30.65,'ding',.5],[31.5,'ding',.5],[32.3,'whoosh',.6],[34.47,'whoosh',.8],[37.78,'whoosh',.8],
+ [41.35,'sparkle',.6],[43.26,'whoosh',.8],[46.95,'stamp',.8],[47.3,'tada',.5],[48.41,'whoosh',.8],[50.1,'whoosh',.6],[51.45,'ding',.6],[52.0,'stamp'],[52.05,'steam']];
+const MOOD=[[0,.4],[4.5,.55],[5.5,.4],[13,.5],[16.2,.6],[19.2,.95],[20.3,.5],[24,.6],[30,.4],[34.5,.4],[37.8,.45],[43.3,.6],[47,.8],[48.4,.5],[52,.95]];
+const POSES=[[0,'rest'],[4.5,'hips'],[5.5,'point'],[10.5,'shrug'],[13,'point'],[16.2,'lean'],[19.2,'up'],[20.3,'point'],[24,'point'],[30,'chin'],[32,'point'],[34.5,'point'],[37.8,'chin'],[41.3,'point'],[43.3,'cross'],[47,'up'],[48.4,'point'],[52,'up']];
+
+const FOOT={legs:'px23796',ctskull:'px4122',xray:'px49814',family:'px237643',office:'px249067',baby:'px66601',money:'px9908',neurons:'px143567'},VID={};
+for(const k in FOOT){const v=document.createElement('video');v.src='../../assets/footage/'+FOOT[k]+'.webm';v.muted=true;v.preload='auto';VID[k]=v}
+const IMG={};for(const k of ['brain-csf','brain-side','brain-axial']){const im=new Image();im.src='../../assets/servier/'+k+'.png';IMG[k]=im}
+const SHOTS=[[2.6,4.45,'family',2,1],[5.45,13.04,'legs',1,.9],[13.04,14.28,'ctskull',0,1],[14.28,16.23,'xray',2,1],[29.98,32.28,'family',6,1],[32.28,34.47,'office',1,1],
+  [34.47,37.78,'baby',2,.8],[41.35,43.26,'neurons',0,1],[50.1,52.04,'money',2,1]];
+
+function shotAt(t){for(const [a,b,k,st,sp] of SHOTS)if(t>=a&&t<b)return[k,Math.min(st+(t-a)*sp,VID[k].duration-.05||99)];return null}
+window.prepare=async t=>{await Promise.all(Object.values(IMG).map(i=>i.decode().catch(()=>{})));const sh=shotAt(t);if(!sh)return;const v=VID[sh[0]];
+  if(v.readyState<2)await new Promise(r=>v.addEventListener('loadeddata',r,{once:true}));
+  const x=Math.min(sh[1],v.duration-.05);if(Math.abs(v.currentTime-x)>1e-3){const p=new Promise(r=>v.addEventListener('seeked',r,{once:true}));v.currentTime=x;await p}};
+
+function coldOpen(t){if(t<2.6){const k=clamp(.55+t*.25);illo('brain-csf',.5,.45,.95+t*.03,t,{bg:'#06101e'});hydro(k,t);vig(.6);return}
+  footage(t,{push:(t-2.6)*.04})}
+
+window.stage=function(s,t){
+  if(s<13.04&&footage(t,{push:(s-5.45)*.02})){tag('FRANCE',300,t,5.55,{x:W/2-200,bg:'#fff',rot:-.05});tag('AGE 44',380,t,6.3,{x:W/2+190,size:50,rot:.04});
+    if(s>9.17)tag('LEFT LEG: A BIT WEAK',1230,t,9.2,{size:50});if(s>10.53)text("THAT'S IT.",W/2,620,120*pop(t,10.55,.3)+1,{fill:'#fff',sw:20});return}
+  if(s<16.23&&footage(t,{push:(s-13.04)*.04,gray:s<14.28?1:0})){tag(s<14.28?'THE SCAN':'THE DOCTORS STARE',300,t,s<14.28?13.1:14.3,{bg:'#4cc9f0'});return}
+  // reveal: where his brain should be... fluid
+  if(s<20.26){const c=camLerp(s,16.23,20.26,[.5,.4,1.05],[.48,.33,1.35]);illo('brain-csf',...c,t,{bg:'#06101e'});hydro(clamp((s-17.4)/1.2),t);vig();
+    if(s>18.35)callout('FLUID',BR_C,W/2+200,1230,t,18.4,{bg:'#4cc9f0',size:56});return}
+  // normal: a few small spaces
+  if(s<23.76){const c=camLerp(s,20.26,23.76,[.5,.48,.95],[.48,.42,1.15]);illo('brain-csf',...c,t,{bg:'#0b1d33'});vig();glow(CSF_V,.12,'rgba(76,201,240,A)',.35+.2*Math.sin(t*4));
+    tag('A NORMAL BRAIN',300,t,20.35,{bg:'#7ae582'});if(s>21.5)callout('SMALL SPACES OF FLUID',CSF_V,W/2+60,1240,t,21.5,{bg:'#4cc9f0'});return}
+  // his swelled like balloons and squashed the brain into a thin layer
+  if(s<29.98){const c=camLerp(s,23.76,29.98,[.48,.38,1.1],[.48,.33,1.35]);illo('brain-csf',...c,t,{bg:'#06101e'});hydro(clamp((s-24.6)/2.6),t);vig();
+    tag('HIS',300,t,23.8,{bg:'#e63946',fg:'#fff'});if(s>24.92)tag('SWOLLEN LIKE BALLOONS',395,t,24.95,{bg:'#fff',size:48});
+    if(s>27.41)callout('BRAIN: A THIN LAYER',[.15,.3],W/2+130,1240,t,27.45,{bg:'#ffd60a'});return}
+  if(s<34.47&&footage(t,{push:(s-29.98)*.03})){if(s<32.28){tag('MARRIED',300,t,30.65,{bg:'#fff',x:W/2-180,rot:-.04});if(s>31.5)tag('TWO KIDS',390,t,31.5,{x:W/2+180,rot:.04})}else tag('A JOB IN THE CIVIL SERVICE',300,t,32.3,{size:48});return}
+  if(s<37.78&&footage(t,{push:(s-34.47)*.03})){tag('AS A BABY',300,t,34.5,{bg:'#fff'});if(s>35.5)tag('A TUBE TO DRAIN THE FLUID',1230,t,35.55,{size:46});return}
+  // pressure built slowly, the brain adapted
+  if(s<41.35){const c=camLerp(s,37.78,41.35,[.5,.45,.95],[.5,.42,1.1]);illo('brain-side',...c,t,{bg:'#0b1d33'});brainGlow(t,fin(s,39.6,.8),{sweep:true});vig();
+    tag('THE PRESSURE BUILT SO SLOWLY',300,t,38.3,{bg:'#fff',size:46});return}
+  if(s<43.26&&footage(t,{push:(s-41.35)*.05})){tag('HIS BRAIN ADAPTED',300,t,41.4,{bg:'#ffd60a'});return}
+  // the 10% myth
+  if(s<48.41){const c=camLerp(s,43.26,48.41,[.5,.45,1.0],[.5,.45,1.12]);illo('brain-side',...c,t,{bg:'#0b1d33'});const all=fin(s,47.3,.4);
+    if(s<46.95){const [cx,cy]=UV(.3,.35);ctx.save();ctx.globalAlpha=.45;ctx.fillStyle='#ffd60a';E(cx,cy,IL.w*.07,IL.w*.05);ctx.fill();ctx.restore();text('10%',W/2,1240,130*pop(t,45.4,.3)+1,{fill:'#ffd60a',sw:22})}
+    else{brainGlow(t,all,{sweep:true});text('NO.',W/2,520,170*pop(t,46.95,.25)+1,{fill:'#ff5c5c',sw:26});if(s>47.3)tag('YOU USE ALL OF IT',1240,t,47.3,{size:56})}
+    vig();return}
+  // less room, still paid his taxes
+  if(s<50.1){const c=camLerp(s,48.41,50.1,[.48,.36,1.1],[.48,.33,1.25]);illo('brain-csf',...c,t,{bg:'#06101e'});hydro(1,t);vig();tag('A LOT LESS ROOM',300,t,48.6,{bg:'#4cc9f0'});return}
+  if(footage(t,{push:(s-50.1)*.04})){if(s>51.45)tag('TAXES: PAID ✓',300,t,51.45,{bg:'#7ae582',size:60});return}
+  illo('brain-csf',.48,.33,1.25,t);hydro(1,t);vig();
+};
+function P_(fill){ctx.fillStyle=fill;ctx.fill();ctx.strokeStyle='#000';ctx.lineWidth=6;ctx.stroke()}
+function content(t){}
+</script></body></html>
