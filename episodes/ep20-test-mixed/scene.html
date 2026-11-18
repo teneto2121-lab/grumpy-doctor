@@ -1,0 +1,296 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/anatomy.js"></script>
+<script>
+// ===== Episode 20: The man who held in a sneeze (FULLSCREEN, medical-cutaway style) =====
+// Source: Yang, Sahota & Das, BMJ Case Reports 2018 (doi 10.1136/bcr-2016-218906)
+// One detailed head/neck/chest cutaway stays on screen; a keyframed camera moves around it.
+window.FULLSCREEN=true;window.OUT_FPS=60;window.DOC_CORNER=[170,1650,.46];window.CAP_Y=1390;
+window.COLD_OPEN={end:3.85,bg:'#050b16',text:[['HE HELD IN A SNEEZE','#fff',104],['IT TORE HIS THROAT','#ff5c5c',108],['OPEN.','#ffd60a',150,2.4]],draw:coldOpen};
+window.INTRO_END=4.85;
+window.SCENES=[4.85,8.45,12.1,17.95,23.25,27.85,32.2,38.5,44.95,48.6,51.4,57.3];
+window.PUNCH=[[24.6,25.65,'IN HIS NECK?!'],[55.5,57.3,'NOT A PRESSURE COOKER']];
+window.JOLTS=[23.29,24.65];window.SHAKES=[23.29,26.8];
+window.KEYWORDS=['sneeze','throat','34-year-old','nose','mouth','lungs','exits','POP!','swell','crackling','ribs','torn','air','week','tube','eardrum','elbow'];
+window.ENDING='cut';window.FOLLOW_AT=32.0;
+window.SFX=[[0,'whoosh',.8],[.5,'tick',.5],[.95,'stamp',.6],[1.15,'crack',1],[1.18,'pop',.8],[1.85,'whoosh',.7],[3.0,'stamp',.6],[2.4,'ding',.6],[3.85,'whoosh'],
+ [4.85,'whoosh',.8],[5.3,'blip'],[5.75,'blip'],[6.4,'sparkle',.4],[7.0,'sparkle',.5],
+ [8.45,'whoosh',.8],[8.6,'pop',.7],[9.85,'stamp',.7],[10.7,'beep',.5],
+ [12.1,'whoosh',.8],[13.4,'whoosh',.6],[15.5,'whoosh',.6],[17.2,'ding',.5],
+ [17.95,'whoosh',.8],[18.3,'stamp',.6],[19.0,'stamp',.6],[20.4,'tick',.5],[20.9,'tick',.6],[21.4,'tick',.7],[21.9,'tick',.8],[22.4,'tick',.9],
+ [23.29,'crack',1],[23.32,'pop',1],[23.35,'fall',.5],[24.6,'stamp'],[24.65,'steam'],[26.2,'steam',.5],
+ [27.85,'whoosh',.8],[29.6,'blip'],[30.9,'blip'],
+ [32.2,'whoosh',.8],[34.45,'pop',.5],[34.65,'pop',.45],[34.85,'pop',.5],[35.6,'pop',.5],[35.8,'pop',.45],[36.0,'pop',.5],[36.6,'pop',.4],[36.9,'pop',.4],[37.2,'pop',.4],[37.5,'pop',.4],
+ [38.5,'whoosh',.8],[38.7,'beep',.5],[41.4,'crack',.7],[42.6,'sparkle',.5],
+ [44.95,'whoosh',.8],[45.3,'tick',.4],[45.6,'tick',.4],[45.9,'tick',.4],[46.2,'tick',.4],[46.5,'ding',.5],
+ [48.6,'whoosh',.8],[50.3,'crack',.6],[51.4,'whoosh',.8],[53.0,'blip'],[54.2,'ding',.7],
+ [55.5,'stamp'],[55.55,'steam'],[57.3,'whoosh',.8],[57.6,'steam',.8]];
+const MOOD=[[0,.4],[3.9,.55],[4.9,.35],[8.4,.5],[12.1,.4],[18,.55],[23.3,.95],[25.7,.6],[27.9,.45],[32.2,.5],[38.5,.45],[45,.5],[48.6,.55],[51.4,.6],[55.5,.95],[57.3,.6]];
+const POSES=[[0,'rest'],[3.9,'hips'],[4.9,'point'],[8.4,'chin'],[12.1,'point'],[18,'cross'],[20,'lean'],[23.3,'up'],[25.7,'facepalm'],[27.9,'point'],[32.2,'point'],[35.3,'shrug'],[38.5,'point'],[45,'pinch'],[48.6,'point'],[51.4,'point'],[53.4,'up'],[55.5,'up'],[57.3,'chin']];
+
+const fin=(t,t0,d=.35)=>easeOut(clamp((t-t0)/d));
+// ---------- camera: local anatomy coords -> screen ----------
+const ANCHOR=[W/2+40,790];let CAM=[0,0,1];
+// [stage time, focus x, focus y, zoom]
+const CAMK=[[4.85,10,-170,.95],[8.3,40,-150,1.0],[8.6,200,-150,1.65],[12.0,190,-140,1.75],[12.4,40,140,.68],[17.6,40,140,.7],[18.2,60,-80,1.0],[23.1,10,0,1.6],
+  [23.5,10,40,1.65],[27.6,40,180,1.15],[28.1,40,40,1.55],[32.0,40,40,1.6],[32.5,0,280,.85],[38.3,0,280,.88],[38.7,0,220,.9],[44.8,10,240,.86],
+  [45.2,60,140,.72],[48.4,60,140,.74],[48.8,-80,-230,1.9],[51.3,-90,-235,2.0]];
+function camAt(s){for(let i=0;i<CAMK.length-1;i++){const a=CAMK[i],b=CAMK[i+1];if(s>=a[0]&&s<b[0]){const u=easeInOut(clamp((s-a[0])/(b[0]-a[0])));return[lerp(a[1],b[1],u),lerp(a[2],b[2],u),lerp(a[3],b[3],u)]}}
+  if(s<CAMK[0][0])return CAMK[0].slice(1);return CAMK[CAMK.length-1].slice(1)}
+const S=(x,y)=>[ANCHOR[0]+(x-CAM[0])*CAM[2],ANCHOR[1]+(y-CAM[1])*CAM[2]];
+function camBegin(c,t){CAM=c;ctx.save();ctx.translate(ANCHOR[0]+Math.sin(t*.7)*6,ANCHOR[1]+Math.cos(t*.5)*5);ctx.scale(c[2],c[2]);ctx.translate(-c[0],-c[1])}
+function camEnd(){ctx.restore()}
+
+// ---------- backgrounds ----------
+function hexMix(a,b,u){const p=h=>h.slice(1).match(/\w\w/g).map(x=>parseInt(x,16)),A=p(a),B=p(b);return'#'+A.map((x,i)=>Math.round(lerp(x,B[i],u)).toString(16).padStart(2,'0')).join('')}
+function hueAt(s){return s<8.45?'#1b4965':s<12.1?'#5c0f1e':s<17.95?'#1f6f5c':s<23.25?'#7a4b00':s<27.85?'#5c0f1e':s<38.5?'#1b4965':s<44.95?'#0b2b40':s<48.6?'#1b4965':'#3c1a5b'}
+// "aah... aah..." head tilt before the sneeze (two beats), returns radians
+function tiltAt(s){const beat=(a,d)=>{const x=(s-a)/d;return x<0||x>1?0:Math.sin(x*Math.PI)};return -.07*(beat(6.0,.9)+1.3*beat(6.6,1.5))}
+function bgMed(t,hue='#1b4965',alarm=0){const g=ctx.createLinearGradient(0,0,0,H);g.addColorStop(0,'#08182c');g.addColorStop(1,'#02060d');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const r=ctx.createRadialGradient(W/2+60,760,40,W/2+60,760,900);r.addColorStop(0,hue+'cc');r.addColorStop(1,hue+'00');ctx.fillStyle=r;ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.globalAlpha=.06;ctx.strokeStyle='#9bd3ff';ctx.lineWidth=2;for(let x=-60+(t*12)%60;x<W;x+=60){ctx.beginPath();ctx.moveTo(x,0);ctx.lineTo(x,H);ctx.stroke()}for(let y=(t*12)%60;y<H;y+=60){ctx.beginPath();ctx.moveTo(0,y);ctx.lineTo(W,y);ctx.stroke()}ctx.restore();
+  if(alarm>0){ctx.save();ctx.globalAlpha=alarm*(.18+.12*Math.sin(t*14));ctx.fillStyle='#ff1f3d';ctx.fillRect(0,0,W,H);ctx.restore()}
+  const rr=rng(77);ctx.save();noShadow();for(let i=0;i<26;i++){const x=(rr()*W+t*(8+rr()*14))%W,y=(rr()*H-t*(5+rr()*10)+H)%H,z=.4+rr();ctx.globalAlpha=.08*z;E(x,y,3*z,3*z);ctx.fillStyle='#cfe8ff';ctx.fill()}ctx.restore()}
+function vignette(){const g=ctx.createRadialGradient(W/2,820,420,W/2,820,1250);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.6)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+
+// ---------- polyline helpers ----------
+function plen(pts){let L=[0];for(let i=1;i<pts.length;i++)L.push(L[i-1]+Math.hypot(pts[i][0]-pts[i-1][0],pts[i][1]-pts[i-1][1]));return L}
+function along(pts,u){const L=pts._L||(pts._L=plen(pts)),d=clamp(u)*L[L.length-1];let i=1;while(i<L.length-1&&L[i]<d)i++;const k=(d-L[i-1])/((L[i]-L[i-1])||1);return[lerp(pts[i-1][0],pts[i][0],k),lerp(pts[i-1][1],pts[i][1],k)]}
+function tube(pts,w,col){ctx.save();noShadow();ctx.lineCap='round';ctx.lineJoin='round';ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();pts.forEach((p,i)=>i?ctx.lineTo(...p):ctx.moveTo(...p));ctx.stroke();ctx.restore()}
+
+// ---------- the anatomy (local coords; head faces right; throat near 0,0) ----------
+const UP=[[150,680],[70,550],[52,420],[48,200],[42,95],[5,10],[-12,-90]];
+const OUTM=[[-12,-90],[60,-86],[170,-90],[250,-74],[470,-66]];
+const OUTN=[[-12,-90],[-8,-180],[30,-222],[160,-206],[275,-165],[470,-160]];
+const TEAR=[22,55],EAR=[-120,-245],NOSEPT=[300,-170],MOUTHPT=[256,-74],LARYNX=[46,150],OESO=[-14,260];
+function headPts(sw){const f=y=>sw*Math.exp(-Math.pow((y-190)/120,2))*95;
+  return [[-300,-420],[-220,-540],[-60,-592],[90,-562],[182,-470],[216,-360],[222,-300],[240,-276],[268,-228],[306,-186],[326,-162],[300,-146],[262,-140],[270,-118],[263,-95],[248,-86],[263,-72],[256,-48],[246,-18],[238,20],[200,56],[130,76],
+   [116+f(110),110],[118+f(190),190],[124+f(270),270],[150,340],[300,385],[390,480],[400,1100],[-400,1100],[-390,480],[-300,400],[-190,350],[-170,280],[-166,120],[-200,20],[-282,-100],[-322,-262]]}
+function anatomy(t,o={}){const sw=o.swell||0,gray=o.gray||0;
+  ctx.save();if(gray)ctx.filter=`grayscale(${gray}) contrast(1.25) brightness(1.05)`;
+  ctx.save();ctx.shadowColor='rgba(120,200,255,.35)';ctx.shadowBlur=60;curve(headPts(sw));ctx.fillStyle=shadeFill(-300,-600,300,900,'#f7d6bd','#d99a78');ctx.fill();ctx.restore();
+  curve(headPts(sw));ctx.strokeStyle='#3a2418';ctx.lineWidth=7;ctx.stroke();
+  ctx.save();curve(headPts(sw));ctx.clip();noShadow();
+  ctx.fillStyle='rgba(214,120,110,.35)';ctx.fillRect(-420,-620,840,1760);
+  // brain + skull
+  E(-55,-392,250,158,-.08);ctx.fillStyle='#f6b9c6';ctx.fill();ctx.strokeStyle='#e9dcc0';ctx.lineWidth=22;ctx.stroke();
+  ctx.strokeStyle='rgba(180,80,110,.45)';ctx.lineWidth=5;for(let i=0;i<7;i++){ctx.beginPath();const x=-230+i*62;ctx.moveTo(x,-480+(i%2)*30);ctx.bezierCurveTo(x+40,-430,x-20,-380,x+30,-320);ctx.stroke()}
+  // spine
+  for(let y=-170;y<1100;y+=66){ctx.beginPath();ctx.roundRect(-158,y,82,52,14);ctx.fillStyle='#efe3c8';ctx.fill();ctx.strokeStyle='#b8a888';ctx.lineWidth=4;ctx.stroke();ctx.beginPath();ctx.roundRect(-150,y+52,66,14,6);ctx.fillStyle='#e7a3b0';ctx.fill()}
+  // lungs + ribs
+  const br=1+.035*Math.sin(t*1.7)+(o.inhale||0)*.08;[[-150,730],[215,730]].forEach(([x,y],i)=>{E(x,y,175*br,250*br,i?.12:-.12);ctx.fillStyle=radial(x-40,y-80,260,'#ffc4d6','#e57a9a');ctx.fill();ctx.strokeStyle='#b5536f';ctx.lineWidth=6;ctx.stroke();
+    ctx.strokeStyle='rgba(181,83,111,.35)';ctx.lineWidth=4;for(let k=0;k<5;k++){ctx.beginPath();ctx.moveTo(x+(i?-60:60),y-120+k*50);ctx.quadraticCurveTo(x,y-90+k*55,x+(i?110:-110),y-60+k*60);ctx.stroke()}});
+  ctx.strokeStyle='rgba(240,228,200,.55)';ctx.lineWidth=16;for(let k=0;k<6;k++){ctx.beginPath();ctx.ellipse(30,540+k*80,390,90,0,.1,Math.PI-.1);ctx.stroke()}
+  // oesophagus (behind airway)
+  tube([[-10,40],[-14,300],[-18,700],[-30,1100]],46,'#c44569');tube([[-10,40],[-14,300],[-18,700],[-30,1100]],10,'#7d1d3f');
+  // nasal + oral cavities
+  curve([[40,-252],[150,-266],[252,-196],[246,-160],[150,-150],[40,-166]]);ctx.fillStyle='#6d1a2a';ctx.fill();
+  ctx.strokeStyle='#e88b9c';ctx.lineWidth=9;[[-238],[-212],[-186]].forEach(([y])=>{ctx.beginPath();ctx.moveTo(60,y);ctx.quadraticCurveTo(140,y-14,215,y+8);ctx.stroke()});
+  ctx.beginPath();ctx.roundRect(40,-156,200,16,8);ctx.fillStyle='#efe3c8';ctx.fill();
+  curve([[40,-132],[232,-122],[250,-84],[232,-54],[80,-44],[40,-80]]);ctx.fillStyle='#6d1a2a';ctx.fill();
+  curve([[48,-104],[150,-116],[214,-96],[202,-60],[120,-38],[42,-18],[18,-60]]);ctx.fillStyle=shadeFill(0,-120,0,-20,'#ff9fb2','#e0607e');ctx.fill();
+  // pharynx (the throat)
+  tube([[20,-238],[-12,-180],[-22,-80],[-16,40],[-6,120]],78,'#e47c8f');tube([[20,-238],[-12,-180],[-22,-80],[-16,40],[-6,120]],56,'#6d1a2a');
+  // Eustachian tube
+  tube([[8,-212],[-50,-230],[-112,-246]],10,'#e47c8f');
+  // larynx + trachea + bronchi
+  tube([[44,92],[50,300],[56,530]],62,'#f3c1cc');tube([[44,92],[50,300],[56,530]],38,'#4a1320');tube([[56,520],[-60,600],[-140,660]],34,'#f3c1cc');tube([[56,520],[150,600],[205,660]],34,'#f3c1cc');
+  ctx.strokeStyle='#fff3f5';ctx.lineWidth=7;for(let y=180;y<515;y+=34){ctx.beginPath();ctx.moveTo(18,y);ctx.lineTo(82,y+3);ctx.stroke()}
+  ctx.beginPath();ctx.moveTo(30,70);ctx.quadraticCurveTo(70,40,64,96);ctx.strokeStyle='#ff8fa3';ctx.lineWidth=12;ctx.stroke();
+  // tissue texture + key light from top-right, shadow bottom-left, wet sheen on the cut surface
+  ctx.fillStyle=tex();ctx.globalAlpha=.35;ctx.fillRect(-420,-620,840,1760);ctx.globalAlpha=1;
+  const L=ctx.createLinearGradient(300,-600,-300,900);L.addColorStop(0,'rgba(255,250,240,.22)');L.addColorStop(.5,'rgba(255,255,255,0)');L.addColorStop(1,'rgba(60,0,20,.18)');ctx.fillStyle=L;ctx.fillRect(-420,-620,840,1760);
+  ctx.strokeStyle='rgba(255,255,255,.35)';ctx.lineWidth=10;ctx.lineCap='round';[[[-40,-120],[-30,-20]],[[30,200],[34,320]],[[-170,-60],[-160,60]]].forEach(([a,b])=>{ctx.beginPath();ctx.moveTo(...a);ctx.lineTo(...b);ctx.stroke()});
+  ctx.restore();
+  // rim light on the silhouette
+  ctx.save();curve(headPts(sw));ctx.strokeStyle='rgba(150,220,255,.55)';ctx.lineWidth=4;ctx.translate(4,-4);ctx.stroke();ctx.restore();
+  // exterior features: eye + ear on the skin
+  noShadow();const bl=((t+.7)%3.3)<.13?.12:1;E(178,-300,22,13*bl);ctx.fillStyle='#fff';ctx.fill();if(bl>.5)E(184,-300,9,10);ctx.fillStyle='#2b2118';ctx.fill();ctx.strokeStyle='#3a2418';ctx.lineWidth=7;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(150,-336);ctx.lineTo(205,-340);ctx.stroke();
+  ctx.beginPath();ctx.moveTo(-100,-300);ctx.bezierCurveTo(-30,-320,-20,-200,-80,-170);ctx.bezierCurveTo(-120,-160,-150,-200,-135,-240);ctx.closePath();ctx.fillStyle='rgba(230,160,130,.85)';ctx.fill();ctx.strokeStyle='#3a2418';ctx.lineWidth=6;ctx.stroke();
+  ctx.restore()}
+// air particles: 'out' = normal sneeze, 'blocked' = trapped, pressure p 0..1
+function air(t,mode,k=1,p=0){const N=70;ctx.save();noShadow();for(let i=0;i<N;i++){const r=rng(i+3),ph=r(),sp=.55+r()*.5;let u=(t*sp*.6+ph)%1,pos,col;
+    if(mode==='out'){const br=i%2?OUTM:OUTN;pos=u<.55?along(UP,u/.55):along(br,(u-.55)/.45);col='rgba(150,225,255,'}
+    else{if(u<.6){pos=along(UP,u/.6*(.82+.18*p))}else{const a=r()*6.28+t*(3+p*6),rad=(20+r()*40)*(1+p*.6);pos=[-14+Math.cos(a)*rad*.6,-30+Math.sin(a)*rad*1.4]}col=p>.5?'rgba(255,90,100,':'rgba(255,200,120,'}
+    const a=(u<.06?u/.06:1)*k,rad=6+r()*6;let prev;
+    if(mode==='out'){const u2=Math.max(0,u-.045),br=i%2?OUTM:OUTN;prev=u2<.55?along(UP,u2/.55):along(br,(u2-.55)/.45)}
+    else if(u<.6){prev=along(UP,Math.max(0,u-.04)/.6*(.82+.18*p))}else{const a2=r()*0+(t-.05)*(3+p*6);prev=null}
+    if(prev){const g=ctx.createLinearGradient(prev[0],prev[1],pos[0],pos[1]);g.addColorStop(0,col+'0)');g.addColorStop(1,col+(.9*a)+')');ctx.strokeStyle=g;ctx.lineWidth=rad*1.6;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(...prev);ctx.lineTo(...pos);ctx.stroke()}
+    ctx.fillStyle=col+(.95*a)+')';E(pos[0],pos[1],rad,rad);ctx.fill();ctx.fillStyle=`rgba(255,255,255,${.6*a})`;E(pos[0]-rad*.3,pos[1]-rad*.3,rad*.35,rad*.35);ctx.fill()}
+  ctx.restore()}
+function pressureGlow(p,t){if(p<=0)return;ctx.save();noShadow();const g=ctx.createRadialGradient(-14,-30,10,-14,-30,170);g.addColorStop(0,`rgba(255,60,80,${.55*p+.15*p*Math.sin(t*16)})`);g.addColorStop(1,'rgba(255,60,80,0)');ctx.fillStyle=g;E(-14,-30,170,230);ctx.fill();ctx.restore()}
+function tearFX(t,s0){const d=t-s0;if(d<0)return;ctx.save();noShadow();ctx.strokeStyle='#ffe066';ctx.lineWidth=8;ctx.lineCap='round';
+  const R=[[0,0],[16,-22],[8,-44],[24,-60]],R2=[[0,0],[-8,26],[10,48],[-2,70]];[R,R2].forEach(L=>{drawOn(L.map(([x,y])=>[TEAR[0]+x,TEAR[1]+y]),clamp(d/.25))});
+  if(d<.6){ctx.globalAlpha=1-d/.6;burst(TEAR[0],TEAR[1],(60+220*d),'#ffd60a')}
+  if(d<.8){const k=d/.8;ctx.globalAlpha=(1-k)*.9;ctx.strokeStyle='#fff';ctx.lineWidth=18*(1-k)+2;E(TEAR[0],TEAR[1],40+520*easeOut(k),40+520*easeOut(k));ctx.stroke();
+    const g=ctx.createRadialGradient(TEAR[0],TEAR[1],0,TEAR[0],TEAR[1],300);g.addColorStop(0,`rgba(255,230,150,${.7*(1-k)})`);g.addColorStop(1,'rgba(255,230,150,0)');ctx.globalAlpha=1;ctx.fillStyle=g;E(TEAR[0],TEAR[1],300,300);ctx.fill()}
+  ctx.restore()}
+// escaping air bubbles under the skin: neck first, chest when reach=2
+function leak(t,s0,reach=1,{dark=false,n=60}={}){const r=rng(41);ctx.save();noShadow();for(let i=0;i<n;i++){const ang=r()*6.28,dist=r(),chest=i>n*.55;
+    let x,y;if(!chest){x=TEAR[0]+Math.cos(ang)*(30+dist*120);y=TEAR[1]+40+Math.abs(Math.sin(ang))*dist*240}else{x=-10+(r()-.5)*170;y=380+r()*300}
+    const delay=chest?1.4+r()*1.2:r()*1.2,rad=8+r()*14;if(chest&&reach<2)continue;const k=pop(t,s0+delay,.35);if(k<=0)continue;const R=rad*k;
+    E(x+Math.sin(t*1.6+i)*5,y+Math.cos(t*1.9+i)*5-Math.min(14,(t-s0-delay)*3),R,R);ctx.fillStyle=dark?'rgba(10,10,14,.95)':'rgba(235,250,255,.75)';ctx.fill();ctx.strokeStyle=dark?'#000':'#5aa9e6';ctx.lineWidth=3;ctx.stroke();if(!dark){E(x-R*.3,y-R*.3,R*.25,R*.25);ctx.fillStyle='#fff';ctx.fill()}}
+  ctx.restore()}
+function blockX(x,y,k){if(k<=0)return;ctx.save();noShadow();ctx.translate(x,y);ctx.scale(k,k);E(0,0,44,44);ctx.fillStyle='#e63946';ctx.fill();ctx.strokeStyle='#fff';ctx.lineWidth=10;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-16,-16);ctx.lineTo(16,16);ctx.moveTo(16,-16);ctx.lineTo(-16,16);ctx.stroke();ctx.restore()}
+// fingers pinching the nose + sealed lips (local coords)
+function finger(x0,y0,x1,y1,w){ctx.save();ctx.lineCap='round';ctx.strokeStyle='#3a2418';ctx.lineWidth=w+12;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();const g=ctx.createLinearGradient(x0,y0-w,x0,y0+w);g.addColorStop(0,'#f8d5ba');g.addColorStop(1,'#d8957a');ctx.strokeStyle=g;ctx.lineWidth=w;ctx.stroke();
+  const a=Math.atan2(y1-y0,x1-x0);ctx.translate(x1,y1);ctx.rotate(a);E(-w*.15,0,w*.38,w*.3);ctx.fillStyle='#fde8e0';ctx.fill();ctx.restore()}
+function pinch(t,k,seal){if(k>0){const sq=k>=1?Math.sin(t*9)*2:0;ctx.save();ctx.translate(lerp(260,0,easeOut(k)),0);
+    // forearm + palm
+    ctx.beginPath();ctx.roundRect(400,-250,300,150,70);ctx.fillStyle=shadeFill(0,-250,0,-100,'#f6cfb2','#d8957a');ctx.fill();ctx.strokeStyle='#3a2418';ctx.lineWidth=7;ctx.stroke();
+    ctx.beginPath();ctx.roundRect(560,-270,340,200,60);ctx.fillStyle='#457b9d';ctx.fill();ctx.stroke();
+    // curled fingers + index over the bridge + thumb under the tip
+    [[-205],[-170],[-135]].forEach(([y])=>finger(450,y+20,410,y+22,34));
+    finger(440,-240,282-sq,-208,36);finger(440,-120,292-sq,-140,40);
+    ctx.restore()}
+  if(seal>0){ctx.save();ctx.strokeStyle=`rgba(230,57,70,${seal})`;ctx.lineWidth=12;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(244,-88);ctx.quadraticCurveTo(272,-80,256,-62);ctx.stroke();ctx.restore()}}
+// callout: leader line from an anatomy point (local) to a label (screen)
+function callout(str,pt,lx,ly,t,s0,o={}){if(t<s0)return;const [px,py]=S(...pt),k=fin(t,s0,.3);ctx.save();noShadow();ctx.strokeStyle=o.bg||'#fff';ctx.lineWidth=5;ctx.globalAlpha=k;ctx.beginPath();ctx.moveTo(px,py);ctx.lineTo(lerp(px,lx,k),lerp(py,ly,k));ctx.stroke();E(px,py,11,11);ctx.fillStyle=o.bg||'#fff';ctx.fill();ctx.restore();label(str,lx,ly,t,s0+.1,{bg:o.bg||'#fff',fg:o.fg||'#111',size:o.size||46,rot:o.rot||0})}
+function tag(str,y,t,s0,o={}){label(str,o.x||W/2,y,t,s0,{bg:o.bg||'#ffd60a',fg:o.fg||'#111',size:o.size||56,rot:o.rot||-.02})}
+function cooker(x,y,s,t,shake){ctx.save();ctx.translate(x+Math.sin(t*60)*8*shake,y);ctx.scale(s,s);
+  ctx.beginPath();ctx.roundRect(-210,-120,420,300,40);P(shadeFill(0,-120,0,180,'#e9ecef','#6c757d'),8);
+  ctx.beginPath();ctx.roundRect(-240,-170,480,60,30);P('#495057',8);ctx.beginPath();ctx.roundRect(-30,-240,60,80,14);P('#212529',7);
+  ctx.beginPath();ctx.roundRect(210,-80,170,46,23);P('#212529',7);ctx.beginPath();ctx.roundRect(-380,-80,170,46,23);P('#212529',7);
+  face(0,30,1.4,'annoyed',t);ctx.restore();
+  ctx.save();noShadow();for(let i=0;i<5;i++){const u=(t*1.3+i/5)%1;ctx.globalAlpha=(1-u)*.8;E(x+Math.sin(u*9+i)*40,y-260*s-u*420,40+u*80,30+u*60);ctx.fillStyle='#fff';ctx.fill()}ctx.restore()}
+// outside view of the head with an elbow in front ("sneeze into your elbow")
+function elbowShot(t,s){camBegin([150,-150,1.3],t);ctx.save();ctx.shadowColor='rgba(120,200,255,.35)';ctx.shadowBlur=60;curve(headPts(0));ctx.fillStyle=shadeFill(-300,-600,300,900,'#f7d6bd','#d99a78');ctx.fill();ctx.restore();curve(headPts(0));ctx.strokeStyle='#3a2418';ctx.lineWidth=7;ctx.stroke();
+  noShadow();E(178,-300,22,10);ctx.fillStyle='#2b2118';ctx.fill();
+  const k=easeOut(clamp((s-51.6)/.6)),flinch=s>53.4?Math.exp(-((s-53.4)%1.2)*6)*8:0;ctx.save();ctx.translate(lerp(380,0,k),lerp(260,0,k)+flinch);
+  const sleeve=(x0,y0,x1,y1,w)=>{ctx.lineCap='round';ctx.strokeStyle='#0d2b28';ctx.lineWidth=w+14;ctx.beginPath();ctx.moveTo(x0,y0);ctx.lineTo(x1,y1);ctx.stroke();const g=ctx.createLinearGradient(x0,y0-w,x0,y0+w);g.addColorStop(0,'#3fb5a4');g.addColorStop(1,'#1d6f66');ctx.strokeStyle=g;ctx.lineWidth=w;ctx.stroke()};
+  sleeve(640,520,385,-110,150);sleeve(385,-110,60,-250,124);
+  E(385,-110,80,80);ctx.fillStyle='#2a9d8f';ctx.fill();ctx.strokeStyle='#0d2b28';ctx.lineWidth=7;ctx.stroke();
+  ctx.strokeStyle='rgba(13,43,40,.45)';ctx.lineWidth=6;[[250,-170],[160,-210],[470,120],[520,260]].forEach(([x,y])=>{ctx.beginPath();ctx.arc(x,y,30,.4,2.2);ctx.stroke()});
+  E(10,-270,62,48,-.4);ctx.fillStyle=shadeFill(100,-200,200,-110,'#f6cfb2','#d8957a');ctx.fill();ctx.strokeStyle='#3a2418';ctx.lineWidth=6;ctx.stroke();
+  ctx.restore();
+  if(s>53.4){const r=rng(12),d=(s-53.4)%1.2;ctx.save();noShadow();for(let i=0;i<26;i++){const a=-.6+r()*1.2,v=40+r()*90,rad=6+r()*6;ctx.globalAlpha=Math.max(0,1-d*1.2);E(270+Math.cos(a)*v*d*2,-120+Math.sin(a)*v*d*2,rad,rad);ctx.fillStyle='#bde0fe';ctx.fill()}ctx.restore()}
+  camEnd()}
+
+// ===== inside-the-airway fly-through (screen space). mode: 'fly' (toward the light), 'blocked' (sealed wall, pressure p), 'tear' (wall rips, d = secs since)
+function tunnel(t,mode,p=0,d=0){const VX=W/2+Math.sin(t*1.3)*30+(mode!=='fly'?Math.sin(t*40)*p*14:0),VY=760+Math.cos(t*1.1)*24;
+  ctx.fillStyle='#1a0306';ctx.fillRect(0,0,W,H);
+  const speed=mode==='fly'?2.2:mode==='blocked'?.35+p*.3:.2,ph=(t*speed)%1,N=16;
+  for(let i=0;i<N;i++){const depth=.55+(i-ph)*.75;if(depth<=.2)continue;const breathe=mode==='fly'?1:1+(.06+.1*p)*Math.sin(t*(8+p*10)+i*.6);
+    const r=820/depth*breathe,fog=clamp((depth-.5)/6),x=VX+(W/2-VX)*Math.min(1,1/depth),y=VY+(820-VY)*Math.min(1,1/depth);
+    const g=ctx.createRadialGradient(x-r*.25,y-r*.3,r*.1,x,y,r);const near=hexMix(mode==='blocked'&&p>.4?'#ff4d5e':'#f08a99','#2a0409',fog),far=hexMix('#b8384f','#14020a',fog);
+    g.addColorStop(0,far);g.addColorStop(.86,near);g.addColorStop(1,hexMix('#ffd0d8','#2a0409',fog));ctx.fillStyle=g;E(x,y,r,r*.92);ctx.fill();
+    // cartilage ridge + wet highlight
+    ctx.strokeStyle=`rgba(255,215,225,${.28*(1-fog)})`;ctx.lineWidth=Math.max(2,40/depth);E(x,y,r*.97,r*.9);ctx.stroke();
+    ctx.strokeStyle=`rgba(255,255,255,${.5*(1-fog)})`;ctx.lineWidth=Math.max(2,14/depth);ctx.beginPath();ctx.ellipse(x,y,r*.82,r*.76,0,3.6,4.6);ctx.stroke()}
+  // longitudinal mucosa folds running into the distance
+  ctx.save();for(let k=0;k<14;k++){const a=k/14*6.28+Math.sin(t*.5+k)*.05;ctx.strokeStyle=k%2?'rgba(60,0,10,.16)':'rgba(255,200,210,.1)';ctx.lineWidth=26;ctx.beginPath();ctx.moveTo(VX+Math.cos(a)*60,VY+Math.sin(a)*55);ctx.quadraticCurveTo(VX+Math.cos(a+.25)*500,VY+Math.sin(a+.25)*460,VX+Math.cos(a+.1)*1300,VY+Math.sin(a+.1)*1200);ctx.stroke()}ctx.restore();
+  // the far end: daylight (fly) or a sealed wall (blocked/tear)
+  const end=mode==='fly'?ctx.createRadialGradient(VX,VY,0,VX,VY,260):null;
+  if(end){end.addColorStop(0,'rgba(255,255,255,.95)');end.addColorStop(1,'rgba(255,255,255,0)');ctx.fillStyle=end;E(VX,VY,260,260);ctx.fill()}
+  else{E(VX,VY,110,100);ctx.fillStyle=`rgb(${150+100*p},20,40)`;ctx.fill();ctx.strokeStyle='#ffb3c1';ctx.lineWidth=6;ctx.stroke();
+    const g=ctx.createRadialGradient(VX,VY,0,VX,VY,700);g.addColorStop(0,`rgba(255,30,60,${.35*p+.15*p*Math.sin(t*18)})`);g.addColorStop(1,'rgba(255,30,60,0)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H)}
+  // air particles
+  const r0=rng(31);for(let i=0;i<60;i++){const a=r0()*6.28,ph2=(r0()+t*(mode==='fly'?1.4:.9))%1;let rad,px,py;
+    if(mode==='fly'){rad=900*(1-ph2)*(1-ph2);px=VX+Math.cos(a)*rad;py=VY+Math.sin(a)*rad;const rad2=900*(1-ph2+.06)**2;ctx.strokeStyle=`rgba(190,235,255,${.8*ph2})`;ctx.lineWidth=4+10*(1-ph2);ctx.beginPath();ctx.moveTo(VX+Math.cos(a)*rad2,VY+Math.sin(a)*rad2);ctx.lineTo(px,py);ctx.stroke()}
+    else{rad=120+260*Math.abs(Math.sin(ph2*Math.PI*2+i))*(.6+p);px=VX+Math.cos(a+t*(1+p*3))*rad;py=VY+Math.sin(a+t*(1+p*3))*rad;E(px,py,8+6*p,8+6*p);ctx.fillStyle=p>.5?'rgba(255,120,130,.85)':'rgba(255,220,150,.8)';ctx.fill()}}
+  // the tear, seen from inside
+  if(mode==='tear'){const k=easeOut(clamp(d/.3)),cx=W/2+90,cy=800;ctx.save();ctx.translate(cx,cy);ctx.rotate(-.25);ctx.scale(1.9,1.9);
+    const crack=[[0,-260],[30,-170],[-20,-90],[40,0],[-10,90],[30,180],[0,260]].map(([x,y])=>[x,y*k]);
+    ctx.beginPath();crack.forEach((q,i)=>i?ctx.lineTo(...q):ctx.moveTo(...q));for(let i=crack.length-1;i>=0;i--)ctx.lineTo(crack[i][0]+50*k*Math.sin(i*1.7+1)+40*k,crack[i][1]);ctx.closePath();
+    ctx.fillStyle='#fff6d6';ctx.shadowColor='#ffd60a';ctx.shadowBlur=120;ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#4a0010';ctx.lineWidth=12;ctx.lineJoin='round';ctx.stroke();ctx.restore();noShadow();
+    if(d<.25){ctx.fillStyle=`rgba(255,250,230,${1-d/.25})`;ctx.fillRect(0,0,W,H)}
+    const r1=rng(8);for(let i=0;i<30;i++){const v=(200+r1()*700)*clamp(d*1.6),a=-.9+r1()*1.8;E(cx+20+Math.cos(a)*v,cy+Math.sin(a)*v*.8,(10+r1()*26)*Math.min(1,d*3),(10+r1()*26)*Math.min(1,d*3));ctx.fillStyle='rgba(235,250,255,.85)';ctx.fill();ctx.strokeStyle='#5aa9e6';ctx.lineWidth=3;ctx.stroke()}}
+  // lens vignette
+  const v=ctx.createRadialGradient(W/2,820,300,W/2,820,1150);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.75)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H)}
+// tissue texture: soft blotches + speckle, made once
+let TEX=null;function tex(){if(TEX)return TEX;const c=document.createElement('canvas');c.width=c.height=512;const x=c.getContext('2d'),r=rng(99);
+  for(let i=0;i<260;i++){const px=r()*512,py=r()*512,rr=8+r()*60,g=x.createRadialGradient(px,py,0,px,py,rr);const dark=r()<.5;g.addColorStop(0,dark?'rgba(200,60,70,.2)':'rgba(255,245,235,.25)');g.addColorStop(1,'rgba(0,0,0,0)');x.fillStyle=g;x.fillRect(px-rr,py-rr,rr*2,rr*2)}
+  for(let i=0;i<5000;i++){x.fillStyle=r()<.5?'rgba(160,40,50,.14)':'rgba(255,255,255,.16)';x.fillRect(r()*512,r()*512,1.5,1.5)}
+  TEX=ctx.createPattern(c,'repeat');return TEX}
+// ===== real footage (Pixabay, free licence) + Servier Medical Art (CC BY 4.0) =====
+const FOOT={sneeze:'../../assets/footage/px34534.webm'},VID={};
+for(const k in FOOT){const v=document.createElement('video');v.src=FOOT[k];v.muted=true;v.preload='auto';v.playsInline=true;VID[k]=v}
+const MOUTH=new Image();MOUTH.src='../../assets/servier/mouth-crop.png';
+// which clip + source time is on screen at time t (null = no footage)
+function shotAt(t){
+  if(t<0.55)return['sneeze',16.4+t*.9];                 // big "aah..."
+  if(t<1.15)return['sneeze',17.55+(t-.55)*1.0];          // hand clamps over nose + mouth
+  if(t>=4.85&&t<8.45)return['sneeze',4.0+(t-4.85)*.83];  // the build-up, hand comes up
+  if(t>=8.45&&t<10.7)return['sneeze',7.0+(t-8.45)*.45];  // stifling it, slow-motion
+  return null}
+window.prepare=async t=>{await MOUTH.decode().catch(()=>{});const sh=shotAt(t);if(!sh)return;const v=VID[sh[0]];
+  if(v.readyState<2)await new Promise(r=>v.addEventListener('loadeddata',r,{once:true}));
+  if(Math.abs(v.currentTime-sh[1])>1e-3){const p=new Promise(r=>v.addEventListener('seeked',r,{once:true}));v.currentTime=sh[1];await p}};
+function footage(t,{push=0,red=0,shake=0}={}){const sh=shotAt(t);if(!sh)return false;const v=VID[sh[0]],z=1.04+push;
+  ctx.save();ctx.translate(W/2+(shake?Math.sin(t*70)*shake:0),900);ctx.scale(z,z);ctx.translate(-W/2,-900);ctx.filter='contrast(1.12) saturate(1.15) brightness(.95)';ctx.drawImage(v,0,0,W,H);ctx.restore();
+  // cinematic grade: teal shadows, vignette, optional red alarm
+  ctx.save();ctx.globalCompositeOperation='soft-light';ctx.fillStyle='rgba(20,60,90,.35)';ctx.fillRect(0,0,W,H);ctx.restore();
+  if(red){ctx.save();ctx.globalCompositeOperation='multiply';ctx.fillStyle=`rgba(255,60,70,${red})`;ctx.fillRect(0,0,W,H);ctx.restore()}
+  const g=ctx.createRadialGradient(W/2,800,350,W/2,800,1200);g.addColorStop(0,'rgba(0,0,0,0)');g.addColorStop(1,'rgba(0,0,0,.65)');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  // film grain
+  const r=rng(Math.floor(t*60));ctx.save();ctx.globalAlpha=.06;for(let i=0;i<500;i++){ctx.fillStyle=r()<.5?'#000':'#fff';ctx.fillRect(r()*W,r()*H,2,2)}ctx.restore();return true}
+// Servier open-mouth illustration filling the screen, throat at the back glowing / tearing
+function mouthShot(t,d){const Wd=1250,Hd=Wd*MOUTH.naturalHeight/MOUTH.naturalWidth,z=1+.05*d;ctx.fillStyle='#120304';ctx.fillRect(0,0,W,H);
+  ctx.save();ctx.translate(W/2,860);ctx.scale(z,z);ctx.drawImage(MOUTH,-Wd/2,-Hd/2,Wd,Hd);ctx.restore();
+  const tx=W/2-25*z,ty=860+40*z;// back of the throat
+  const k=clamp(d/.4);ctx.save();noShadow();const g=ctx.createRadialGradient(tx,ty,0,tx,ty,320);g.addColorStop(0,`rgba(255,40,60,${.75*k})`);g.addColorStop(1,'rgba(255,40,60,0)');ctx.fillStyle=g;E(tx,ty,320,320);ctx.fill();
+  ctx.strokeStyle='#fff3c4';ctx.shadowColor='#ffd60a';ctx.shadowBlur=40;ctx.lineWidth=12;ctx.lineCap='round';drawOn([[tx-10,ty-90],[tx+22,ty-40],[tx-8,ty+5],[tx+26,ty+55],[tx+4,ty+110]],clamp(d/.3));ctx.restore();noShadow();
+  const r=rng(3);for(let i=0;i<22;i++){const a=r()*6.28,v=(60+r()*260)*clamp((d-.2)/1.2),R=(8+r()*16)*clamp((d-.2)*3);if(R<=0)continue;E(tx+Math.cos(a)*v,ty+Math.sin(a)*v*.7-v*.2,R,R);ctx.fillStyle='rgba(235,250,255,.8)';ctx.fill();ctx.strokeStyle='#5aa9e6';ctx.lineWidth=3;ctx.stroke()}
+  const v=ctx.createRadialGradient(W/2,820,380,W/2,820,1200);v.addColorStop(0,'rgba(0,0,0,0)');v.addColorStop(1,'rgba(0,0,0,.7)');ctx.fillStyle=v;ctx.fillRect(0,0,W,H)}
+function coldOpen(t){if(t<1.15){footage(t,{push:t*.12,red:t>.55?.2+.12*Math.sin(t*30):.08,shake:t>.55?10:0});return}
+  if(t<1.85){tunnel(t,'tear',1,t-1.15);return}
+  mouthShot(t,t-1.85);if(t>3.0)label('THROAT: TORN',W/2+170,1120,t,3.0,{bg:'#e63946',fg:'#fff',size:52,rot:.03});return;
+  bgMed(t,'#5c0f1e',.6);camBegin([10,0,1.45+t*.06],t);const p=clamp(t/1.0);anatomy(t,{swell:clamp((t-1.1)/1.6)*.8});pinch(t,1,1);
+  if(t<1.0){air(t,'blocked',1,p);pressureGlow(p,t)}else{tearFX(t,1.0);leak(t,1.0,1)}camEnd();vignette()}
+
+window.stage=function(s,t){
+  if(s>=4.85&&s<8.45&&footage(t,{push:(s-4.85)*.03})){tag('AGE 34',300,t,4.95,{x:W/2-220,bg:'#fff',rot:-.05});tag('LEICESTER, UK',380,t,5.25,{x:W/2+170,size:48,rot:.04});if(s>6.3)tag('A BIG ONE COMING...',1230,t,6.3,{bg:'#ffd60a',size:50});return}
+  if(s>=8.45&&s<10.7&&footage(t,{push:.11+(s-8.45)*.05,red:s>9.8?.25:0,shake:s>9.8?4:0})){tag('NOSE: PINCHED',320,t,8.6,{bg:'#e63946',fg:'#fff',x:W/2-150,rot:-.04});if(s>9.85)tag('MOUTH: SHUT',430,t,9.85,{bg:'#e63946',fg:'#fff',x:W/2+150,rot:.04});return}
+  // inside-the-airway shots
+  if(s>=13.3&&s<15.3){tunnel(t,'fly');tag('UP FROM YOUR LUNGS',300,t,13.35,{bg:'#4cc9f0'});return}
+  if(s>=19.75&&s<21.3){const p=clamp((s-19.75)/1.5);tunnel(t,'blocked',.3+.7*p);tag('NOWHERE TO GO',300,t,19.85,{bg:'#e63946',fg:'#fff'});return}
+  if(s>=23.29&&s<24.55){tunnel(t,'tear',1,s-23.29);if(s>23.35)text('POP!',W/2,420,190*pop(t,23.35,.25)+1,{fill:'#ffd60a',sw:26});return}
+  // 12. ending
+  if(s>=57.3){bgMed(t,'#5c0f1e');cooker(W/2,880,1.2,t,clamp((s-57.6)/1.4));if(s>57.9)tag('SOME OF YOU...',300,t,57.98);vignette();return}
+  // 11. sneeze into your elbow
+  if(s>=51.4){bgMed(t,'#1f6f5c');elbowShot(t,s);vignette();if(s>52.98)tag('LET IT OUT',300,t,53.0,{bg:'#fff',rot:-.04});if(s>54.2){tag('INTO YOUR ELBOW',410,t,54.2,{rot:.03});check(W-150,560,1.3,pop(t,54.2))}return}
+  const c=camAt(s);let hue=hueAt(s),alarm=s>=8.45&&s<12.1?(s>10.7?.7*fin(s,10.7,.4):0):s>=17.95&&s<23.25?clamp((s-19.8)/3.4):0;
+  if(s>23.29&&s<25){c[2]*=1+.14*Math.exp(-(s-23.29)*5)}
+  {const SC=window.SCENES;let st=SC[0];for(const x of SC)if(s>=x)st=x;c[2]*=1+.06*clamp((s-st)/5);
+   const KW=(window.KEYWORDS||[]).map(k=>k.toLowerCase().replace(/[^a-z0-9-]/g,''));let kick=0;for(const w of (typeof WORDS!=='undefined'?WORDS:[])){const d=s-w.s;if(d>=0&&d<.5&&KW.includes(w.w.toLowerCase().replace(/[^a-z0-9-]/g,'')))kick=Math.max(kick,.045*Math.exp(-d*9))}c[2]*=1+kick}
+  const SC=window.SCENES;let si=0;for(let i=0;i<SC.length;i++)if(s>=SC[i])si=i;const prevHue=hueAt(SC[si]-.01);hue=hexMix(prevHue,hue,fin(s,SC[si],.5));
+  bgMed(t,hue,alarm);if(s>=23.25&&s<23.6){ctx.fillStyle=`rgba(255,240,200,${1-(s-23.29)/.3})`;ctx.fillRect(0,0,W,H)}
+  const swell=s<23.3?0:s<25.7?.25:s<44.95?.25+.75*easeOut(clamp((s-25.7)/1.6)):.6;const scan=s>=38.5&&s<44.95;
+  camBegin(c,t);const tl=tiltAt(s);if(tl){ctx.translate(0,300);ctx.rotate(tl);ctx.translate(0,-300)}anatomy(t,{swell,gray:scan?1:0,inhale:-tl/.09});
+  if(s<8.45){const k=clamp((s-6.2)/2.2);ctx.save();noShadow();const r=rng(5);for(let i=0;i<16;i++){const x=70+r()*170,y=-245+r()*80,rad=6+r()*8,tw=.5+.5*Math.sin(t*9+i*2);ctx.globalAlpha=k*tw;E(x,y,rad,rad);ctx.fillStyle='#ffe066';ctx.fill()}ctx.restore()}
+  else if(s<12.1){pinch(t,fin(s,8.55,.3),fin(s,9.8,.25))}
+  else if(s<17.95){air(t,'out',fin(s,13.3,.6))}
+  else if(s<23.25){pinch(t,1,1);const p=clamp((s-19.8)/3.4);air(t,'blocked',fin(s,18.4,.5),p);pressureGlow(p,t)}
+  else if(s<27.85){pinch(t,1,1);tearFX(t,23.29);leak(t,23.4,1)}
+  else if(s<32.2){leak(t,0,1);
+    if(s>29.6){ctx.save();noShadow();ctx.globalAlpha=.5+.3*Math.sin(t*5);E(...LARYNX,50,26);ctx.fillStyle='#4cc9f0';ctx.fill();ctx.restore()}
+    if(s>30.9){ctx.save();ctx.globalAlpha=.45+.35*Math.sin(t*8);tube([[-10,40],[-14,300],[-18,500]],56,'#ff1f3d');ctx.restore()}}
+  else if(s<38.5){leak(t,32.4,2);
+    if(s>33.0){const k=fin(s,33.0,.4),pr=Math.max(0,Math.sin(t*6))*10;ctx.save();ctx.translate(lerp(420,205,k)-pr,185);ctx.fillStyle='#caf0f8';ctx.strokeStyle='#1b4965';ctx.lineWidth=6;ctx.beginPath();ctx.roundRect(0,-34,220,68,34);ctx.fill();ctx.stroke();ctx.restore()}}
+  else if(s<44.95){if(s>41.36)tearFX(t,41.36);if(s>42.5)leak(t,42.5,2,{dark:true,n:70})}
+  else if(s<48.6){leak(t,0,2);
+    if(s>46.46){ctx.save();noShadow();ctx.strokeStyle='#ffd60a';ctx.lineWidth=12;ctx.lineCap='round';ctx.lineJoin='round';drawOn([[470,-190],[300,-178],[160,-205],[30,-222],[-14,-150],[-20,-40],[-12,100],[-14,300],[-18,600]],fin(s,46.46,.9));ctx.restore()}}
+  else {const k=clamp((s-49.2)/1.0);ctx.save();noShadow();ctx.strokeStyle=`rgba(255,80,90,${.4+.4*Math.sin(t*12)})`;ctx.lineWidth=18;ctx.lineCap='round';drawOn([[8,-212],[-50,-230],[-112,-246]],k);ctx.restore();
+    ctx.save();noShadow();const b=12*Math.sin(t*10)*k;E(EAR[0]-20,EAR[1]+10,30+b*.3,40+b*.3);ctx.fillStyle='#ffb3c1';ctx.fill();ctx.strokeStyle='#7d1d3f';ctx.lineWidth=5;ctx.stroke();
+    if(s>50.25){ctx.strokeStyle='#2b2118';ctx.lineWidth=5;drawOn([[EAR[0]-30,EAR[1]-20],[EAR[0]-14,EAR[1]],[EAR[0]-28,EAR[1]+14],[EAR[0]-12,EAR[1]+36]],fin(s,50.25,.3))}ctx.restore()}
+  camEnd();
+  if(scan){ctx.save();const u=((s-38.5)*.55)%1;ctx.fillStyle='rgba(76,201,240,.22)';ctx.fillRect(0,180+u*1150,W,16);ctx.globalAlpha=.08;ctx.fillStyle='#4cc9f0';for(let y=0;y<H;y+=6)ctx.fillRect(0,y,W,2);ctx.restore()}
+  vignette();
+  // ---- labels (screen space) ----
+  if(s<8.45){if(s>4.95)tag('AGE 34',300,t,4.95,{x:W/2-220,bg:'#fff',rot:-.05});if(s>5.25)tag('LEICESTER, UK',380,t,5.25,{x:W/2+170,size:48,rot:.04});if(s>6.3)callout('A SNEEZE BUILDING',[150,-215],W/2+150,1210,t,6.3,{bg:'#ffd60a'});return}
+  if(s<12.1){if(s>8.6)callout('NOSE: PINCHED',NOSEPT,W/2+120,320,t,8.6,{bg:'#e63946',fg:'#fff'});if(s>9.85)callout('MOUTH: SHUT',MOUTHPT,W/2+60,1230,t,9.85,{bg:'#e63946',fg:'#fff'});return}
+  if(s<17.95){tag('NORMAL SNEEZE',290,t,12.3,{bg:'#7ae582'});if(s>13.35)callout('LUNGS',[150,720],W/2+290,1250,t,13.4,{bg:'#4cc9f0'});if(s>16.85){callout('NOSE',NOSEPT,W-160,390,t,16.9,{bg:'#7ae582'});callout('MOUTH',MOUTHPT,W-160,520,t,17.2,{bg:'#7ae582'})}return}
+  if(s<23.25){tag('BOTH EXITS BLOCKED',290,t,18.3,{bg:'#e63946',fg:'#fff'});const [nx,ny]=S(...NOSEPT),[mx,my]=S(...MOUTHPT);blockX(nx+40,ny,pop(t,18.3));blockX(mx+40,my,pop(t,19.0));
+    if(s>19.9){const p=clamp((s-19.8)/3.4);ctx.save();ctx.beginPath();ctx.roundRect(W-150,520,60,520,30);P('#111',6);const h=500*p;if(h>2){ctx.beginPath();ctx.roundRect(W-140,1030-h,40,h,20);P(p>.6?'#ff1f3d':'#ffd60a',0)}ctx.restore();text('PRESSURE',W-120,1090,34,{fill:'#fff',sw:8})}
+    if(s>21.35)text('SOMEWHERE ELSE...',W/2,410,64,{fill:'#fff',sw:14,alpha:fin(s,21.35)});return}
+  if(s<27.85){if(s>23.3&&s<24.6)text('POP!',W/2,420,190*pop(t,23.29,.25)+1,{fill:'#ffd60a',sw:26});if(s>25.7)callout('NECK SWELLING',[150,250],W/2+140,330,t,25.75,{bg:'#ffd60a'});return}
+  if(s<32.2){tag('HOSPITAL',290,t,27.95,{bg:'#fff'});if(s>29.6)callout('VOICE: BARELY',LARYNX,W/2+250,470,t,29.65,{bg:'#4cc9f0'});if(s>30.9)callout('SWALLOWING HURTS',OESO,W/2+150,1240,t,30.95,{bg:'#e63946',fg:'#fff'});return}
+  if(s<38.5){if(s>34.4)tag('CRACKLING',290,t,34.45,{rot:-.04});if(s>35.35)tag('LIKE BUBBLE WRAP',390,t,35.4,{bg:'#fff',size:46,rot:.03});if(s>36.55)callout('DOWN TO HIS RIBS',[60,600],W/2+200,1250,t,37.3,{bg:'#e63946',fg:'#fff'});return}
+  if(s<44.95){tag('THE SCAN',290,t,38.6,{bg:'#4cc9f0'});if(s>41.4)callout('THROAT: TORN',TEAR,W/2+260,480,t,41.4,{bg:'#e63946',fg:'#fff'});if(s>42.8)tag('AIR IN NECK + CHEST',1260,t,42.8,{bg:'#fff',size:50});return}
+  if(s<48.6){counter(W/2,330,t,45.05,1.4,1,7,{size:150,fmt:v=>'DAY '+Math.round(v),col:'#fff'});if(s>46.5)tag('FED THROUGH A TUBE',1260,t,46.5,{size:52});return}
+  tag('EARDRUM',300,t,48.7,{bg:'#fff'});if(s>50.6)tag('CAN BURST TOO',1260,t,50.65,{bg:'#e63946',fg:'#fff'});
+};
+function content(t){}
+</script></body></html>

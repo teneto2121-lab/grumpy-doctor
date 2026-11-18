@@ -36,14 +36,14 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
 
   if (mode === 'stills') {
     for (const t of process.argv.slice(4).map(Number)) {
-      await p.evaluate(t => render(t), t);
+      await p.evaluate(async t => { if (window.prepare) await window.prepare(t); render(t); }, t);
       await p.screenshot({path: path.join(ep, `still_${t}.jpg`), type: 'jpeg', quality: 80});
     }
   } else {
     const dir = path.join(ep, 'frames');
     fs.rmSync(dir, {recursive: true, force: true}); fs.mkdirSync(dir);
     FPS = await p.evaluate(() => window.OUT_FPS || 30);  // set window.OUT_FPS=60 in scene.html for smoother motion
-    const N = Math.round(DUR * FPS);
+    const N = Math.round(Math.min(DUR, +process.env.UNTIL || DUR) * FPS);
     const pages = [p];
     for (let w = 1; w < WORKERS; w++) {
       const q = await b.newPage({viewport: {width: 1080, height: 1920}});
@@ -58,7 +58,7 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
     let done = 0;
     await Promise.all(pages.map(async (q, w) => {
       for (let i = w; i < N; i += pages.length) {
-        await q.evaluate(t => render(t), i / FPS);
+        await q.evaluate(async t => { if (window.prepare) await window.prepare(t); render(t); }, i / FPS);
         await q.screenshot({path: path.join(dir, `f${String(i).padStart(5, '0')}.jpg`), type: 'jpeg', quality: 95});
         if (++done % 300 === 0) console.log(`frame ${done}/${N}`);
       }
