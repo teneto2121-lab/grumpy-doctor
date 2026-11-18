@@ -15,4 +15,8 @@ experiments/3d-skull/render.log
 assets/anatomy/obj/
 assets/hdri/*.hdr
 experiments/3d-skull/pframes/
-assets/footage/
+assets/footage/px*
+assets/anatomy/dl/
+experiments/3d-lungs/frames*/
+experiments/3d-lungs/still_*.png
+experiments/3d-lungs/*.log

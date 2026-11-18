@@ -194,6 +194,16 @@ Credit line for all three: `Illustrations: Servier Medical Art (smart.servier.co
 - **D2** `loops/D2-ears-pop.mp4`. Caption: `That's the pop. ✈️ #ears #plane #bodyfacts #learnontiktok #science`. Pinned: `Yawning or swallowing helps open the tube. Which works for you?`
 - **D3** `loops/D3-lungs-cant-move.mp4`. Caption: `Your lungs are lazy. 😤 #lungs #breathing #bodyfacts #learnontiktok #science`. Pinned: `Did you know this?`
 
+### Ep 22: His spit started to boil  *(NEW 3D STYLE: Blender anatomy renders + footage)*
+**File:** `episodes/ep22-space-vacuum/ep22-space-vacuum.mp4`
+**Caption:**
+```
+In 1966 his suit lost its air. Then his spit started to boil. 🚀 #space #nasa #bodyfacts #truestory #doctorexplains
+
+Anatomy models: BodyParts3D, (c) DBCLS, CC BY-SA 2.1 JP. Footage: Pixabay.
+```
+**Pinned comment:** `Would you rather be stuck in space or deep underwater? 👀`
+
 ---
 
 ## Fact sources (for replying to "source?" comments)
@@ -220,3 +230,4 @@ Credit line for all three: `Illustrations: Servier Medical Art (smart.servier.co
 - **Fluid brain (ep 21):** Feuillet L, Dufour H, Pelletier J. "Brain of a white-collar worker." *The Lancet* 2007;370:262. A 44-year-old man presented with mild left leg weakness; he had a ventriculoatrial shunt at 6 months for postnatal hydrocephalus (revised at 14). CT/MRI showed massive enlargement of the lateral, third and fourth ventricles, with the brain compressed to a thin layer. He was married with two children and worked as a civil servant (IQ 75: verbal 84, performance 70). The authors suggest slow progression allowed the brain to adapt. (The brain was compressed, not literally missing; the video says this.) "10% of the brain" myth: see ep 10.
 
 - **Loops:** smoker's vs healthy lung is Servier's "Lung cancer: healthy lung / smoker's lung" illustration. Ear popping: the Eustachian (auditory) tube links the middle ear to the back of the throat (nasopharynx) and opens (e.g. when swallowing/yawning) to equalise pressure across the eardrum. Breathing: the lungs have no skeletal muscle and cannot expand themselves; inhalation happens when the diaphragm contracts and moves down and the external intercostal muscles lift the ribs, enlarging the chest cavity.
+- **Space without a suit (ep 22):** On 14 December 1966 a NASA test subject (Jim LeBlanc) was in a vacuum chamber in Houston when the pressurisation hose came off his suit; he stayed conscious for about 14 seconds, later recalling the saliva on his tongue beginning to bubble, and recovered after the chamber was repressurised with only ear pain (Guinness World Records, "Highest equivalent altitude exposure survived"; NASA CR-1223). General physiology: useful consciousness in vacuum is about 10-15 s; holding the breath risks lung over-expansion injury (barotrauma), so air is exhaled; at very low pressure body fluids can boil at body temperature (ebullism); the body does not explode and does not freeze instantly (Space.com; Live Science; Aerospace Medicine and Human Performance review, 2013).
