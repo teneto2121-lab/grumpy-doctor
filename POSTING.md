@@ -167,12 +167,15 @@ An iron rod went through his skull. Then he sat up. 🤯 #phineasgage #medicalhi
 ```
 **Pinned comment:** `What's the craziest medical story you know? I'll cover the best one.`
 
-### Ep 20: He held in a sneeze  *(FULL-SCREEN, medical-cutaway style with camera moves)*
+### Ep 20: He held in a sneeze  *(NEW MIXED-MEDIA STYLE: real footage + Servier medical illustrations + inside-the-throat shots)*
 **File:** `episodes/ep20-held-sneeze/ep20-held-sneeze.mp4`
 **Caption:**
 ```
 He held in a sneeze. It tore a hole in his throat. 😳 #sneeze #medicalcase #bodyfacts #truestory #doctorexplains
+
+Illustrations: Servier Medical Art (smart.servier.com), CC BY 4.0. Footage: Pixabay.
 ```
+*(Keep the credit line: the illustration licence requires it.)*
 **Pinned comment:** `Be honest: do you hold your sneezes in? 👀`
 
 ---
