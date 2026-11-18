@@ -23,7 +23,7 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
   const b = await chromium.launch();
   const p = await b.newPage({viewport: {width: 1080, height: 1920}});
   p.on('pageerror', e => { console.error('PAGE ERROR', e.message); process.exitCode = 1; });
-  await p.goto('file://' + path.join(ep, 'scene.html'));
+  await p.goto('file://' + path.join(ep, process.env.SCENE || 'scene.html'));
   await p.evaluate(() => document.fonts.ready);
   const pauses = rd(path.join(ep, 'pauses.json')) || [];
   await p.evaluate(ps => { window.PAUSES = ps; }, pauses);
@@ -43,12 +43,17 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
     const dir = path.join(ep, 'frames');
     fs.rmSync(dir, {recursive: true, force: true}); fs.mkdirSync(dir);
     FPS = await p.evaluate(() => window.OUT_FPS || 30);  // set window.OUT_FPS=60 in scene.html for smoother motion
-    const N = Math.round(Math.min(DUR, +process.env.UNTIL || DUR) * FPS);
+    // CUTS="a-b,c-d" renders only those time ranges (seconds), spliced back to back (for short test cuts)
+    const CUTS = (process.env.CUTS || '').split(',').filter(Boolean).map(r => r.split('-').map(Number));
+    const TIMES = [];
+    if (CUTS.length) { for (const [a, b] of CUTS) for (let tt = a; tt < b - 1e-6; tt += 1 / FPS) TIMES.push(tt); }
+    else { const n = Math.round(Math.min(DUR, +process.env.UNTIL || DUR) * FPS); for (let i = 0; i < n; i++) TIMES.push(i / FPS); }
+    const N = TIMES.length;
     const pages = [p];
     for (let w = 1; w < WORKERS; w++) {
       const q = await b.newPage({viewport: {width: 1080, height: 1920}});
       q.on('pageerror', e => { console.error('PAGE ERROR', e.message); process.exitCode = 1; });
-      await q.goto('file://' + path.join(ep, 'scene.html'));
+      await q.goto('file://' + path.join(ep, process.env.SCENE || 'scene.html'));
       await q.evaluate(() => document.fonts.ready);
       await q.evaluate(ps => { window.PAUSES = ps; }, pauses);
       await q.evaluate(a => setup(...a), args);
@@ -58,7 +63,7 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
     let done = 0;
     await Promise.all(pages.map(async (q, w) => {
       for (let i = w; i < N; i += pages.length) {
-        await q.evaluate(async t => { if (window.prepare) await window.prepare(t); render(t); }, i / FPS);
+        await q.evaluate(async t => { if (window.prepare) await window.prepare(t); render(t); }, TIMES[i]);
         await q.screenshot({path: path.join(dir, `f${String(i).padStart(5, '0')}.jpg`), type: 'jpeg', quality: 95});
         if (++done % 300 === 0) console.log(`frame ${done}/${N}`);
       }
@@ -71,7 +76,12 @@ const outro = rd(path.join(__dirname, '..', 'engine', 'voice', 'next_patient.jso
       execFileSync('python3', [path.join(__dirname, 'mix.py'), ep], {stdio: 'inherit'});
       audio = path.join(ep, 'mix.wav');
     }
-    const out = path.join(ep, path.basename(ep) + '.mp4');
+    const out = path.join(ep, path.basename(ep) + (CUTS.length ? '-short' : '') + '.mp4');
+    if (CUTS.length) {  // splice the audio to the same ranges
+      const cut = path.join(ep, 'cut-audio.wav'), f = CUTS.map(([a, b], k) => `[0:a]atrim=${a}:${b},asetpts=PTS-STARTPTS,afade=t=in:d=0.03,afade=t=out:st=${Math.max(0, b - a - 0.04)}:d=0.04[a${k}]`).join(';');
+      execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-i', audio, '-filter_complex', f + ';' + CUTS.map((_, k) => `[a${k}]`).join('') + `concat=n=${CUTS.length}:v=0:a=1[o]`, '-map', '[o]', cut]);
+      audio = cut;
+    }
     execFileSync('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', String(FPS), '-i', path.join(dir, 'f%05d.jpg'),
       '-i', audio, '-c:v', 'libx264', '-preset', 'slow', '-crf', '17', '-profile:v', 'high', '-level', '4.2', '-pix_fmt', 'yuv420p',
       '-maxrate', '14M', '-bufsize', '28M', '-c:a', 'aac', '-b:a', '192k', '-af', 'apad', '-shortest', '-movflags', '+faststart', out]);
