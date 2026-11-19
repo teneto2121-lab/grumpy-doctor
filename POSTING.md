@@ -200,7 +200,7 @@ Credit line for all three: `Illustrations: Servier Medical Art (smart.servier.co
 ```
 In 1966 his suit lost its air. Then his spit started to boil. 🚀 #space #nasa #bodyfacts #truestory #doctorexplains
 
-Anatomy models: BodyParts3D, (c) DBCLS, CC BY-SA 2.1 JP. Footage: Pixabay.
+Anatomy models: BodyParts3D, (c) DBCLS, CC BY-SA 2.1 JP. Footage: Pixabay. Chamber scenes are an AI-generated dramatisation.
 ```
 **Pinned comment:** `Would you rather be stuck in space or deep underwater? 👀`
 

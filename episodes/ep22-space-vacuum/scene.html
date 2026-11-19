@@ -34,11 +34,11 @@ window.SFX=[[0,'whoosh',.8],[1.5,'pop',.4],[2.3,'pop',.4],[3.0,'pop',.5],[3.8,'d
 const MOOD=[[0,.4],[6.2,.55],[6.9,.4],[12.5,.6],[15.4,.5],[19.9,.95],[21.6,.6],[25,.55],[30.3,.5],[34,.45],[38.3,.4],[43.4,.6],[47,.55],[51.2,.95]];
 const POSES=[[0,'rest'],[6.2,'hips'],[6.9,'point'],[12.5,'up'],[15.4,'point'],[19.9,'up'],[21.6,'point'],[25,'point'],[30.3,'chin'],[34,'point'],[37.3,'facepalm'],[38.3,'point'],[43.4,'cross'],[47,'shrug'],[51.2,'up']];
 
-const FOOT={tongue:'3d-tongue',lungs:'3d-breathe',hold:'3d-hold',exhale:'3d-exhale',astro:'px218784',earth:'px308799',iss:'px189455',cola:'px331066',red:'px4865'},VID={};
+const FOOT={chamber:'ai-vacuum-chamber',tongue:'3d-tongue',lungs:'3d-breathe',hold:'3d-hold',exhale:'3d-exhale',astro:'px218784',earth:'px308799',iss:'px189455',cola:'px331066',red:'px4865'},VID={};
 for(const k in FOOT){const v=document.createElement('video');v.src='../../assets/footage/'+FOOT[k]+'.webm';v.muted=true;v.preload='auto';VID[k]=v}
 const IMG={};
-const SHOTS=[[0,6.2,'tongue',0,.75],[6.94,12.51,'astro',4,1],[12.51,15.45,'red',1,1],[15.45,19.9,'lungs',1.0,1],[21.64,25.02,'hold',0.6,1.1],[25.02,27.5,'exhale',0,1],
-  [27.5,30.34,'earth',2,1],[30.34,34.08,'tongue',3.2,.75],[34.08,38.35,'astro',14,1],[38.35,43.44,'iss',1,1],[43.44,47.04,'earth',8,1],[47.04,51.2,'cola',2,1]];
+const SHOTS=[[0,6.2,'tongue',0,.75],[6.94,12.51,'chamber',0,.43],[12.51,15.45,'chamber',2.4,.9],[15.45,19.9,'lungs',1.0,1],[21.64,25.02,'hold',0.6,1.1],[25.02,27.5,'exhale',0,1],
+  [27.5,30.34,'earth',2,1],[30.34,34.08,'tongue',3.2,.75],[34.08,38.35,'chamber',3.0,.48],[38.35,43.44,'iss',1,1],[43.44,47.04,'earth',8,1],[47.04,51.2,'cola',2,1]];
 function shotAt(t){for(const [a,b,k,st,sp] of SHOTS)if(t>=a&&t<b)return[k,Math.min(st+(t-a)*sp,(VID[k].duration||99)-.05)];return null}
 window.prepare=async t=>{const sh=shotAt(t);if(!sh)return;const v=VID[sh[0]];
   if(v.readyState<2)await new Promise(r=>v.addEventListener('loadeddata',r,{once:true}));
@@ -51,7 +51,7 @@ function coldOpen(t){footage(t,{push:t*.03});vig(.55)}
 
 window.stage=function(s,t){
   if(s<12.51&&footage(t,{push:(s-6.9)*.02})){tag('1966',300,t,7.0,{x:W/2-220,bg:'#fff',rot:-.05});tag('HOUSTON',380,t,7.3,{x:W/2+190,size:52,rot:.04});if(s>9.5)tag('A VACUUM CHAMBER',1230,t,9.5,{size:52});return}
-  if(s<15.45&&footage(t,{push:(s-12.51)*.05,red:.35+.2*Math.sin(t*12),shake:s>13.95?8:0})){if(s>13.95){text('HISS!',W/2,700,170*pop(t,13.95,.25)+1,{fill:'#fff',sw:24});tag('HOSE: OFF',300,t,13.95,{bg:'#e63946',fg:'#fff'})}return}
+  if(s<15.45&&footage(t,{push:(s-12.51)*.05,red:s>13.95?.18+.12*Math.sin(t*12):0,shake:s>13.95?8:0})){if(s>13.95){text('HISS!',W/2,700,170*pop(t,13.95,.25)+1,{fill:'#fff',sw:24});tag('HOSE: OFF',300,t,13.95,{bg:'#e63946',fg:'#fff'})}return}
   if(s<21.64&&footage(t,{push:(s-15.45)*.03})){tag('THE AIR IN YOUR LUNGS',300,t,15.9,{bg:'#4cc9f0',size:48});if(s>18.33)tag('WANTS OUT. FAST.',1230,t,18.35,{size:56});return}
   if(s<25.02&&footage(t,{push:(s-21.64)*.04,red:clamp((s-22.5)/2.5)*.3,shake:s>23.5?6:0})){tag('HOLD IT IN...',300,t,21.7,{bg:'#fff'});if(s>22.15)tag('IT SWELLS',400,t,22.15,{bg:'#ffd60a',size:50});
     if(s>23.78){crackLines(W/2+60,900,fin(s,23.78,.35),1.3);tag('AND CAN TEAR YOUR LUNGS',1230,t,23.8,{bg:'#e63946',fg:'#fff',size:48})}return}
