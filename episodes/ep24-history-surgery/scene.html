@@ -1,0 +1,113 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/stick.js"></script>
+<script>
+// ===== Ep24: The brutal history of surgery (flat stick-people style, title on top, 16:9 panel) =====
+window.FULLSCREEN=true;window.NO_DOC=true;window.OUT_FPS=60;window.CAP_Y=1420;window.INTRO_END=0.001;window.ENDING='cut';window.FOLLOW=false;
+const MOOD=[[0,.5]],POSES=[[0,'rest']];function content(t){}
+window.KEYWORDS=['1840.','anaesthetic.','fast','seven','skulls.','survived.','barber.','bloodletting.','timed.','thirty','painkiller.','ether.','humbug."','no.','dirty','half','germs','seven.','gloves?','married','awake'];
+const CUTS=[7.04,7.87,14.36,19.35,27.83,34.99,39.56,42.89,48.25,54.71];
+window.SFX=[[0,'whoosh',.6],[1.98,'stamp',.6],[3.2,'crack',.5],[5.9,'ding',.5],[7.04,'whoosh',1],[7.4,'tick',.4],[7.6,'tick',.4],[7.87,'whoosh',.7],[9.7,'tick',.5],[10.0,'tick',.5],[10.3,'tick',.5],[12.37,'tada',.4],[13.6,'sparkle',.5],
+ [14.36,'whoosh',.7],[17.21,'blip',.5],[17.93,'blip',.5],[18.55,'pop',.5],[19.35,'whoosh',.7],[21.14,'stamp',.6],[24.8,'tick',.5],[25.0,'tick',.5],[25.2,'tick',.5],[25.35,'ding',.6],[27.0,'stamp',.6],
+ [27.83,'whoosh',.7],[30.9,'steam',.4],[31.5,'pop',.4],[33.0,'tada',.4],[34.99,'whoosh',.7],[35.79,'stamp',.9],[39.0,'fall',.4],[39.56,'whoosh',.7],[40.5,'fall',.4],[42.3,'crack',.5],
+ [42.89,'whoosh',.7],[44.3,'steam',.7],[45.8,'pop',.4],[46.2,'pop',.4],[46.6,'pop',.4],[47.33,'ding',.6],[48.25,'whoosh',.7],[50.5,'blip',.4],[52.4,'pop',.5],[53.9,'sparkle',.7],[54.71,'whoosh',.7],[58.56,'stamp',.6]];
+const ERA=[[0,'LONDON, 1840'],[7.6,'5000 BC'],[14.36,'MIDDLE AGES'],[19.35,'LONDON, 1840s'],[27.83,'BOSTON, 1846'],[34.99,'1860s'],[48.25,'BALTIMORE, 1890'],[54.71,'LONDON, 1840']];
+function eraBadge(s){let e=ERA[0][1];for(const [a,b] of ERA)if(s>=a)e=b;if(s>=7.04&&s<7.87){const y=Math.round(lerp(1840,-5000,easeIn3(clamp((s-7.04)/.8))));e=y<0?`${-y} BC`:`${y}`}
+  ctx.font=`900 30px ${FONT}`;const w=ctx.measureText(e).width+50;srect(22,22,w,60,'#fff',14,4);text(e,22+w/2,54,30,{fill:SOL,sw:0,shadow:false})}
+function cutKick(s){let l=0;for(const c of CUTS)if(s>=c)l=c;return .05*Math.exp(-(s-l)*8)}
+// ---------- props for this episode ----------
+function theatre(){wallP('#cdb48a');// tiered wooden gallery with spectators
+  for(let r=0;r<3;r++){const y=120+r*95;srect(-20,y,PW+40,18,C.woodD,4,4);for(let x=40+(r%2)*45;x<PW;x+=95){const c=['#4a5a7a','#6b4a3a','#3a5a4a','#5a4a6a','#7a6a4a'][(x/95+r)%5|0];
+      spoly([[x-22,y-4],[x+22,y-4],[x+18,y-40],[x-18,y-40]],c,3);scirc(x,y-58,18,'#fff',3);ctx.fillStyle=SOL;ctx.beginPath();ctx.arc(x-6,y-60,2.5,0,7);ctx.arc(x+6,y-60,2.5,0,7);ctx.fill();
+      if(r===0&&(x/95|0)%3===0)srect(x-16,y-86,32,14,'#222',3,2)}}
+  floorP(470,'#9a7650','#8a6a46')}
+function opTable(x,y){srect(x,y,380,26,C.wood,6);srect(x+20,y+24,18,PH-y-90,C.woodD,3);srect(x+340,y+24,18,PH-y-90,C.woodD,3);srect(x+30,y+60,30,38,'#8a8f96',4,3)}
+function saw(x,y,a=0){ctx.save();ctx.translate(x,y);ctx.rotate(a);srect(-8,-16,30,32,C.woodD,6,3);spoly([[22,-8],[120,-4],[120,10],[22,14]],'#cfd5dc',3);for(let i=26;i<118;i+=8)sline([[i,12],[i+4,18],[i+8,12]],2);ctx.restore()}
+function stopwatch(x,y,r,sec,k=1){if(k<=0)return;ctx.save();ctx.translate(x,y);ctx.scale(k,k);srect(-8,-r-18,16,14,'#aaa',3,3);scirc(0,0,r,'#fff',5);const a=sec/60*Math.PI*2;sline([[0,0],[Math.sin(a)*r*.75,-Math.cos(a)*r*.75]],4,C.red);text(`${sec.toFixed(0)}s`,0,r*.45,r*.38,{fill:SOL,sw:0,shadow:false});ctx.restore()}
+function cave(){ctx.fillStyle='#6f5a48';ctx.fillRect(0,0,PW,PH);ctx.fillStyle='#5d4a3b';[[120,90,140],[420,40,180],[800,110,160],[1000,30,120]].forEach(([x,y,r])=>{ctx.beginPath();ctx.ellipse(x,y,r,r*.6,0,0,7);ctx.fill()});
+  ctx.fillStyle='#a88b62';ctx.fillRect(0,470,PW,PH-470);sline([[0,470],[PW,470]],4)}
+function fire(x,y,t){srect(x-40,y-10,80,14,C.woodD,6,3);[[0,-60,30,'#ff7b2e'],[0,-42,20,'#ffd23f']].forEach(([dx,dy,r,c])=>{ctx.beginPath();const fl=Math.sin(t*14)*5;ctx.moveTo(x-r,y-6);ctx.quadraticCurveTo(x-r*.6,y+dy*.5,x+dx+fl,y+dy);ctx.quadraticCurveTo(x+r*.6,y+dy*.5,x+r,y-6);ctx.closePath();sfill(c,3)});glow(x,y-30,180,'255,160,60',.35)}
+function bowDrill(x,y,t,on){const m=on?Math.sin(t*28)*26:0;sline([[x,y-70],[x,y]],5);sline([[x-60+m,y-40],[x+60+m,y-40]],5,C.woodD);ctx.beginPath();ctx.moveTo(x-60+m,y-40);ctx.quadraticCurveTo(x+m,y-80,x+60+m,y-40);ctx.strokeStyle=SOL;ctx.lineWidth=3;ctx.stroke()}
+function skullP(x,y,r,hole=1,heal=0){ctx.save();ctx.translate(x,y);ctx.beginPath();ctx.arc(0,0,r,Math.PI*.9,Math.PI*2.1);ctx.lineTo(r*.6,r*.9);ctx.lineTo(-r*.6,r*.9);ctx.closePath();sfill('#f3ead6',5);
+  sell(-r*.38,r*.15,r*.2,r*.24,SOL,0);sell(r*.38,r*.15,r*.2,r*.24,SOL,0);spoly([[0,r*.4],[-r*.1,r*.6],[r*.1,r*.6]],SOL,0);for(let i=-2;i<=2;i++)sline([[i*r*.16,r*.75],[i*r*.16,r*.92]],3);
+  if(hole){scirc(-r*.15,-r*.6,r*.2*(1-heal*.75),'#3b2a1e',4);if(heal>.5)ctx.save(),ctx.globalAlpha=(heal-.5)*2,ctx.beginPath(),ctx.arc(-r*.15,-r*.6,r*.2,0,7),ctx.strokeStyle='#7ae582',ctx.lineWidth=5,ctx.stroke(),ctx.restore()}ctx.restore()}
+function barberShop(){wallP('#d8c39a','#d1bb90');ctx.fillStyle='#8a6440';for(let x=0;x<PW;x+=270)ctx.fillRect(x,0,26,470);ctx.fillRect(0,0,PW,24);floorP(470,'#7d6a52','#6d5c47');
+  srect(860,170,44,220,'#fff',20,4);ctx.save();ctx.beginPath();ctx.roundRect(860,170,44,220,20);ctx.clip();ctx.fillStyle=C.red;for(let i=-4;i<12;i++){const yy=170+i*40+(ST*60)%40;ctx.beginPath();ctx.moveTo(860,yy);ctx.lineTo(904,yy-30);ctx.lineTo(904,yy-12);ctx.lineTo(860,yy+18);ctx.fill()}ctx.restore();scirc(882,160,16,C.yellow,4)}
+function barberChair(x,y){srect(x-70,y-14,140,22,'#7a2e2e',8,4);srect(x-74,y-140,24,140,'#7a2e2e',8,4);srect(x-16,y+8,32,PH-y-80,'#555',4,3)}
+function scissors(x,y,o){ctx.save();ctx.translate(x,y);sline([[0,0],[44,-6-o*8]],5,'#9aa');sline([[0,0],[44,6+o*8]],5,'#9aa');scirc(-10,-8,8,null,4);scirc(-10,8,8,null,4);ctx.restore()}
+function razor(x,y){srect(x-4,y-6,44,12,'#ddd',3,3);srect(x-40,y-5,38,10,C.woodD,3,3)}
+function bowl(x,y,fill){ctx.beginPath();ctx.arc(x,y-18,36,0,Math.PI);ctx.closePath();sfill('#d9d0c0',4);if(fill>0){ctx.save();ctx.beginPath();ctx.arc(x,y-18,30,0,Math.PI);ctx.clip();ctx.fillStyle=C.blood;ctx.fillRect(x-40,y-18+30*(1-fill),80,40);ctx.restore()}}
+function etherGlobe(x,y){scirc(x,y,30,'rgba(220,240,255,.85)',4);sline([[x+26,y-12],[x+70,y-30]],6);ctx.save();ctx.globalAlpha=.6;scirc(x-8,y+6,12,'#c9f0ff',0);ctx.restore()}
+function germ(x,y,r,t,dead=0){if(dead>=1)return;ctx.save();ctx.translate(x,y);ctx.scale(1-dead,1-dead);for(let i=0;i<8;i++){const a=i/8*Math.PI*2+t;sline([[Math.cos(a)*r,Math.sin(a)*r],[Math.cos(a)*(r+9),Math.sin(a)*(r+9)]],3,'#2f6e2a')}
+  scirc(0,0,r,'#7bc96f',3);ctx.fillStyle=SOL;ctx.beginPath();ctx.arc(-r*.3,-r*.1,2.5,0,7);ctx.arc(r*.3,-r*.1,2.5,0,7);ctx.fill();sline([[-r*.3,r*.3],[r*.3,r*.3]],2.5);ctx.restore()}
+function sprayer(x,y,t,on){sline([[x-40,y],[x-20,y-110]],5);sline([[x+40,y],[x+20,y-110]],5);sline([[x,y],[x,y-110]],5);srect(x-44,y-190,88,80,'#c98a3a',20,4);sline([[x+40,y-160],[x+120,y-175]],8,'#8a5a2a');
+  if(on)for(let i=0;i<14;i++){const u=((t*1.6+i/14)%1);ctx.save();ctx.globalAlpha=.55*(1-u);scirc(x+125+u*260,y-178+Math.sin(i*7)*u*70,10+u*30,'#e8f6ff',0);ctx.restore()}}
+function bedRow(y,n,dead,t,sp=140,sc=1.4,x0=120){for(let i=0;i<n;i++){const x=x0+i*sp;ctx.save();ctx.translate(x,y);ctx.scale(sc,sc);srect(-34,-20,76,22,'#f5f1ea',6,3);srect(-38,0,84,10,C.wood,3,3);srect(-34,8,8,30,C.woodD,2,2);srect(34,8,8,30,C.woodD,2,2);const d=i<dead;
+  ctx.save();ctx.translate(-18,-32);scirc(0,0,16,d?'#cfd2d6':'#fff',3);if(d){sline([[-6,-4],[-2,0]],2);sline([[-2,-4],[-6,0]],2);sline([[2,-4],[6,0]],2);sline([[6,-4],[2,0]],2)}else{ctx.fillStyle=SOL;ctx.beginPath();ctx.arc(-4,-2,2,0,7);ctx.arc(4,-2,2,0,7);ctx.fill()}ctx.restore();
+  srect(-6,-36,46,18,d?'#9aa0a8':'#7aa0d8',6,3);ctx.restore()}}
+function hospWard(){wallP('#d8d2c2','#d2ccbb');[160,540,920].forEach(x=>windowP(x-60,60,120,150,0));floorP(470,'#a29882','#948a75')}
+function heart(x,y,k){if(k<=0)return;ctx.save();ctx.translate(x,y);ctx.scale(k,k);ctx.beginPath();ctx.moveTo(0,18);ctx.bezierCurveTo(-40,-8,-22,-38,0,-18);ctx.bezierCurveTo(22,-38,40,-8,0,18);sfill(C.red,4);ctx.restore()}
+// characters
+const YOU={top:'#f1ece0',bottom:'#5a4a3c',hair:'#4a3020'};
+const SURG={top:'#2b2b30',bottom:'#2b2b30',coat:1,hair:'#2a2a2a',sleeves:'long'};
+function surgeonScene(s,o={}){theatre();opTable(330,440);
+  const pat=person({x:470,y:420,sit:1,s:1.15,f:1,rot:-Math.PI/2,...YOU,aR:[.2,.1],aL:[.3,.1],lL:[0,0],lR:[0,0],eyes:o.patEyes||'wide',mouth:o.patMouth||'scream',look:[1,-1],sweat:o.sweat});
+  const raise=o.raise||0;
+  const doc=person({x:800,y:540,f:-1,s:1.25,...SURG,blood:o.blood??.8,aR:[lerp(.6,2.6,raise),lerp(1.1,-.3,raise)],aL:[.7,1.0],eyes:'half',brow:-.6,mouth:'flat',hat:o.hat,beard:o.beard});
+  saw(doc.hR[0],doc.hR[1],lerp(-2.5,-1.2,raise));return{pat,doc}}
+
+window.stage=function(s,t){ST=t;backdrop();titleTop('The brutal history','of surgery 😨');
+  const k=cutKick(s);
+  if(s<7.04){panel(()=>{const r=s<4.19?0:easeInOut(clamp((s-4.4)/.6));surgeonScene(s,{raise:r*.6+.2*Math.sin(s*3)*(s>4.4?1:0),sweat:s>2.2});
+      if(s>4.6){const sp=person({x:120,y:230,f:1,s:.7,top:'#6b4a3a',bottom:'#3a3a3a',hat:'top',aR:[1.6,.4],eyes:'open',mouth:'smile'});stopwatch(sp.hR[0]+26,sp.hR[1]-10,30,(s-4.6)*3,pop(s,4.6,.25))}},[600,360,1.32+.05*s/7+k]);
+    numCard('1840',PY+120,s,.3,'#fff',100);if(s>3.2)numCard('NO ANAESTHETIC',PY+PH-80,s,3.2,C.red,84)}
+  else if(s<7.87){panel(()=>{surgeonScene(s,{raise:.3});ctx.fillStyle='rgba(20,20,30,.35)';ctx.fillRect(0,0,PW,PH);for(let i=0;i<9;i++){const y=(i*80+s*900)%PH;ctx.fillStyle='rgba(255,255,255,.25)';ctx.fillRect(0,y,PW,6)}},[540,304,1]);
+    text('◀◀ REWIND',W/2,PY+PH/2,90,{fill:'#fff',sw:16})}
+  else if(s<14.36){panel(()=>{cave();fire(880,470,t);const drill=s>9.6&&s<11.6;
+      const pat=person({x:470,y:470,f:1,s:1.15,top:'#8a6a46',bottom:'#8a6a46',robe:1,hat:null,eyes:drill?'closed':(s>12.37?'open':'wide'),mouth:drill?'scream':(s>12.37?'smile':'o'),sweat:drill,aL:[.3,.2],aR:[.3,.2]});
+      const doc=person({x:600,y:470,f:-1,s:1.2,top:'#a07a4a',bottom:'#a07a4a',robe:1,hat:'fur',beard:'#6a4a2a',aR:[2.3,.3],aL:[1.4,.6],eyes:'open',brow:-.3,mouth:'flat'});
+      bowDrill(pat.head[0]-4,pat.head[1]-36,t,drill);
+      if(s>12.37){skullP(250,250,80,1,clamp((s-13.2)/.8))}},[540,330,1.25+k]);
+    numCard('7,000 YEARS AGO',PY+110,s,7.9,'#fff',88);if(s>12.37)numCard('MANY SURVIVED',PY+PH-80,s,12.37,'#7ae582',86)}
+  else if(s<19.35){panel(()=>{barberShop();barberChair(480,420);
+      const cust=person({x:480,y:408,sit:1,f:1,s:1.15,top:'#3d6fb6',bottom:'#5a4a3c',hair:s<17.21?'#4a3020':'#4a3020',beard:s<17.93?'#4a3020':null,lL:[1.5,1.5],lR:[1.45,1.45],aL:[1.2,.4],aR:s>18.55?[1.5,.1]:[1.2,.4],eyes:s>18.55?'wide':'open',mouth:s>18.55?'o':'smile'});
+      const bar=person({x:640,y:540,f:-1,s:1.2,top:'#f1ece0',bottom:'#3a3a3a',apron:'#e9e2d0',hair:'#6a4a2a',aR:[1.9,.7],aL:[.8,.9],eyes:'open',mouth:'grin'});
+      if(s<17.93)scissors(bar.hR[0]-10,bar.hR[1],Math.abs(Math.sin(t*16)));else if(s<18.55)razor(bar.hR[0]-20,bar.hR[1]);else{bowl(cust.hR[0]+10,cust.hR[1]+34,clamp((s-18.7)/.6));}
+      },[560,300,1.12+k]);
+    numCard('YOUR BARBER = YOUR SURGEON',PY+110,s,14.6,'#fff',62);
+    if(s>17.21)numCard(s<17.93?'HAIRCUT':s<18.55?'SHAVE':'BLOODLETTING',PY+PH-80,s,s<17.93?17.21:s<18.55?17.93:18.55,s>18.55?C.red:C.yellow,84)}
+  else if(s<27.83){const timing=s>=24.69;const sec=timing?Math.min(28,(s-24.69)*40):0;
+    panel(()=>{const r=timing?.5+.5*Math.sin(t*30):(s>21.14?.3:0);surgeonScene(s,{raise:r,blood:.6,patEyes:s>25.94?'closed':'wide',patMouth:s>25.94?'wavy':'scream'});
+      if(s>21.14)stopwatch(870,215,52,timing?sec:0,pop(s,21.14,.3))},[600,360,1.32+k],timing?4:0);
+    if(s>21.63&&s<24.69)numCard('ROBERT LISTON',PY+110,s,21.63,'#fff',86);if(timing)numCard('UNDER 30 SECONDS',PY+110,s,24.82,C.yellow,80);
+    if(s>25.94)numCard('SPEED = PAINKILLER',PY+PH-80,s,25.94,'#fff',72)}
+  else if(s<34.99){panel(()=>{theatre();opTable(330,440);const asleep=s>31.4;
+      const pat=person({x:470,y:420,sit:1,s:1.15,f:1,rot:-Math.PI/2,...YOU,aR:[.2,.1],aL:[.3,.1],lL:[0,0],lR:[0,0],eyes:asleep?'closed':'wide',mouth:asleep?'smile':'o'});
+      const dent=person({x:330,y:540,f:1,s:1.2,top:'#4a3a5a',bottom:'#2b2b30',coat:1,hair:'#3a2a1a',beard:'#3a2a1a',aR:[1.8,.6],aL:[.5,.5],eyes:'open',mouth:'smile'});
+      etherGlobe(dent.hR[0]+30,dent.hR[1]-10);if(asleep)zzz(pat.head[0]+20,pat.head[1]-40,t);
+      const war=person({x:830,y:540,f:-1,s:1.25,top:'#2b2b30',bottom:'#2b2b30',coat:1,hair:'#ddd',aR:s>32.7?[2.5,-.2]:[.4,.6],aL:[.5,.6],eyes:'open',mouth:s>32.7?'grin':'flat'});
+      if(s>32.7)bubbleP(700,215,400,80,'"This is no humbug."',pop(s,32.8,.25),34)},[580,360,1.25+k]);
+    numCard('ETHER',PY+PH-80,s,31.51,'#9ad1ff',96)}
+  else if(s<39.56){panel(()=>{theatre();opTable(330,440);
+      const doc=person({x:560,y:540,f:0,s:1.35,...SURG,blood:1,aL:[2.6,-.4],aR:[2.6,-.4],eyes:'open',mouth:'grin'});
+      if(s>37.0){[[doc.hL[0],doc.hL[1]],[doc.hR[0],doc.hR[1]]].forEach(([x,y],i)=>{for(let j=0;j<3;j++)germ(x+(j-1)*26,y-16-j*10+Math.sin(t*6+j)*4,11,t+j)})}},[560,360,1.3+k]);
+    if(s>35.79)numCard('NO.',PY+120,s,35.79,C.red,130);if(s>38.0)numCard('BLOODY COATS, DIRTY HANDS',PY+PH-80,s,38.0,'#fff',58)}
+  else if(s<42.89){panel(()=>{hospWard();const dead=Math.round(clamp((s-40.2)/1.8)*3);bedRow(440,7,dead,t)},[540,320,1.1+k]);
+    numCard('NEARLY 1 IN 2 DIED',PY+110,s,39.97,C.red,80);if(s>40.35)numCard('JOSEPH LISTER',PY+PH-80,s,40.35,'#fff',70)}
+  else if(s<48.25){panel(()=>{hospWard();const on=s>43.47;sprayer(220,470,t,on);
+      const lis=person({x:370,y:540,f:1,s:1.2,top:'#2b2b30',bottom:'#2b2b30',coat:1,hair:'#6a4a2a',beard:'#6a4a2a',aR:[1.5,.4],eyes:'open',brow:-.4,mouth:'flat'});
+      if(s<45.42){for(let i=0;i<8;i++){const gx=560+(i%4)*110,gy=200+Math.floor(i/4)*130;germ(gx+Math.sin(t*3+i)*10,gy,18,t+i,on?clamp((s-43.8-i*.12)/.3):0)}}
+      else{const dead=Math.round(lerp(3,1,clamp((s-45.7)/1.2)));bedRow(440,4,dead,t,130,1.25,560);ctx.save();ctx.translate(0,0);bedRow(250,3,0,t,130,1.25,625);ctx.restore()}},[540,320,1.1+k]);
+    numCard('CARBOLIC ACID',PY+110,s,44.34,'#fff',84);if(s>46.84)numCard('1 IN 7',PY+PH-80,s,46.84,'#7ae582',110)}
+  else if(s<54.71){panel(()=>{hospWard();
+      const nurse=person({x:420,y:540,f:1,s:1.2,top:'#f4f4f4',bottom:'#f4f4f4',robe:1,hat:'nurse',hair:'#6a3a20',aL:[1.3,1.2],aR:s<52.4?[1.3,1.1]:[1.6,.5],gloves:s<52.4?'#e8746a':'#f2b13a',eyes:s>53.6?'closed':'open',mouth:s<51.6?'frown':'smile',brow:s<51.6?.8:0});
+      const hal=person({x:690,y:540,f:-1,s:1.25,top:'#2b2b30',bottom:'#2b2b30',coat:1,hair:'#2a2a2a',aR:s<52.4?[1.5,.4]:[1.6,.5],eyes:'open',mouth:'smile'});
+      if(s>49.2&&s<52.4){srect(hal.hR[0]-16,hal.hR[1]-14,32,26,'#f2b13a',8,3)}
+      if(s>53.9){heart(555,190,pop(s,53.9,.35)*1.3);heart(470,240,pop(s,54.1,.3)*.7);heart(650,250,pop(s,54.2,.3)*.8)}},[555,320,1.12+k]);
+    numCard('RUBBER GLOVES',PY+110,s,48.3,C.yellow,90);if(s>50.04&&s<53.9)numCard('1890',PY+PH-80,s,50.04,'#fff',100);if(s>53.9)numCard('THEN SHE MARRIED HIM',PY+PH-80,s,53.9,'#ff8fa3',66)}
+  else{panel(()=>{const r=easeInOut(clamp((s-57.4)/1.2));surgeonScene(s,{raise:r,sweat:1});},[600,360,1.3+.15*clamp((s-54.71)/4.5)+k],s>58.4?3:0);
+    numCard('1840',PY+120,s,57.43,'#fff',100);if(s>58.56)numCard('AWAKE.',PY+PH-80,s,58.56,C.red,120)}
+  panel(()=>eraBadge(s));wipe(s,CUTS)};
+</script></body></html>

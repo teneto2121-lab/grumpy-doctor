@@ -206,6 +206,28 @@ Anatomy models: BodyParts3D, (c) DBCLS, CC BY-SA 2.1 JP. Footage: Pixabay. Chamb
 
 ---
 
+### Ep 23: If you stayed awake for 11 days  *(FLAT STICK-PEOPLE STYLE: "you" story, day counter, voice only)*
+**File:** `episodes/ep23-no-sleep/ep23-no-sleep-flat-music.mp4` (flat style, music built in). 3D version for reference: `ep23-no-sleep-3d-music.mp4`
+**Caption:**
+```
+A 17-year-old actually did this in 1964 😳 How long have YOU stayed awake? #sleep #bodyfacts #truestory #doctorexplains #insomnia
+
+The people shown are illustrations, not the real teenager.
+```
+**Pinned comment:** `What's the longest you've ever stayed awake? Be honest 👀`
+
+---
+
+### Ep 24: The brutal history of surgery  *(NEW FLAT STICK-PEOPLE STYLE: title on top, 16:9 story panel, voice only)*
+**File:** `episodes/ep24-history-surgery/ep24-history-surgery-music.mp4`
+**Caption:**
+```
+In 1840 you'd have been awake for this 😨 #history #surgery #medicalhistory #doctorexplains #bodyfacts
+```
+**Pinned comment:** `Which era would you LEAST want to have surgery in? 👀`
+
+---
+
 ## Fact sources (for replying to "source?" comments)
 - **Knuckles:** Kawchuk et al., *PLOS ONE* (2015): real-time MRI of joint cracking (bubble formation). Donald Unger, 2009 Ig Nobel Prize in Medicine: 60 years of cracking one hand only.
 - **Brain freeze:** brain tissue has no pain receptors; cold on the palate changes blood flow, and the trigeminal nerve refers the pain to the forehead (Serrador et al., 2012, FASEB meeting presentation).
@@ -231,3 +253,5 @@ Anatomy models: BodyParts3D, (c) DBCLS, CC BY-SA 2.1 JP. Footage: Pixabay. Chamb
 
 - **Loops:** smoker's vs healthy lung is Servier's "Lung cancer: healthy lung / smoker's lung" illustration. Ear popping: the Eustachian (auditory) tube links the middle ear to the back of the throat (nasopharynx) and opens (e.g. when swallowing/yawning) to equalise pressure across the eardrum. Breathing: the lungs have no skeletal muscle and cannot expand themselves; inhalation happens when the diaphragm contracts and moves down and the external intercostal muscles lift the ribs, enlarging the chest cavity.
 - **Space without a suit (ep 22):** On 14 December 1966 a NASA test subject (Jim LeBlanc) was in a vacuum chamber in Houston when the pressurisation hose came off his suit; he stayed conscious for about 14 seconds, later recalling the saliva on his tongue beginning to bubble, and recovered after the chamber was repressurised with only ear pain (Guinness World Records, "Highest equivalent altitude exposure survived"; NASA CR-1223). General physiology: useful consciousness in vacuum is about 10-15 s; holding the breath risks lung over-expansion injury (barotrauma), so air is exhaled; at very low pressure body fluids can boil at body temperature (ebullism); the body does not explode and does not freeze instantly (Space.com; Live Science; Aerospace Medicine and Human Performance review, 2013).
+- **11 days awake (ep 23):** Randy Gardner, 17, of San Diego stayed awake 264.4 hours (11 days 25 min) from 28 Dec 1963 to 8 Jan 1964, watched by Stanford sleep researcher William Dement and monitored by Navy physician Lt Cdr John J. Ross, who reported moodiness, concentration and short-term memory problems, paranoia and hallucinations. On day 11, asked to subtract 7 repeatedly from 100, he stopped at 65 and said he had forgotten what he was doing. He then slept 14 h 46 min. Guinness stopped accepting voluntary sleep-deprivation records for safety reasons (Gulevich, Dement & Johnson, *Arch Gen Psychiatry* 1966;15:29-35; Ross, *Arch Neurol* 1965; NPR, 28 Jan 2024; Wikipedia "Randy Gardner (record holder)"). After 17-19 h awake, performance on some tests is equal to or worse than at a blood alcohol level of 0.05% (Williamson & Feyer, *Occup Environ Med* 2000;57:649-655). Microsleeps: brief lapses into sleep, lasting a few seconds, that the person often doesn't notice.
+- **History of surgery (ep 24):** Trepanation (drilling/scraping holes in the skull) dates back at least 7,000 years; many skulls show healed bone at the edges, meaning the patient survived. In medieval Europe barber-surgeons cut hair, shaved and did bloodletting and minor surgery. Robert Liston (University College Hospital, London) was famed for speed; at least one amputation reportedly took under 30 seconds (Clin Orthop Relat Res 2021; RCSEd archive). 16 Oct 1846, Massachusetts General Hospital, Boston: dentist William Morton gave ether; surgeon John Collins Warren said "Gentlemen, this is no humbug." Joseph Lister's antiseptic system (carbolic acid, from 1867): his amputation deaths fell from 16 of 35 (45.7%, 1864-66) to 6 of 40 (15%, 1867-70) (Lister, Lancet 1870; James Lind Library; note small numbers and later debate, JRSM 2015). Rubber gloves: around 1889-90 William Halsted (Johns Hopkins, Baltimore) had Goodyear make rubber gloves for scrub nurse Caroline Hampton, whose hands reacted to mercuric chloride/carbolic acid; they married in 1890.

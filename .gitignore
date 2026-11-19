@@ -21,3 +21,8 @@ experiments/3d-lungs/frames*/
 experiments/3d-lungs/still_*.png
 experiments/3d-lungs/*.log
 assets/footage/ai/
+assets/mpfb/
+assets/models/
+*-short*.mp4
+cut-audio.wav
+still_*.jpg

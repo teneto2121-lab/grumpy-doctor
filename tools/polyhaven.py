@@ -16,3 +16,12 @@ elif sys.argv[1]=='get':
     f=get(f"https://api.polyhaven.com/files/{aid}")
     url=f['hdri'][res]['hdr']['url'];out=os.path.join(os.path.dirname(__file__),'..','assets','hdri',f'{aid}_{res}.hdr')
     open(out,'wb').write(urllib.request.urlopen(urllib.request.Request(url,headers=UA),timeout=120).read());print('saved',out)
+elif sys.argv[1]=='model':
+    # python3 tools/polyhaven.py model <asset_id> [res=1k] -> assets/models/<id>/<id>.gltf (+ textures)
+    aid=sys.argv[2];res=sys.argv[3] if len(sys.argv)>3 else '1k'
+    g=get(f"https://api.polyhaven.com/files/{aid}")['gltf'][res]['gltf']
+    base=os.path.join(os.path.dirname(__file__),'..','assets','models',aid);os.makedirs(base,exist_ok=True)
+    for rel,info in [(os.path.basename(g['url']),g)]+list(g.get('include',{}).items()):
+        p=os.path.join(base,rel);os.makedirs(os.path.dirname(p),exist_ok=True)
+        open(p,'wb').write(urllib.request.urlopen(urllib.request.Request(info['url'],headers=UA),timeout=120).read())
+    print('saved',base)

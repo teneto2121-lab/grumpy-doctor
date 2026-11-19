@@ -313,7 +313,8 @@ function renderMain(t){
   else{
     if(pf<1){ctx.save();ctx.globalAlpha=1-pf;if(FS){const sh=shakeAt(s);if(sh)ctx.translate(sh[0],sh[1]);window.stage(s,t)}else drawCard(s,INTRO,cardA);ctx.restore()}
     if(pf>0)punchFX(t,pf,out);
-    ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();
+    // window.NO_DOC: voice only, no cartoon doctor on screen (3D-person episodes)
+    if(!window.NO_DOC){ctx.save();ctx.translate(dx,dy);ctx.scale(ds,ds);doctor(p,t);ctx.restore();}
     if(out)outroFX(t);
     const pw=punchWord(s);if(pw&&pf>.5){ctx.save();ctx.translate(W/2,400);ctx.rotate(-.05);ctx.scale(1+.04*Math.sin(t*18),1);text(pw[0],0,0,Math.min(190,1500/pw[0].length),{fill:'#ffd60a',sw:28,scale:pop(pw[1],0,.25)});ctx.restore()}
   }

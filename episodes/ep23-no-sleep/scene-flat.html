@@ -1,0 +1,77 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style></head><body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script src="../../engine/core.js"></script>
+<script src="../../engine/stick.js"></script>
+<script>
+// ===== Ep23 in the flat stick-people style (title on top, 16:9 story panel) =====
+window.FULLSCREEN=true;window.NO_DOC=true;window.OUT_FPS=60;window.CAP_Y=1420;window.INTRO_END=0.001;window.ENDING='cut';window.FOLLOW=false;
+const MOOD=[[0,.5]],POSES=[[0,'rest']];function content(t){}
+window.KEYWORDS=['eleven','fine.','nineteen','drinking.','moody.','forget','microsleeps.','things','1964.','sevens.','sixty-five.','forgot','fifteen','guinness','sleep,'];
+const CUTS=[3.69,6.75,11.53,15.07,20.61,22.77,26.62,33.45,38.05];
+window.SFX=[[0,'whoosh',.5],[1.0,'tick',.3],[2.0,'tick',.3],[3.0,'tick',.3],[3.69,'whoosh',.7],[4.3,'pop',.5],[5.45,'sparkle',.6],[6.75,'whoosh',.7],[8.35,'fall',.5],[9.05,'crack',.7],
+ [10.13,'pop',.7],[11.53,'whoosh',.7],[11.7,'blip',.4],[12.07,'stamp',.5],[13.0,'blip',.4],[14.55,'pop',.4],[15.07,'whoosh',.7],[15.8,'fall',.35],[16.74,'crack',.55],[18.94,'fall',.35],[20.07,'crack',.6],[20.61,'whoosh',.7],[21.2,'beep',.4],[22.2,'pop',.5],[22.77,'whoosh',.8],[25.2,'stamp',.7],[26.62,'whoosh',.7],[28.2,'tick',.5],[28.6,'tick',.5],[29.0,'tick',.5],[29.4,'tick',.5],[29.8,'tick',.5],[30.92,'ding',.5],[32.0,'beep',.45],[33.45,'whoosh',.7],[34.5,'sparkle',.4],[35.83,'stamp',.9],[38.05,'whoosh',.8]];
+const HRS=[[0,0],[3.69,4],[6.75,19],[11.53,60],[15.07,84],[20.61,140],[22.77,200],[26.62,250],[30.92,264]];
+function hoursAt(s){for(let i=HRS.length-1;i>0;i--)if(s>=HRS[i][0])return lerp(HRS[i-1][1],HRS[i][1],easeInOut(clamp((s-HRS[i][0])/1.2)));return HRS[0][1]}
+function counter(s){if(s>=33.45&&s<38.05){const m=Math.min(886,Math.floor(886*easeOut(clamp((s-33.6)/2.2))));srect(24,22,250,92,'#1b2440',16,4);text('ASLEEP',149,52,26,{fill:'#9ad1ff',sw:0,shadow:false});text(`${Math.floor(m/60)}H ${String(m%60).padStart(2,'0')}M`,149,92,42,{fill:'#fff',sw:0,shadow:false});return}
+  if(s>=38.05){srect(24,22,250,92,'#fff',16,4);text('DAY 1',149,56,44,{fill:SOL,sw:0,shadow:false});text('0 HOURS AWAKE',149,94,24,{fill:'#555',sw:0,shadow:false});return}
+  const h=Math.round(hoursAt(s)),d=Math.min(11,1+Math.floor(h/24));srect(24,22,250,92,'#fff',16,4);text(`DAY ${d}`,149,56,44,{fill:SOL,sw:0,shadow:false});text(`${h} HOURS AWAKE`,149,94,24,{fill:h>40?C.red:'#555',sw:0,shadow:false})}
+function cutKick(s){let l=0;for(const c of CUTS)if(s>=c)l=c;return .05*Math.exp(-(s-l)*8)}
+function room(night,lampOn){wallP(night?'#2d3658':'#e8d9b8',night?'#29314f':'#e2d1ad');windowP(640,70,170,150,night);floorP(470,night?'#3a3046':'#b98a5a',night?'#332a3e':'#a87c50')}
+
+window.stage=function(s,t){ST=t;backdrop();titleTop('What 11 days without sleep','does to your body 😵');
+  if(s<3.69){panel(()=>{room(1);clockP(910,150,48,s*5);bedP(160,470,560);
+      const o=person({x:335,y:418,sit:1,s:1.3,f:1,rot:-Math.PI/2,top:'#d9564a',bottom:'#3d5a8c',lean:0,hd:-.1,aR:[2.2,-.7],aL:[.2,.1],eyes:'wide',look:[1,-1],bags:.4,hair:'#3a2a1c'});
+      duvetP(318,470,410);const p=[o.hR[0]+6,o.hR[1]-26];glow(p[0],p[1]+30,170);phoneP(p[0],p[1],.3);},[540,330,1.08+.05*s/3.69+cutKick(s)]);
+    }
+  else if(s<6.75){panel(()=>{room(0);const b=Math.abs(Math.sin((s-3.69)*7))*(s<5.3?14:0),smug=s>=5.45;shade(540,520,70);
+      person({x:540,y:520-b,f:0,s:1.25,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',aL:[2.6,-.2],aR:smug?[.5,1.9]:[2.6,-.2],lL:[.12,0],lR:[-.12,0],eyes:smug?'half':'open',mouth:'grin',brow:smug?-.3:.4});
+      },[540,330,1.12+cutKick(s)]);numCard('FEELING FINE',PY+130,s,4.81,'#7ae582',90)}
+  else if(s<11.53){panel(()=>{room(0);clockP(900,150,50,s*1.3+7);const sway=Math.sin((s-6.75)*2.4)*.1,drop=s>8.2,reach=clamp((s-8.85)/.35);shade(470,520,70);
+      const o=person({x:470,y:520,f:1,s:1.25,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',lean:sway,hd:sway,aR:drop?[lerp(.9,.3,reach),lerp(1.3,.3,reach)]:[.9,1.3],eyes:s>9.6?'x':'half',mouth:'wavy',bags:.6});
+      const cx=o.hR[0]+16,cy=drop?Math.min(512,o.hR[1]+((s-8.2)**2)*700):o.hR[1]-6;
+      if(s<9.05)mugP(cx,cy+14);else{burstP(cx,500,22,8,C.red);srect(cx-30,505,22,10,'#e05a3a',3,3);srect(cx+6,500,26,12,'#e05a3a',3,3)}
+      if(s>10.13)beerP(720,520,pop(s,10.13,.3)*1.2);},[520,330,1.12+cutKick(s)]);
+    numCard('19 HOURS',PY+130,s,7.0,'#fff',80);if(s>10.13)numCard('= DRUNK',PY+PH-90,s,10.13,C.red,100)}
+  else if(s<15.07){panel(()=>{room(0);shade(380,520,70);shade(760,520,70);const forget=s>=12.57;
+      const me=person({x:380,y:520,f:1,s:1.25,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',aL:[.9,1.9],aR:forget?[.6,2.2]:[.9,1.9],eyes:forget?'open':'half',look:forget?[0,-1]:[0,0],brow:forget?.9:-1,mouth:forget?'o':'frown',bags:.8});
+      person({x:760,y:520,f:-1,s:1.2,top:'#4f8a4b',bottom:'#6b5a45',hair:'#b5652e',aR:s<12.07?[1.6,.5]:[.2,.1],eyes:s>12.07?'wide':'open',mouth:s<12.07?'smile':'o'});
+      if(s<12.07)bubbleP(800,170,200,70,'Morning!',pop(s,11.6,.2));
+      cloudP(me.head[0]-10,me.head[1]-90,.9,t);
+      if(forget){const msg='I was going to say...',n=Math.max(0,msg.length-Math.floor(clamp((s-13.6)/.9)*msg.length));bubbleP(560,150,330,80,s<14.55?msg.slice(0,n):'',pop(s,12.6,.25),28);if(s>=14.55)text('???',560,154,56,{fill:C.red,sw:0,shadow:false,scale:pop(s,14.55,.25)})}
+      },[560,320,1.08+cutKick(s)]);if(s>12.07&&s<12.57)numCard('MOODY',PY+PH-90,s,12.07,'#fff',100)}
+  else if(s<20.61){const nod=[[15.77,16.74],[18.94,20.07]];let dr=0,snap=-1;for(const [a,b] of nod){if(s>=a&&s<b)dr=easeInOut(clamp((s-a)/(b-a-.1)));if(s>=b&&s<b+.5)snap=s-b}
+    panel(()=>{room(1);deskP(520,380,420);chairP(410,420,1);laptopP(760,380,1,1-dr*.7);
+      const o=person({x:420,y:418,sit:1,f:1,s:1.15,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',lean:.1+dr*.4,hd:dr*.9,aR:[1.3,.2+dr*.3],aL:[1.2,.3],lL:[1.55,1.6],lR:[1.5,1.55],eyes:dr>.4?'closed':(snap>=0?'wide':'half'),mouth:snap>=0?'o':'flat',bags:.9,sweat:snap>=0});
+      if(snap>=0&&snap<.4)burstP(o.head[0],o.head[1],50,12,C.yellow);
+      if(dr>.3){ctx.fillStyle=`rgba(0,0,0,${clamp((dr-.3)*1.6)*.92})`;ctx.fillRect(0,0,PW,PH);ctx.globalAlpha=clamp((dr-.5)*3);ctx.strokeStyle='#7ae582';ctx.lineWidth=5;ctx.beginPath();for(let x=0;x<=PW;x+=8){const y=330+Math.sin(x*.02+s*8)*3;x?ctx.lineTo(x,y):ctx.moveTo(x,y)}ctx.stroke();text('BRAIN: OFF',PW/2,280,44,{fill:'#7ae582',sw:0,shadow:false});ctx.globalAlpha=1}
+      },[560,320,1.1+.08*clamp((s-15.07)/5.5)+cutKick(s)]);
+    if(s>17.99)numCard('MICROSLEEP',PY+PH-90,s,17.99,C.red,100)}
+  else if(s<22.77){const turn=s>21.2;panel(()=>{room(1);deskP(520,380,420);chairP(410,420,1);laptopP(760,380,1,1);
+      // doorway with a shadow figure
+      srect(80,150,170,320,'#141a2c',4,5);const fl=s>22.0?(Math.sin(s*60)>0?1:0):1;
+      if(fl&&s<22.6){ctx.save();ctx.globalAlpha=.95;person({x:165,y:470,f:0,s:1.15,top:'#05070c',bottom:'#05070c',skin:'#05070c',eyes:'open',mouth:'flat',gloves:'#05070c',shoes:'#05070c'});ctx.restore()}
+      person({x:420,y:418,sit:1,f:turn?-1:1,s:1.15,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',lean:turn?-.05:.1,aR:[1.3,.3],aL:[1.2,.3],lL:[1.55,1.6],lR:[1.5,1.55],eyes:turn?'wide':'half',mouth:turn?'scream':'flat',bags:.9,sweat:turn})},[440,320,1.12+cutKick(s)]);
+    if(s>22.2)numCard("IT'S NOT REAL",PY+PH-90,s,22.2,'#fff',96)}
+  else if(s<26.62){panel(()=>{ctx.save();ctx.filter='sepia(.85) contrast(1.05)';wallP('#e8d9b8','#e2d1ad');floorP(470,'#b98a5a','#a87c50');
+      srect(360,70,360,100,'#fff',8,4);text('264 HOURS',540,124,56,{fill:C.red,sw:0,shadow:false});
+      person({x:300,y:540,f:1,s:1.25,top:'#c0392b',bottom:'#2c3e50',hair:'#4a3020',aR:[2.6,-.2],eyes:'half',mouth:'grin',bags:.8});
+      person({x:520,y:540,f:-1,s:1.15,top:'#2e86ab',bottom:'#5a4a3c',hair:'#b5652e',aR:[1.4,.5],eyes:'open',mouth:'smile'});
+      person({x:760,y:540,f:-1,s:1.2,top:'#f4f4f4',bottom:'#3a3a3a',coat:1,hair:'#777',aR:[1.2,1.3],eyes:'open',mouth:'flat'});ctx.restore()},[540,320,1.1+cutKick(s)]);
+    if(s>23.1&&s<25.2)numCard('AGE 17',PY+PH-90,s,23.1,'#fff',90);if(s>25.2)numCard('1964',PY+PH-90,s,25.2,C.yellow,120)}
+  else if(s<33.45){panel(()=>{room(0);const blank=s>31.95;
+      person({x:340,y:520,f:1,s:1.25,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',eyes:blank?'half':'open',look:[0,-1],mouth:blank?'o':'flat',bags:1,lean:.04});
+      const doc=person({x:780,y:520,f:-1,s:1.25,top:'#f4f4f4',bottom:'#3a3a3a',coat:1,hair:'#777',aR:[1.3,1.2],eyes:'open',mouth:s<28.2?'o':'flat'});
+      srect(doc.hR[0]-34,doc.hR[1]-40,40,54,'#c9a36a',4,3);
+      const seq=[[28.2,'100'],[28.6,'93'],[29.0,'86'],[29.4,'79'],[29.8,'72'],[30.92,'65']];let cur='';for(const [a,n] of seq)if(s>=a)cur=n;
+      if(s>=28.2&&s<31.95)bubbleP(470,270,180,90,cur,pop(s,28.2,.2),52);if(s>=31.95)bubbleP(470,270,220,90,'65... ?',pop(s,31.95,.25),46)},[540,320,1.12+cutKick(s)]);
+    if(s<28.1)numCard('DAY 11 TEST',PY+110,s,26.77,'#fff',80);if(s>=28.2&&s<31.95)numCard('100 − 7 − 7 − 7...',PY+110,s,28.2,'#9ad1ff',70);if(s>32.06)numCard('FORGOT WHAT HE WAS DOING',PY+PH-90,s,32.06,'#fff',56)}
+  else if(s<38.05){panel(()=>{room(0);bedP(160,470,560);const o=person({x:335,y:418,sit:1,s:1.3,f:1,rot:-Math.PI/2,top:'#d9564a',bottom:'#3d5a8c',hair:'#3a2a1c',aR:[.3,.2],aL:[.25,.1],eyes:'closed',mouth:'smile'});
+      duvetP(318,470,410);zzz(o.head[0]+30,o.head[1]-40,s)},[540,330,1.1+cutKick(s)]);
+    if(s>35.83){const k=1+2*Math.max(0,1-(s-35.83)/.18);ctx.save();ctx.translate(W/2,PY+PH/2);ctx.rotate(-.12);ctx.scale(k,k);ctx.globalAlpha=Math.min(1,(s-35.83)/.12);ctx.lineWidth=12;ctx.strokeStyle=C.red;ctx.strokeRect(-330,-70,660,140);text('RECORD BANNED',0,0,78,{fill:C.red,sw:0,shadow:false});ctx.restore()}}
+  else{panel(()=>{room(1);clockP(910,150,48,s*5);bedP(160,470,560);
+      const o=person({x:335,y:418,sit:1,s:1.3,f:1,rot:-Math.PI/2,top:'#d9564a',bottom:'#3d5a8c',lean:0,hd:-.1,aR:[2.2,-.7],aL:[.2,.1],eyes:'wide',look:[1,-1],bags:.4,hair:'#3a2a1c'});
+      duvetP(318,470,410);const p=[o.hR[0]+6,o.hR[1]-26];glow(p[0],p[1]+30,170);phoneP(p[0],p[1],.3)},[540,330,1.08+.05*(s-38.05)/2+cutKick(s)]);
+    if(s>38.2)numCard('PUT THE PHONE DOWN',PY+PH-90,s,38.2,C.yellow,72)}
+  panel(()=>counter(s));wipe(s,CUTS)};
+</script></body></html>
